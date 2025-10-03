@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolio/login_screen.dart';
+import 'package:portfolio/skills.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -356,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final Map<String, Widget> screenMap = {
     'home': const HomePage(),
     // 'projects': const PortfolioScreen(),
-    // 'skills': const SkillsScreen(),
+     'skills': const SkillsScreen(),
     // 'experience': LearningScreen(),
     // 'github': const GitHubScreen(),
     // 'leetcode': const LeetcodeScreen(),
