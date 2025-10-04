@@ -180,6 +180,7 @@ class _GitHubScreenState extends State<GitHubScreen> {
                                       autofocus: true,
                                       child: GitHubContributionsWidget(
                                         username: 'pratikkumarpradhan',
+
                                         token: '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',
                                         height: 180,
                                         contributionColors: const [
