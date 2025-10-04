@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:portfolio/register_screen.dart';
+import 'package:portfolio/login/register_screen.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

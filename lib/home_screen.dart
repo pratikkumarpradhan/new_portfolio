@@ -1,8 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:portfolio/login_screen.dart';
-import 'package:portfolio/skills.dart';
+import 'package:portfolio/connect_screen.dart';
+import 'package:portfolio/github/github_screen.dart';
+import 'package:portfolio/login/login_screen.dart';
+import 'package:portfolio/skills/skills.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -359,9 +361,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // 'projects': const PortfolioScreen(),
      'skills': const SkillsScreen(),
     // 'experience': LearningScreen(),
-    // 'github': const GitHubScreen(),
+    'github': const GitHubScreen(),
     // 'leetcode': const LeetcodeScreen(),
-    // 'about': const AboutScreen(),
+    'about': const AboutScreen(),
     // 'blog': const BlogScreen(),
   };
 
