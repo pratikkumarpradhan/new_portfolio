@@ -181,7 +181,7 @@ class _GitHubScreenState extends State<GitHubScreen> {
                                       child: GitHubContributionsWidget(
                                         username: 'pratikkumarpradhan',
 
-                                        token: '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',
+                                        token: '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',
                                         height: 180,
                                         contributionColors: const [
                                           Color(0xFF40C463),

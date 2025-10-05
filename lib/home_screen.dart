@@ -1263,15 +1263,20 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    "Hello, I'm ",
-                    style: GoogleFonts.saira(
-                      color: Colors.white,
-                      fontSize: 40,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                  LayoutBuilder(
+        builder: (context, constraints) {
+          bool isMobile = constraints.maxWidth < 600; // <600 = mobile
+          return Text(
+            "Hello, I'm ",
+            style: GoogleFonts.saira(
+              color: Colors.white,
+              fontSize: isMobile ? 24 : 40, // smaller on mobile
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          );
+        },
+      ),
                   const SizedBox(height: 8),
                   Flexible(
                     child: ClipRRect(
@@ -1299,25 +1304,31 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               ),
                             ],
                           ),
-                          child: TypewriterText(
-                            text: "Pratik Kumar Pradhan",
-                            style: GoogleFonts.cinzelDecorative(
-                              fontSize: 45,
-                              fontWeight: FontWeight.w700,
-                              foreground: Paint()
-                                ..shader = const LinearGradient(
-                                  colors: [
-                                    Colors.tealAccent,
-                                    Colors.lightBlueAccent,
-                                    Colors.cyanAccent,
-                                  ],
-                                ).createShader(
-                                  const Rect.fromLTWH(0.0, 0.0, 300.0, 70.0),
-                                ),
-                            ),
-                            duration: const Duration(milliseconds: 150),
-                            delay: const Duration(milliseconds: 500),
-                          ),
+                          child: LayoutBuilder(
+  builder: (context, constraints) {
+    // check screen width
+    bool isMobile = constraints.maxWidth < 600; // <600 means mobile
+    return TypewriterText(
+      text: "Pratik Kumar Pradhan",
+      style: GoogleFonts.cinzelDecorative(
+        fontSize: isMobile ? 28 : 45, // small on mobile
+        fontWeight: FontWeight.w700,
+        foreground: Paint()
+          ..shader = const LinearGradient(
+            colors: [
+              Colors.tealAccent,
+              Colors.lightBlueAccent,
+              Colors.cyanAccent,
+            ],
+          ).createShader(
+            const Rect.fromLTWH(0.0, 0.0, 300.0, 70.0),
+          ),
+      ),
+      duration: const Duration(milliseconds: 150),
+      delay: const Duration(milliseconds: 500),
+    );
+  },
+),
                         ),
                       ),
                     ),

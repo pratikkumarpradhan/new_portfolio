@@ -175,27 +175,44 @@ class _GitHubContributionsWidgetState extends State<GitHubContributionsWidget> {
     final index = (count ~/ 2).clamp(0, widget.contributionColors.length - 1);
     return widget.contributionColors[index];
   }
+void _scrollToCurrentMonth() {
+  final monthGroups = _groupByMonth();
+  if (monthGroups.isEmpty) return;
 
-  void _scrollToCurrentMonth() {
-    final monthGroups = _groupByMonth();
-    if (monthGroups.isEmpty) return;
+  const targetMonth = '2025-07'; // Target June 2025
+  double offset = 0;
+  bool foundTarget = false;
 
-    final currentMonth = DateFormat('yyyy-MM').format(DateTime.now());
-    final targetMonth =
-        monthGroups.containsKey(currentMonth) ? currentMonth : '2025-04';
-    double offset = 0;
-
-    for (final entry in monthGroups.entries) {
-      if (entry.key == targetMonth) break;
-      offset += (entry.value.length / 7).ceil() * 18 + 12;
+  // Calculate the offset to the start of June
+  for (final entry in monthGroups.entries) {
+    if (entry.key == targetMonth) {
+      foundTarget = true;
+      break;
     }
-
-    scrollController.animateTo(
-      offset - 100,
-      duration: const Duration(milliseconds: 800),
-      curve: Curves.easeInOut,
-    );
+    offset += (entry.value.length / 7).ceil() * 18 + 12; // Width of each month
   }
+
+  if (!foundTarget) return; // Exit if June 2025 is not found
+
+  // Get the width of June
+  final juneDays = monthGroups[targetMonth]!;
+  final juneWidth = (juneDays.length / 7).ceil() * 18 + 12;
+
+  // Get the viewport width (approximated as widget width minus padding)
+  final viewportWidth = MediaQuery.of(context).size.width - 80; // 40 padding on each side
+
+  // Calculate the offset to center June
+  final centerOffset = offset + (juneWidth / 2) - (viewportWidth / 2);
+
+  // Ensure the offset is within valid bounds
+  final finalOffset = centerOffset.clamp(0.0, scrollController.position.maxScrollExtent);
+
+  scrollController.animateTo(
+    finalOffset,
+    duration: const Duration(milliseconds: 800),
+    curve: Curves.easeInOut,
+  );
+}
 
 
   void _onScrollbarDrag(double value) {
