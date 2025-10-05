@@ -292,131 +292,116 @@ class _GetInTouchCardState extends State<GetInTouchCard> {
     });
   }
 
-  Future<void> _sendEmail() async {
-    final Uri emailUri = Uri(
-      scheme: 'mailto',
-      path: 'pratikkumarpradhan2006@gmail.com',
-      queryParameters: {
-        'subject': 'Message from Portfolio App',
-        'body': 'Hello Pratik,\n\n',
-      },
-    );
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri, mode: LaunchMode.externalApplication);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open email client')),
-      );
-    }
-  }
+Future<void> _sendEmail() async {
+  final Uri emailUri = Uri(
+    scheme: 'mailto',
+    path: 'pratikkumarpradhan2006@gmail.com',
+    queryParameters: {
+      'subject': 'Message from Portfolio App',
+      'body': 'Hello Pratik,\n\n',
+    },
+  );
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: 600,
-        margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xCC0B132B),
-              Color(0x99112233),
-              Color(0x66121A2E),
+  if (await canLaunchUrl(emailUri)) {
+    await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+  } else {
+    throw 'Could not launch email client';
+  }
+}
+
+@override
+Widget build(BuildContext context) {
+  return StreamBuilder<User?>(
+    stream: FirebaseAuth.instance.authStateChanges(),
+    builder: (context, snapshot) {
+      final user = snapshot.data;
+      final isLoggedIn = user != null;
+
+      return Center(
+        child: Container(
+          width: 600,
+          margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xCC0B132B),
+                Color(0x99112233),
+                Color(0x66121A2E),
+              ],
+            ),
+            border: Border.all(color: Colors.white54, width: 1.2),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.teal.shade900,
+                  shape: BoxShape.circle,
+                ),
+                child: Image.asset(
+                  'assets/images/gmail.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Get In Touch',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                isLoggedIn
+                    ? 'Logged in as: ${user?.email ?? "Unknown"}'
+                    : 'Please sign in to send a message',
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal.shade700,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
+                ),
+                onPressed: () async {
+                  if (isLoggedIn) {
+                    await _sendEmail();
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                    );
+                  }
+                },
+                child: Text(
+                  isLoggedIn ? 'Send Message' : 'Sign In / Sign Up',
+                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                ),
+              ),
             ],
           ),
-          border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.2),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.28),
-              blurRadius: 24,
-              offset: const Offset(0, 10),
-            ),
-            BoxShadow(
-              color: Colors.cyanAccent.withOpacity(0.05),
-              blurRadius: 16,
-              spreadRadius: 1,
-            ),
-          ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.teal.shade900,
-                shape: BoxShape.circle,
-              ),
-              child:  Image.asset(
-                
-                    'assets/images/gmail.png',
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.contain,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Get In Touch',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _isLoggedIn
-                  ? 'Logged in as: ${_userEmail ?? "Unknown"}'
-                  : 'Please sign in to send a message',
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal.shade700,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 24,
-                ),
-              ),
-              onPressed: () async {
-                if (_isLoggedIn) {
-                  await _sendEmail();
-                } else {
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginPage()),
-                  );
-                  if (result == true) {
-                    await _checkLoginStatus();
-                  }
-                }
-              },
-              child: Text(
-                _isLoggedIn ? 'Send Message' : 'Sign In / Sign Up',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+      );
+    },
+  );
+}
 }
 
 class _CircleBox extends StatefulWidget {
@@ -447,7 +432,7 @@ class _CircleBoxState extends State<_CircleBox> {
   if (widget.isLinkedIn) {
     return ClipOval(
       child: Image.asset(
-        'assets/images/linkedin.png',
+        'assets/images/linkedin1.png',
         width: 60,
         height: 60,
         fit: BoxFit.cover,
@@ -456,7 +441,7 @@ class _CircleBoxState extends State<_CircleBox> {
   } else if (widget.isInstagram) {
     return ClipOval(
       child: Image.asset(
-        'assets/images/instagram.png',
+        'assets/images/instagram1.png',
         width: 60,
         height: 60,
         fit: BoxFit.cover,
