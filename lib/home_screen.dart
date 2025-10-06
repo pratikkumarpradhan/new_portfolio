@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolio/connect_screen.dart';
 import 'package:portfolio/github/github_screen.dart';
 import 'package:portfolio/login/login_screen.dart';
+import 'package:portfolio/projects/project_screen.dart';
 import 'package:portfolio/skills/skills.dart';
 
 import 'package:url_launcher/url_launcher.dart';
@@ -358,8 +359,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final Map<String, Widget> screenMap = {
     'home': const HomePage(),
-    // 'projects': const PortfolioScreen(),
-     'skills': const SkillsScreen(),
+    'projects': const PortfolioScreen(),
+    'skills': const SkillsScreen(),
     // 'experience': LearningScreen(),
     'github': const GitHubScreen(),
     // 'leetcode': const LeetcodeScreen(),
