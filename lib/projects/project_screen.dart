@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:portfolio/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/rendering.dart';
+import 'package:portfolio/projects/add_project.dart';
 import 'package:portfolio/projects/project_details_screen.dart';
 import 'dart:ui';
 import 'dart:async';
@@ -94,7 +93,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
+                  MaterialPageRoute(builder: (_) => const AddProjectScreen()),
                 );
               },
               icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -127,7 +126,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               foregroundColor: Colors.black,
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                MaterialPageRoute(builder: (_) => const AddProjectScreen()),
               ),
               child: const Icon(Icons.add),
             )
@@ -202,7 +201,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               //     Navigator.push(
                               //       context,
                               //       MaterialPageRoute(
-                              //         builder: (_) => HomeScreen(project: app, documentId: docId),
+                              //         builder: (_) => AddProjectScreen(project: app, documentId: docId),
                               //       ),
                               //     );
                               //   },
