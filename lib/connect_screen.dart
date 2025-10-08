@@ -233,19 +233,29 @@ class _YouTubeCircleButtonState extends State<_YouTubeCircleButton> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1),
+              ElevatedButton(
+                onPressed: widget.onTap,
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  backgroundColor: Colors.transparent,
+                 // shadowColor: Colors.redAccent.withOpacity(0.6),
+                  elevation: 8,
+                  side: const BorderSide(color: Colors.white, width: 1),
+                  padding: EdgeInsets.zero,
                 ),
-                child: Center(
-                  child: Image.asset(
-                    'assets/images/youtube.png',
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.contain,
+                child: Container(
+                  width: 90,
+                  height: 90,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/youtube.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
               ),
