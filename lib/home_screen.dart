@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:portfolio/blogs/blog_screen.dart';
 import 'package:portfolio/connect_screen.dart';
 import 'package:portfolio/github/github_screen.dart';
 import 'package:portfolio/leetcode/leetcode_screen.dart';
@@ -366,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'github': const GitHubScreen(),
     'leetcode': const LeetcodeScreen(),
     'about': const AboutScreen(),
-    // 'blog': const BlogScreen(),
+    'blog': const BlogScreen(),
   };
 
   @override
@@ -1272,7 +1273,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             "Hello, I'm ",
             style: GoogleFonts.saira(
               color: Colors.white,
-              fontSize: isMobile ? 24 : 40, // smaller on mobile
+              fontSize: isMobile ? 27 : 40, // smaller on mobile
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
@@ -1313,7 +1314,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return TypewriterText(
       text: "Pratik Kumar Pradhan",
       style: GoogleFonts.cinzelDecorative(
-        fontSize: isMobile ? 28 : 45, // small on mobile
+        fontSize: isMobile ? 33 : 45, // small on mobile
         fontWeight: FontWeight.w700,
         foreground: Paint()
           ..shader = const LinearGradient(
@@ -1383,17 +1384,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               ),
                             ],
                           ),
-                          child: TypewriterText(
-                            text: 'App Developer . Web Developer',
-                            style: GoogleFonts.comfortaa(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: isHovered ? Colors.cyanAccent.shade200 : Colors.white,
-                              letterSpacing: 1.1,
-                            ),
-                            duration: const Duration(milliseconds: 100),
-                            delay: const Duration(milliseconds: 500),
-                          ),
+                         child: TypewriterText(
+  text: 'App Developer . Web Developer',
+  style: GoogleFonts.comfortaa(
+    fontSize: MediaQuery.of(context).size.width < 600 ? 16 : 18, // smaller on mobile
+    fontWeight: FontWeight.w700,
+    color: Colors.white,
+    letterSpacing: 1.1,
+  ),
+  duration: const Duration(milliseconds: 100),
+  delay: const Duration(milliseconds: 500),
+),
                         ),
                       ),
                     ),
@@ -1462,15 +1463,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 size: 22,
                               ),
                               const SizedBox(width: 10),
-                              Text(
-                                'View CV',
-                                style: GoogleFonts.comfortaa(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w700,
-                                  color: isHovered ? Colors.cyanAccent.shade200 : Colors.white,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
+                           Text(
+  'View CV',
+  style: GoogleFonts.playwriteAuNsw(
+    fontSize: MediaQuery.of(context).size.width < 600 ? 14 : 17, // smaller on mobile
+    fontWeight: FontWeight.w700,
+    color: Colors.white,
+    letterSpacing: 0.5,
+  ),
+),
                             ],
                           ),
                         ),
@@ -1666,8 +1667,9 @@ class _HoverZoomButtonState extends State<_HoverZoomButton> with SingleTickerPro
                 ),
                 child: Text(
                   widget.title,
-                  style: GoogleFonts.satisfy(
-                    fontWeight: FontWeight.w600,
+                  //style: GoogleFonts.pacifico(
+                  style: GoogleFonts.montaga(
+                    //fontWeight: FontWeight.w600,
                     fontSize: widget.fontSize ?? 18,
                     color: widget.isSelected ? Colors.cyanAccent : Colors.white,
                   ),
@@ -1824,7 +1826,7 @@ class _HoverSlideButtonState extends State<_HoverSlideButton> with SingleTickerP
                 ),
                 child: Text(
                   widget.title,
-                  style: GoogleFonts.satisfy(
+                  style: GoogleFonts.montaga(
                     fontWeight: FontWeight.w600,
                     fontSize: widget.fontSize ?? 16,
                     color: widget.isSelected ? Colors.cyanAccent : Colors.white,
