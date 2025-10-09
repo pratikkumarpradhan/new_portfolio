@@ -100,8 +100,10 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         child: SingleChildScrollView(
           child: Center( // Center the content column horizontally
             child: Card(
-              margin: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
-              elevation: 8.0,
+margin: EdgeInsets.symmetric(
+  horizontal: MediaQuery.of(context).size.width < 600 ? 8.0 : 32.0,
+  vertical: 16.0,
+),              elevation: 8.0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
               ),
@@ -201,31 +203,67 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                                             },
                                           ),
 
-                                          // Arrows
-                                          Positioned(
-                                            left: 8,
-                                            top: 0,
-                                            bottom: 0,
-                                            child: Center(
-                                              child: IconButton(
-                                                icon: const Icon(Icons.arrow_back_ios),
-                                                onPressed: () => _goToPage(_currentIndex - 1),
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            right: 8,
-                                            top: 0,
-                                            bottom: 0,
-                                            child: Center(
-                                              child: IconButton(
-                                                icon: const Icon(Icons.arrow_forward_ios),
-                                                onPressed: () => _goToPage(_currentIndex + 1),
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
+                                  // Arrows (square shape for all screens)
+Positioned(
+  left: 12,
+  top: 0,
+  bottom: 0,
+  child: Center(
+    child: Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () => _goToPage(_currentIndex - 1),
+        child: const SizedBox(
+          width: 42,
+          height: 42,
+          child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
+        ),
+      ),
+    ),
+  ),
+),
+Positioned(
+  right: 12,
+  top: 0,
+  bottom: 0,
+  child: Center(
+    child: Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () => _goToPage(_currentIndex + 1),
+        child: const SizedBox(
+          width: 42,
+          height: 42,
+          child: Icon(Icons.arrow_forward_ios, color: Colors.white, size: 22),
+        ),
+      ),
+    ),
+  ),
+),
                                         ],
                                       ),
                                     ),
