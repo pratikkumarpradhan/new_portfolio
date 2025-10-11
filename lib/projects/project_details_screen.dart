@@ -234,8 +234,40 @@ Positioned(
     ),
   ),
 ),
+// // Square Arrow Buttons (adjusted for mobile)
+// Positioned(
+//   left: MediaQuery.of(context).size.width < 600 ? 2 : 12,
+//   top: 0,
+//   bottom: 0,
+//   child: Center(
+//     child: Container(
+//       decoration: BoxDecoration(
+//         color: Colors.white.withOpacity(0.15),
+//         borderRadius: BorderRadius.circular(8),
+//         border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.black.withOpacity(0.3),
+//             blurRadius: 8,
+//             offset: const Offset(0, 3),
+//           ),
+//         ],
+//       ),
+//       child: InkWell(
+//         borderRadius: BorderRadius.circular(8),
+//         onTap: () => _goToPage(_currentIndex - 1),
+//         child: const SizedBox(
+//           width: 42,
+//           height: 42,
+//           child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
+//         ),
+//       ),
+//     ),
+//   ),
+// ),
+
 Positioned(
-  right: 12,
+  right: MediaQuery.of(context).size.width < 600 ? 2 : 12,
   top: 0,
   bottom: 0,
   child: Center(
@@ -577,80 +609,93 @@ Positioned(
                                   ],
                                 ),
                               ),
+// Youtube Video Thumbnail (clickable)
+if (youtubeThumbnailUrl != null) ...[
+  Padding(
+    padding: EdgeInsets.symmetric(
+      horizontal: MediaQuery.of(context).size.width < 600 ? 8.0 : 16.0,
+    ),
+    child: Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xCC0B132B),
+            Color(0x99112233),
+            Color(0x66121A2E),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.22),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(8),
+      child: Center(
+        child: GestureDetector(
+          onTap: () => _launchYouTubeUrl(project.youtubeUrl),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Thumbnail with max size
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12.0),
+                child: Image.network(
+                  youtubeThumbnailUrl,
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width < 600 ? 320 : 560,
+                  height: MediaQuery.of(context).size.width < 600 ? 180 : 315,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.grey[300],
+                    width: MediaQuery.of(context).size.width < 600 ? 320 : 560,
+                    height: MediaQuery.of(context).size.width < 600 ? 180 : 315,
+                    child: const Icon(Icons.broken_image, size: 50, color: Colors.white),
+                  ),
+                ),
+              ),
 
-                              // Youtube Video Thumbnail (clickable)
-                              if (youtubeThumbnailUrl != null) ...[
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Color(0xCC0B132B),
-                                          Color(0x99112233),
-                                          Color(0x66121A2E),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.0),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.22),
-                                          blurRadius: 16,
-                                          offset: const Offset(0, 8),
-                                        ),
-                                      ],
-                                    ),
-                                    padding: const EdgeInsets.all(8),
-                                    child: GestureDetector(
-                                      onTap: () => _launchYouTubeUrl(project.youtubeUrl),
-                                      child: AspectRatio(
-                                        aspectRatio: 20 / 9, // Standard YouTube aspect ratio
-                                        child: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius: BorderRadius.circular(8.0),
-                                              child: Image.network(
-                                                youtubeThumbnailUrl,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error, stackTrace) => Container(
-                                                  color: Colors.grey[300],
-                                                  child: const Icon(Icons.broken_image, size: 50, color: Colors.white),
-                                                ),
-                                              ),
-                                            ),
-                                            // YouTube-style red play button with hover effect
-                                            MouseRegion(
-                                              onEnter: (_) => setState(() => _isPlayButtonHovered = true),
-                                              onExit: (_) => setState(() => _isPlayButtonHovered = false),
-                                              child: AnimatedScale(
-                                                scale: _isPlayButtonHovered ? 1.1 : 1.0, // Zoom in by 10% on hover
-                                                duration: const Duration(milliseconds: 200),
-                                                child: Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.red, // Using a brighter red color
-                                                    borderRadius: BorderRadius.circular(8.0), // Increased border radius for more rounded corners
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.play_arrow,
-                                                    color: Colors.white,
-                                                    size: 35.0, // Adjust size as needed
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-                              ],
+              // ElevatedButton with PNG
+              MouseRegion(
+                onEnter: (_) => setState(() => _isPlayButtonHovered = true),
+                onExit: (_) => setState(() => _isPlayButtonHovered = false),
+                child: AnimatedScale(
+                  
+                  scale: _isPlayButtonHovered ? 1.15 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.black.withOpacity(0.35),
+                      elevation: 12,
+                      padding: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: () => _launchYouTubeUrl(project.youtubeUrl),
+                    child: Image.asset(
+                      'assets/images/youtube.png', // PNG path
+                      width: MediaQuery.of(context).size.width < 600 ? 80 : 100,
+                      height: MediaQuery.of(context).size.width < 600 ? 80 : 100,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  ),
+  const SizedBox(height: 24),
+],
                             ],
                           ),
                         ),

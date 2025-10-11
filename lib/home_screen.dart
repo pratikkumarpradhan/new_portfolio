@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolio/blogs/blog_screen.dart';
 import 'package:portfolio/connect_screen.dart';
+import 'package:portfolio/experience_screen.dart';
 import 'package:portfolio/github/github_screen.dart';
 import 'package:portfolio/leetcode/leetcode_screen.dart';
 import 'package:portfolio/login/login_screen.dart';
@@ -363,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'home': const HomePage(),
     'projects': const PortfolioScreen(),
     'skills': const SkillsScreen(),
-    // 'experience': LearningScreen(),
+    'experience': LearningScreen(),
     'github': const GitHubScreen(),
     'leetcode': const LeetcodeScreen(),
     'about': const AboutScreen(),
