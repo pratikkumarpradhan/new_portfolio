@@ -312,10 +312,18 @@ Future<void> _sendEmail() async {
     },
   );
 
-  if (await canLaunchUrl(emailUri)) {
-    await launchUrl(emailUri, mode: LaunchMode.externalApplication);
-  } else {
-    throw 'Could not launch email client';
+  try {
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No email app found on this device')),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error opening email: $e')),
+    );
   }
 }
 
