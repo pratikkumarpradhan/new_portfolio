@@ -7,6 +7,7 @@ import 'package:portfolio/experience_screen.dart';
 import 'package:portfolio/github/github_screen.dart';
 import 'package:portfolio/leetcode/leetcode_screen.dart';
 import 'package:portfolio/login/login_screen.dart';
+import 'package:portfolio/login/register_screen.dart';
 import 'package:portfolio/projects/project_screen.dart';
 import 'package:portfolio/skills/skills.dart';
 
@@ -973,173 +974,208 @@ class _HomeScreenState extends State<HomeScreen> {
     ],
   ),
 ),
-      endDrawer: (isDesktop || isLandscape)
-          ? null
-          : Drawer(
-              backgroundColor: Colors.transparent,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: ClipRRect(
+     endDrawer: (isDesktop || isLandscape)
+    ? null
+    : Drawer(
+        backgroundColor: Colors.transparent,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                child: Container(
+                  decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xCC0B132B),
-                              Color(0x99112233),
-                              Color(0x66121A2E),
-                            ],
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xCC0B132B),
+                        Color(0x99112233),
+                        Color(0x66121A2E),
+                      ],
+                    ),
+                    border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.28),
+                        blurRadius: 24,
+                        offset: const Offset(0, 10),
+                      ),
+                      BoxShadow(
+                        color: Colors.cyanAccent.withOpacity(0.05),
+                        blurRadius: 16,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+                        child: Text(
+                          'Navigation',
+                          style: GoogleFonts.varelaRound(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
                           ),
-                          border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.28),
-                              blurRadius: 24,
-                              offset: const Offset(0, 10),
-                            ),
-                            BoxShadow(
-                              color: Colors.cyanAccent.withOpacity(0.05),
-                              blurRadius: 16,
-                              spreadRadius: 1,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
-                              child: Text(
-                                'Navigation',
-                                style: GoogleFonts.varelaRound(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            if (_isAdmin == true) ...[
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                child: ListTile(
-                                  onTap: _showAddButtonDialog,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                  tileColor: Colors.cyanAccent.withOpacity(0.08),
-                                  leading: const Icon(Icons.add, color: Colors.cyanAccent),
-                                  title: Text(
-                                    'Add New Button',
-                                    style: GoogleFonts.varelaRound(
-                                      fontSize: 16,
-                                      color: Colors.cyanAccent,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                            ],
-                            Expanded(
-                              child: _loading
-                                  ? const Center(child: CircularProgressIndicator())
-                                  : _isAdmin == true
-                                      ? ReorderableListView.builder(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                                          itemCount: navigationButtons.length,
-                                          onReorder: _updateButtonOrder,
-                                          itemBuilder: (context, index) {
-                                            final button = navigationButtons[index];
-                                            final isSelected = selectedIndex == index;
-                                            return Padding(
-                                              key: ValueKey(button.id),
-                                              padding: const EdgeInsets.symmetric(vertical: 4),
-                                              child: ListTile(
-                                                onTap: () => onNavTap(index),
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                                tileColor: isSelected ? Colors.cyan.withOpacity(0.18) : Colors.transparent,
-                                                leading: const Icon(Icons.drag_handle, color: Colors.white54, size: 20),
-                                                title: Text(
-                                                  button.title,
-                                                  style: GoogleFonts.varelaRound(
-                                                    fontSize: 18,
-                                                    color: isSelected ? Colors.cyanAccent : Colors.white,
-                                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                                  ),
-                                                ),
-                                                trailing: isSelected
-                                                    ? const Icon(Icons.check_circle, color: Colors.cyanAccent)
-                                                    : const SizedBox.shrink(),
-                                              ),
-                                            );
-                                          },
-                                        )
-                                      : ListView.builder(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                                          itemCount: navigationButtons.length + 1,
-                                          itemBuilder: (context, index) {
-                                            if (index == navigationButtons.length) {
-                                              return Padding(
-                                                padding: const EdgeInsets.symmetric(vertical: 4),
-                                                child: ListTile(
-                                                  onTap: () async {
-                                                    await FirebaseAuth.instance.signOut();
-                                                    if (context.mounted) {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(builder: (_) => const LoginPage()),
-                                                      );
-                                                    }
-                                                  },
-                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                                  tileColor: Colors.transparent,
-                                                  title: Text(
-                                                    'Login',
-                                                    style: GoogleFonts.varelaRound(
-                                                      fontSize: 18,
-                                                      color: Colors.white,
-                                                      fontWeight: FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                            final button = navigationButtons[index];
-                                            final isSelected = selectedIndex == index;
-                                            return Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 4),
-                                              child: ListTile(
-                                                onTap: () => onNavTap(index),
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                                tileColor: isSelected ? Colors.cyan.withOpacity(0.18) : Colors.transparent,
-                                                title: Text(
-                                                  button.title,
-                                                  style: GoogleFonts.varelaRound(
-                                                    fontSize: 18,
-                                                    color: isSelected ? Colors.cyanAccent : Colors.white,
-                                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                                  ),
-                                                ),
-                                                trailing: isSelected
-                                                    ? const Icon(Icons.check_circle, color: Colors.cyanAccent)
-                                                    : const SizedBox.shrink(),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                            ),
-                          ],
                         ),
                       ),
-                    ),
+                      if (_isAdmin == true) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: ListTile(
+                            onTap: _showAddButtonDialog,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            tileColor: Colors.cyanAccent.withOpacity(0.08),
+                            leading: const Icon(Icons.add, color: Colors.cyanAccent),
+                            title: Text(
+                              'Add New Button',
+                              style: GoogleFonts.montaga(
+                                fontSize: 16,
+                                color: Colors.cyanAccent,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      Expanded(
+                        child: _loading
+                            ? const Center(child: CircularProgressIndicator())
+                            : _isAdmin == true
+                                ? ReorderableListView.builder(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    itemCount: navigationButtons.length,
+                                    onReorder: _updateButtonOrder,
+                                    itemBuilder: (context, index) {
+                                      final button = navigationButtons[index];
+                                      final isSelected = selectedIndex == index;
+                                      return Padding(
+                                        key: ValueKey(button.id),
+                                        padding: const EdgeInsets.symmetric(vertical: 4),
+                                        child: ListTile(
+                                          onTap: () => onNavTap(index),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                          tileColor: isSelected ? Colors.cyan.withOpacity(0.18) : Colors.transparent,
+                                          leading: const Icon(Icons.drag_handle, color: Colors.white54, size: 20),
+                                          title: Text(
+                                            button.title,
+                                            style: GoogleFonts.montaga(
+                                              fontSize: 18,
+                                              color: isSelected ? Colors.cyanAccent : Colors.white,
+                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                            ),
+                                          ),
+                                          trailing: isSelected
+                                              ? const Icon(Icons.check_circle, color: Colors.cyanAccent)
+                                              : const SizedBox.shrink(),
+                                        ),
+                                      );
+                                    },
+                                  )
+                                : ListView.builder(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    itemCount: navigationButtons.length + 2, // Increased to accommodate Register
+                                    itemBuilder: (context, index) {
+                                      if (index == navigationButtons.length) {
+                                        return Column(
+                                          children: [
+                                            const SizedBox(height: 12),
+                                            Divider(
+                                              color: Colors.white.withOpacity(0.25),
+                                              thickness: 1,
+                                              indent: 16,
+                                              endIndent: 16,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 4),
+                                              child: ListTile(
+                                                onTap: () async {
+                                                  await FirebaseAuth.instance.signOut();
+                                                  if (context.mounted) {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                                                    );
+                                                  }
+                                                },
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                tileColor: Colors.transparent,
+                                                title: Text(
+                                                  'Login',
+                                                  style: GoogleFonts.montaga(
+                                                    fontSize: 18,
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                      if (index == navigationButtons.length + 1) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 4),
+                                          child: ListTile(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(builder: (_) => const RegisterPage()),
+                                              );
+                                            },
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                            tileColor: Colors.transparent,
+                                            title: Text(
+                                              'Register',
+                                              style: GoogleFonts.montaga(
+                                                fontSize: 18,
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                      final button = navigationButtons[index];
+                                      final isSelected = selectedIndex == index;
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 4),
+                                        child: ListTile(
+                                          onTap: () => onNavTap(index),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                          tileColor: isSelected ? Colors.cyan.withOpacity(0.18) : Colors.transparent,
+                                          title: Text(
+                                            button.title,
+                                            style: GoogleFonts.montaga(
+                                              fontSize: 18,
+                                              color: isSelected ? Colors.cyanAccent : Colors.white,
+                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                            ),
+                                          ),
+                                          trailing: isSelected
+                                              ? const Icon(Icons.check_circle, color: Colors.cyanAccent)
+                                              : const SizedBox.shrink(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
+          ),
+        ),
+      ),
       body: Stack(
         children: [
           Container(
