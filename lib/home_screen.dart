@@ -955,6 +955,24 @@ class _HomeScreenState extends State<HomeScreen> {
                               : const EdgeInsets.all(10),
                         ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        child: _HoverSlideButton(
+                          title: "Register",
+                          isSelected: false,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const RegisterPage()),
+                            );
+                          },
+                          isAdmin: false,
+                          fontSize: isDesktop ? 16 : 14,
+                          padding: isDesktop
+                              ? const EdgeInsets.all(12)
+                              : const EdgeInsets.all(10),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -1449,7 +1467,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   onExit: (_) => setState(() => isHovered = false),
                   child: GestureDetector(
                     onTap: () async {
-                      const url = 'https://www.overleaf.com/project/682202b2b010d50556f5169b';
+                      const url = 'assets/pdf/Resume (6).pdf';
                       if (await canLaunchUrl(Uri.parse(url))) {
                         await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                       } else {
