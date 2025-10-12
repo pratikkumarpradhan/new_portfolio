@@ -53,6 +53,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   firebase_auth: ^5.6.0
   animate_do: ^3.0.2
+  syncfusion_flutter_pdfviewer: ^31.1.23  
   
 dev_dependencies:
   flutter_test:
@@ -101,7 +102,7 @@ flutter:
      - assets/images/gmail.png
      - assets/images/LinkedIn.png
      - assets/images/github.png
-
+     - assets/pdf/Resume (6).pdf
 
 fonts:
     - family: CinzelDecorative
