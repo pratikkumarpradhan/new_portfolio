@@ -6,7 +6,7 @@ import 'package:portfolio/projects/project_screen.dart';
 import 'package:portfolio/services/firebase.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/rendering.dart';
+ 
 
 class ProjectDetailScreen extends StatefulWidget {
   final PortfolioProject project;
@@ -148,10 +148,7 @@ margin: EdgeInsets.symmetric(
                           left: 0,
                           child: OutlinedButton.icon(
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (_) => const PortfolioScreen()),
-                              );
+                              Navigator.pop(context);
                             },
                             icon: const Icon(Icons.arrow_back, color: Colors.white),
                             label: const Text(
@@ -366,21 +363,21 @@ Positioned(
                                   ),
                                 ),
                               ),
-                              // Tagline display
-                              if (project.tagline != null && project.tagline.trim().isNotEmpty) ...[
-                                const SizedBox(height: 16),
-                                Center(
-                                  child: Text(
-                                    project.tagline,
-                                    style: GoogleFonts.comfortaa(
-                                      fontSize: 18,
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.white,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
+                            // Tagline display
+if (project.tagline.trim().isNotEmpty) ...[
+  const SizedBox(height: 16),
+  Center(
+    child: Text(
+      project.tagline,
+      style: GoogleFonts.comfortaa(
+        fontSize: MediaQuery.of(context).size.width < 600 ? 14 : 18, // smaller on mobile
+        fontStyle: FontStyle.italic,
+        color: Colors.white,
+      ),
+      textAlign: TextAlign.center,
+    ),
+  ),
+],
                               const SizedBox(height: 32),
 
                               // Description sections (left-aligned)
