@@ -1,8 +1,13 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:portfolio/blogs/blog_screen.dart';
 import 'package:portfolio/connect_screen.dart';
+import 'package:portfolio/cv_screen.dart';
 import 'package:portfolio/experience_screen.dart';
 import 'package:portfolio/github/github_screen.dart';
 import 'package:portfolio/leetcode/leetcode_screen.dart';
@@ -1466,19 +1471,24 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   onEnter: (_) => setState(() => isHovered = true),
                   onExit: (_) => setState(() => isHovered = false),
                   child: GestureDetector(
-                    onTap: () async {
-                      const url = 'assets/pdf/Resume (6).pdf';
-                      if (await canLaunchUrl(Uri.parse(url))) {
-                        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Could not open CV link'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },
+onTap: () async {
+  const url = 'https://qrr.to/bf04e34f';
+  final uri = Uri.parse(url);
+
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication, // opens in default browser
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Could not open PDF link'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+},
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(32),
                       child: BackdropFilter(
