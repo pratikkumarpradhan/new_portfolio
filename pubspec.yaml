@@ -54,7 +54,9 @@ dependencies:
   firebase_auth: ^5.6.0
   animate_do: ^3.0.2
   syncfusion_flutter_pdfviewer: ^31.1.23  
-  
+  path_provider: ^2.1.5
+  flutter_pdfview: ^1.4.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -102,8 +104,7 @@ flutter:
      - assets/images/gmail.png
      - assets/images/LinkedIn.png
      - assets/images/github.png
-     - assets/pdf/Resume (6).pdf
-
+     - assets/pdf/Resume.pdf
 fonts:
     - family: CinzelDecorative
       fonts:
