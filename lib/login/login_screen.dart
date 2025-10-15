@@ -65,81 +65,78 @@ class _LoginPageState extends State<LoginPage> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.transparent,
-appBar: AppBar(
-  automaticallyImplyLeading: false,
-  elevation: 0,
-  flexibleSpace: Container(
-    decoration: const BoxDecoration(
-      gradient: LinearGradient(
-        colors: [
-          Color(0xFF0B1020),
-          Color(0xFF101828),
-        ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-    ),
-  ),
-  leadingWidth: MediaQuery.of(context).size.width < 600 ? 130 : 160,
-  leading: Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-          );
-        },
-        icon: const Icon(Icons.arrow_back, color: Colors.white),
-        label: MediaQuery.of(context).size.width < 600
-            ? const Text(
-                "Back",
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              )
-            : const Text(
-                "Back",
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Colors.white54, width: 1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10), // 🔹 Slightly circular
-          ),
-          backgroundColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+  extendBodyBehindAppBar: true,
+  backgroundColor: Colors.transparent,
+  appBar: AppBar(
+    automaticallyImplyLeading: false,
+    elevation: 0,
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF0B1020),
+            Color(0xFF101828),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
       ),
     ),
-  ),
-),
-      body: Container(
+    leadingWidth: MediaQuery.of(context).size.width < 600 ? 130 : 160,
+    leading: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
         width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF0B1020),
-              Color(0xFF101828),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+        child: OutlinedButton.icon(
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          label: MediaQuery.of(context).size.width < 600
+              ? const Text("Back",
+                  style: TextStyle(color: Colors.white, fontSize: 14))
+              : const Text("Back",
+                  style: TextStyle(color: Colors.white, fontSize: 16)),
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: Colors.white54, width: 1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            backgroundColor: Colors.transparent,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           ),
         ),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: ClipRRect(
+      ),
+    ),
+  ),
+  body: SafeArea( // ✅ prevents overlap with AppBar in landscape mode
+    child: Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF0B1020),
+            Color(0xFF101828),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: ClipRRect(
                         borderRadius: BorderRadius.circular(30),
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
@@ -323,6 +320,7 @@ appBar: AppBar(
           },
         ),
       ),
+  )
     );
   }
 }
