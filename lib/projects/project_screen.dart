@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -392,11 +394,287 @@ class PhoneMockupNetwork extends StatelessWidget {
   }
 }
 
+
+
+// class PhoneMockup extends StatefulWidget {
+//   final String imagePath;
+//   final bool isNetwork;
+
+//   const PhoneMockup({super.key, required this.imagePath, this.isNetwork = false});
+
+//   @override
+//   State<PhoneMockup> createState() => _PhoneMockupState();
+// }
+
+// class _PhoneMockupState extends State<PhoneMockup> {
+//   double _tiltX = 0;
+//   double _tiltY = 0;
+//   bool _hovering = false;
+
+//   void _updateTilt(Offset localPosition, Size size) {
+//     final dx = (localPosition.dx - size.width / 2) / (size.width / 2);
+//     final dy = (localPosition.dy - size.height / 2) / (size.height / 2);
+
+//     setState(() {
+//       _tiltY = dx;
+//       _tiltX = -dy;
+//       _hovering = true;
+//     });
+//   }
+
+//   void _resetTilt() {
+//     setState(() {
+//       _tiltX = 0;
+//       _tiltY = 0;
+//       _hovering = false;
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     const borderRadius = BorderRadius.all(Radius.circular(36));
+//     const moveFactor = 12.0;
+
+//     return GestureDetector(
+//       onPanStart: (details) {
+//         final box = context.findRenderObject() as RenderBox;
+//         _updateTilt(box.globalToLocal(details.globalPosition), box.size);
+//       },
+//       onPanUpdate: (details) {
+//         final box = context.findRenderObject() as RenderBox;
+//         _updateTilt(box.globalToLocal(details.globalPosition), box.size);
+//       },
+//       onPanEnd: (details) => _resetTilt(),
+//       onPanCancel: () => _resetTilt(),
+//       child: MouseRegion(
+//         onHover: (event) {
+//           final box = context.findRenderObject() as RenderBox;
+//           _updateTilt(box.globalToLocal(event.position), box.size);
+//         },
+//         onExit: (_) => _resetTilt(),
+//         child: AnimatedContainer(
+//           duration: const Duration(milliseconds: 220),
+//           transform: _build3DMatrix(),
+//           transformAlignment: Alignment.center,
+//           child: Stack(
+//             alignment: Alignment.center,
+//             children: [
+//               // Shadow behind phone
+//               AnimatedOpacity(
+//                 opacity: _hovering ? 1 : 0.7,
+//                 duration: const Duration(milliseconds: 300),
+//                 child: Transform.translate(
+//                   offset: const Offset(0, 18),
+//                   child: Container(
+//                     width: 220,
+//                     height: 470,
+//                     decoration: BoxDecoration(
+//                       borderRadius: borderRadius,
+//                       boxShadow: [
+//                         BoxShadow(
+//                           color: Colors.black.withOpacity(0.5),
+//                           blurRadius: 35,
+//                           spreadRadius: 8,
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//               ),
+
+//               // Main phone body
+//               Container(
+//                 width: 230,
+//                 height: 490,
+//                 decoration: BoxDecoration(
+//                   borderRadius: borderRadius,
+//                   gradient: const LinearGradient(
+//                     begin: Alignment.topLeft,
+//                     end: Alignment.bottomRight,
+//                     colors: [
+//                       Color(0xFF1F2124),
+//                       Color(0xFF2C2E31),
+//                       Color(0xFF18191B),
+//                     ],
+//                   ),
+//                   border: Border.all(color: Colors.white10, width: 0.8),
+//                 ),
+//                 child: ClipRRect(
+//                   borderRadius: borderRadius,
+//                   child: Stack(
+//                     clipBehavior: Clip.none,
+//                     children: [
+//                       // Screen
+//                       AnimatedPositioned(
+//                         duration: const Duration(milliseconds: 150),
+//                         top: 14 - _tiltX * moveFactor,
+//                         left: 14 + _tiltY * moveFactor,
+//                         right: 14 - _tiltY * moveFactor,
+//                         bottom: 14 + _tiltX * moveFactor,
+//                         child: ClipRRect(
+//                           borderRadius: BorderRadius.circular(28),
+//                           child: widget.isNetwork
+//                               ? Image.network(widget.imagePath, fit: BoxFit.cover)
+//                               : Image.asset(widget.imagePath, fit: BoxFit.cover),
+//                         ),
+//                       ),
+
+//                       // Glossy highlight
+//                       Positioned(
+//                         top: 0 - _tiltX * 3,
+//                         left: 0 + _tiltY * 3,
+//                         right: 0 - _tiltY * 3,
+//                         height: 40,
+//                         child: IgnorePointer(
+//                           child: Container(
+//                             decoration: BoxDecoration(
+//                               gradient: LinearGradient(
+//                                 begin: Alignment.topCenter,
+//                                 end: Alignment.bottomCenter,
+//                                 colors: [
+//                                   Colors.white.withOpacity(0.10),
+//                                   Colors.transparent,
+//                                 ],
+//                               ),
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+
+//                       // Selfie camera (moves with tilt)
+//                       Positioned(
+//                         top: 8 - _tiltX * 2,
+//                         left: 0 + _tiltY * 2,
+//                         right: 0 - _tiltY * 2,
+//                         child: Transform.translate(
+//                           offset: Offset(_tiltY * 4, -_tiltX * 3),
+//                           child: Align(
+//                             alignment: Alignment.topCenter,
+//                             child: Container(
+//                               width: 80,
+//                               height: 18,
+//                               decoration: BoxDecoration(
+//                                 color: Colors.black.withOpacity(0.9),
+//                                 borderRadius: BorderRadius.circular(10),
+//                                 border: Border.all(color: Colors.white12, width: 0.8),
+//                               ),
+//                               child: Row(
+//                                 mainAxisAlignment: MainAxisAlignment.center,
+//                                 children: [
+//                                   Container(
+//                                     width: 9,
+//                                     height: 9,
+//                                     decoration: BoxDecoration(
+//                                       color: Colors.black,
+//                                       shape: BoxShape.circle,
+//                                       border: Border.all(color: Colors.white30, width: 0.7),
+//                                     ),
+//                                     child: Center(
+//                                       child: Container(
+//                                         width: 3,
+//                                         height: 3,
+//                                         decoration: const BoxDecoration(
+//                                           color: Colors.white24,
+//                                           shape: BoxShape.circle,
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                   const SizedBox(width: 5),
+//                                   Container(
+//                                     width: 7,
+//                                     height: 2.5,
+//                                     decoration: BoxDecoration(
+//                                       color: const Color(0xFFFFF9C4),
+//                                       borderRadius: BorderRadius.circular(1.5),
+//                                       border: Border.all(color: Colors.white30, width: 0.5),
+//                                     ),
+//                                   ),
+//                                 ],
+//                               ),
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+
+//                       // Side buttons (move dynamically)
+//                       Positioned(
+//                         top: 120 - _tiltX * 5,
+//                         left: -3 + _tiltY * 5,
+//                         child: Transform.translate(
+//                           offset: Offset(_tiltY * 2, -_tiltX * 2),
+//                           child: _sideButton(height: 35),
+//                         ),
+//                       ),
+//                       Positioned(
+//                         top: 160 - _tiltX * 7,
+//                         left: -3 + _tiltY * 7,
+//                         child: Transform.translate(
+//                           offset: Offset(_tiltY * 3, -_tiltX * 3),
+//                           child: _sideButton(height: 50),
+//                         ),
+//                       ),
+//                       Positioned(
+//                         top: 150 - _tiltX * 6,
+//                         right: -3 - _tiltY * 6,
+//                         child: Transform.translate(
+//                           offset: Offset(_tiltY * -2, -_tiltX * 2),
+//                           child: _sideButton(height: 45),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   // 3D transform
+//   Matrix4 _build3DMatrix() {
+//     final tiltAmount = 0.03;
+//     return Matrix4.identity()
+//       ..setEntry(3, 2, 0.0015)
+//       ..rotateX(_tiltX * tiltAmount)
+//       ..rotateY(_tiltY * tiltAmount)
+//       ..scale(_hovering ? 1.02 : 1.0);
+//   }
+
+//   Widget _sideButton({double height = 30}) {
+//     return Container(
+//       width: 4,
+//       height: height,
+//       decoration: BoxDecoration(
+//         color: Colors.grey.shade300,
+//         borderRadius: BorderRadius.circular(3),
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.black.withOpacity(0.25),
+//             blurRadius: 2,
+//             offset: const Offset(0, 1),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+
+
+
+
 class PhoneMockup extends StatefulWidget {
   final String imagePath;
   final bool isNetwork;
 
-  const PhoneMockup({super.key, required this.imagePath, this.isNetwork = false});
+  const PhoneMockup({
+    super.key,
+    required this.imagePath,
+    this.isNetwork = false,
+  });
 
   @override
   State<PhoneMockup> createState() => _PhoneMockupState();
@@ -407,22 +685,18 @@ class _PhoneMockupState extends State<PhoneMockup> {
   double _tiltY = 0;
   bool _hovering = false;
 
-  void _onHover(PointerEvent event) {
-    final box = context.findRenderObject() as RenderBox;
-    final localPosition = box.globalToLocal(event.position);
-    final size = box.size;
-
+  void _updateTilt(Offset localPosition, Size size) {
     final dx = (localPosition.dx - size.width / 2) / (size.width / 2);
     final dy = (localPosition.dy - size.height / 2) / (size.height / 2);
 
     setState(() {
-      _tiltY = dx * 0.5;
-      _tiltX = -dy * 0.5;
+      _tiltY = dx.clamp(-1, 1).toDouble();
+      _tiltX = -dy.clamp(-1, 1).toDouble();
       _hovering = true;
     });
   }
 
-  void _onExit(PointerEvent event) {
+  void _resetTilt() {
     setState(() {
       _tiltX = 0;
       _tiltY = 0;
@@ -432,285 +706,233 @@ class _PhoneMockupState extends State<PhoneMockup> {
 
   @override
   Widget build(BuildContext context) {
-    const borderRadius = BorderRadius.all(Radius.circular(40));
+    const borderRadius = BorderRadius.all(Radius.circular(36));
+    const moveFactor = 12.0;
 
-    return MouseRegion(
-      onHover: _onHover,
-      onExit: _onExit,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        transform: Matrix4.identity()
-          ..setEntry(3, 2, 0.0018)
-          ..rotateX(_tiltX)
-          ..rotateY(_tiltY)
-          ..scale(_hovering ? 1.03 : 1.0),
-        transformAlignment: Alignment.center,
-        child: Stack(
-          children: [
-            // Shadow underneath
-            Positioned(
-              left: 30,
-              right: 30,
-              top: 50,
-              bottom: 0,
-              child: Container(
+    return Listener(
+      onPointerMove: (event) {
+        // This ensures it works with finger movement on mobile
+        final box = context.findRenderObject() as RenderBox?;
+        if (box != null) {
+          _updateTilt(box.globalToLocal(event.position), box.size);
+        }
+      },
+      onPointerUp: (_) => _resetTilt(),
+      onPointerCancel: (_) => _resetTilt(),
+      child: MouseRegion(
+        onHover: (event) {
+          // Desktop hover stays EXACTLY as before
+          final box = context.findRenderObject() as RenderBox?;
+          if (box != null) {
+            _updateTilt(box.globalToLocal(event.position), box.size);
+          }
+        },
+        onExit: (_) => _resetTilt(),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          transform: _build3DMatrix(),
+          transformAlignment: Alignment.center,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Shadow behind phone
+              AnimatedOpacity(
+                opacity: _hovering ? 1 : 0.7,
+                duration: const Duration(milliseconds: 300),
+                child: Transform.translate(
+                  offset: const Offset(0, 18),
+                  child: Container(
+                    width: 220,
+                    height: 470,
+                    decoration: BoxDecoration(
+                      borderRadius: borderRadius,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          blurRadius: 35,
+                          spreadRadius: 8,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // Main phone body
+              Container(
+                width: 230,
+                height: 490,
                 decoration: BoxDecoration(
                   borderRadius: borderRadius,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.5),
-                      blurRadius: 30,
-                      spreadRadius: 4,
-                      offset: const Offset(10, 20),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Phone body
-            Container(
-              width: 260,
-              height: 540,
-              decoration: BoxDecoration(
-                borderRadius: borderRadius,
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF232526), // dark blue-grey
-                    Color(0xFF414345), // slate
-                    Color(0xFF232526), // dark again for depth
-                  ],
-                ),
-                border: Border.all(color: Colors.white24, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.25),
-                    blurRadius: 24,
-                    offset: Offset(0, 8),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF1F2124),
+                      Color(0xFF2C2E31),
+                      Color(0xFF18191B),
+                    ],
                   ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: borderRadius,
-                child: Stack(
-                  children: [
-                    // Glass highlight overlay
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: 60,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(40),
-                            topRight: Radius.circular(40),
-                          ),
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.white.withOpacity(0.18),
-                              Colors.transparent,
-                            ],
+                  border: Border.all(color: Colors.white10, width: 0.8),
+                ),
+                child: ClipRRect(
+                  borderRadius: borderRadius,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      // Screen
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 150),
+                        top: 14 - _tiltX * moveFactor,
+                        left: 14 + _tiltY * moveFactor,
+                        right: 14 - _tiltY * moveFactor,
+                        bottom: 14 + _tiltX * moveFactor,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(28),
+                          child: widget.isNetwork
+                              ? Image.network(widget.imagePath, fit: BoxFit.cover)
+                              : Image.asset(widget.imagePath, fit: BoxFit.cover),
+                        ),
+                      ),
+
+                      // Glossy highlight
+                      Positioned(
+                        top: 0 - _tiltX * 3,
+                        left: 0 + _tiltY * 3,
+                        right: 0 - _tiltY * 3,
+                        height: 40,
+                        child: IgnorePointer(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.white.withOpacity(0.10),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    // Phone screen
-                    Positioned(
-                      top: 16,
-                      left: 16,
-                      right: 16,
-                      bottom: 16,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(32),
-                        child: widget.isNetwork
-                            ? Image.network(widget.imagePath, fit: BoxFit.cover)
-                            : Image.asset(widget.imagePath, fit: BoxFit.cover),
-                      ),
-                    ),
-                    // Selfie camera and flash box (real phone style)
-                    Positioned(
-                      top: 16,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: Colors.black87,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white24, width: 1),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.18),
-                                blurRadius: 4,
-                                offset: Offset(0, 1),
+
+                      // Selfie camera
+                      Positioned(
+                        top: 8 - _tiltX * 2,
+                        left: 0 + _tiltY * 2,
+                        right: 0 - _tiltY * 2,
+                        child: Transform.translate(
+                          offset: Offset(_tiltY * 4, -_tiltX * 3),
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: Container(
+                              width: 80,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.9),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.white12, width: 0.8),
                               ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Selfie camera
-                              Container(
-                                width: 13,
-                                height: 13,
-                                decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 0.8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      blurRadius: 3,
-                                      offset: Offset(0, 1),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Container(
-                                    width: 4,
-                                    height: 4,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 9,
+                                    height: 9,
                                     decoration: BoxDecoration(
-                                      color: Colors.white24,
+                                      color: Colors.black,
                                       shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white30, width: 0.7),
+                                    ),
+                                    child: Center(
+                                      child: Container(
+                                        width: 3,
+                                        height: 3,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white24,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              // Flash
-                              Container(
-                                width: 7,
-                                height: 3,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFFFF9C4), // soft yellow
-                                  borderRadius: BorderRadius.circular(1.5),
-                                  border: Border.all(color: Colors.white70, width: 0.5),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.15),
-                                      blurRadius: 1.5,
-                                      offset: Offset(0, 1),
+                                  const SizedBox(width: 5),
+                                  Container(
+                                    width: 7,
+                                    height: 2.5,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFF9C4),
+                                      borderRadius: BorderRadius.circular(1.5),
+                                      border: Border.all(color: Colors.white30, width: 0.5),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    // Simulated phone thickness via gradients
-                    _buildSideShading(),
-
-                    // Side buttons
-                    Positioned(
-                      top: 120,
-                      left: -5,
-                      child: Column(
-                        children: [
-                          _sideButton(),
-                          const SizedBox(height: 10),
-                          _sideButton(),
-                        ],
+                      // Side buttons
+                      Positioned(
+                        top: 120 - _tiltX * 5,
+                        left: -3 + _tiltY * 5,
+                        child: Transform.translate(
+                          offset: Offset(_tiltY * 2, -_tiltX * 2),
+                          child: _sideButton(height: 35),
+                        ),
                       ),
-                    ),
-                    Positioned(
-                      top: 150,
-                      right: -5,
-                      child: _sideButton(height: 60),
-                    ),
-                  ],
+                      Positioned(
+                        top: 160 - _tiltX * 7,
+                        left: -3 + _tiltY * 7,
+                        child: Transform.translate(
+                          offset: Offset(_tiltY * 3, -_tiltX * 3),
+                          child: _sideButton(height: 50),
+                        ),
+                      ),
+                      Positioned(
+                        top: 150 - _tiltX * 6,
+                        right: -3 - _tiltY * 6,
+                        child: Transform.translate(
+                          offset: Offset(_tiltY * -2, -_tiltX * 2),
+                          child: _sideButton(height: 45),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Matrix4 _build3DMatrix() {
+    final tiltAmount = 0.03;
+    return Matrix4.identity()
+      ..setEntry(3, 2, 0.0015)
+      ..rotateX(_tiltX * tiltAmount)
+      ..rotateY(_tiltY * tiltAmount)
+      ..scale(_hovering ? 1.02 : 1.0);
   }
 
   Widget _sideButton({double height = 30}) {
     return Container(
-      width: 6,
+      width: 4,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.grey.shade300,
         borderRadius: BorderRadius.circular(3),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildSideShading() {
-    return Stack(
-      children: [
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 12,
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.black87, Colors.transparent],
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 12,
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                colors: [Colors.black87, Colors.transparent],
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: 12,
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [Colors.black87, Colors.transparent],
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          right: 0,
-          top: 0,
-          bottom: 0,
-          width: 12,
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerRight,
-                end: Alignment.centerLeft,
-                colors: [Colors.black87, Colors.transparent],
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
