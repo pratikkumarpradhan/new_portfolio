@@ -178,27 +178,39 @@ class _LeetcodeScreenState extends State<LeetcodeScreen> {
                                     height: 180,
                                     child: Focus(
                                       autofocus: true,
-                                      child: LeetCodeContributionsWidget(
-                                        username: 'pratikkumarpradhan',
+                                      // child: LeetCodeContributionsWidget(
+                                      //   username: 'pratikkumarpradhan',
 
-                                        token: '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',
-                                        height: 180,
-                                        contributionColors: const [
-                                          Color(0xFF40C463),
-                                          Color(0xFF7BC96F),
-                                          Color(0xFF9BE9A8),
-                                          Color(0xFFB8E6B8),
-                                          Color(0xFFD4F4D4),
-                                        ],
-                                        emptyColor: const Color(0xff161b22),
-                                        backgroundColor: Colors.transparent,
-                                        loadingWidget: const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
-                                        onSliderReady: (slider) {
-                                          setState(() {
-                                            _sliderWidget = slider;
-                                          });
-                                        },
-                                      ),
+                                      // //  token: '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',
+                                      //   height: 180,
+                                      //   contributionColors: const [
+                                      //     Color(0xFF40C463),
+                                      //     Color(0xFF7BC96F),
+                                      //     Color(0xFF9BE9A8),
+                                      //     Color(0xFFB8E6B8),
+                                      //     Color(0xFFD4F4D4),
+                                      //   ],
+                                      //   emptyColor: const Color(0xff161b22),
+                                      //   backgroundColor: Colors.transparent,
+                                      //   loadingWidget: const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
+                                      //   onSliderReady: (slider) {
+                                      //     setState(() {
+                                      //       _sliderWidget = slider;
+                                      //     });
+                                      //   },
+                                      // ),
+                                      child: LeetCodeContributionsWidget(
+  username: 'pratikkumarpradhan', // 🔹 your LeetCode username
+  height: 220,
+  contributionColors: [
+    Colors.green.shade200,
+    Colors.green.shade400,
+    Colors.green.shade600,
+    Colors.green.shade800,
+  ],
+  emptyColor: Colors.grey.shade900,
+  backgroundColor: const Color(0xFF0B1020),
+)
                                     ),
                                   ),
                                   const SizedBox(height: 12),
