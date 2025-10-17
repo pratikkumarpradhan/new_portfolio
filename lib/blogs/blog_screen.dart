@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolio/home_screen.dart';
 import 'dart:ui';
+import 'dart:async';
 
 import 'package:portfolio/login/login_screen.dart';
 
@@ -21,18 +22,34 @@ class _BlogScreenState extends State<BlogScreen> {
   bool _isSubmitting = false;
   String? _editingPostId;
   final String _adminEmail = 'pratikkumarpradhan2006@gmail.com';
+  StreamSubscription<User?>? _authSubscription;
 
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
+    _listenToAuthState();
   }
 
-  Future<void> _checkLoginStatus() async {
-    final user = FirebaseAuth.instance.currentUser;
-    setState(() {
-      _isLoggedIn = user != null;
-      _userEmail = user?.email;
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    _postController.dispose();
+    super.dispose();
+  }
+
+  void _listenToAuthState() {
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+      debugPrint('🔍 BlogScreen auth state changed: ${user?.email}');
+      setState(() {
+        _isLoggedIn = user != null;
+        _userEmail = user?.email;
+      });
+    }, onError: (error) {
+      debugPrint('❌ BlogScreen auth state error: $error');
+      setState(() {
+        _isLoggedIn = false;
+        _userEmail = null;
+      });
     });
   }
 
@@ -100,11 +117,6 @@ class _BlogScreenState extends State<BlogScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    _postController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -295,7 +307,7 @@ class _BlogScreenState extends State<BlogScreen> {
                                               MaterialPageRoute(builder: (_) => const LoginPage()),
                                             );
                                             if (result == true) {
-                                              await _checkLoginStatus();
+                                              // Auth state will be updated automatically via listener
                                             }
                                           },
                                     child: _isSubmitting
@@ -380,7 +392,7 @@ class _BlogScreenState extends State<BlogScreen> {
                                                   MaterialPageRoute(builder: (_) => const LoginPage()),
                                                 );
                                                 if (result == true) {
-                                                  await _checkLoginStatus();
+                                                  // Auth state will be updated automatically via listener
                                                 }
                                               },
                                         child: _isSubmitting

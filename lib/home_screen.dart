@@ -939,45 +939,72 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6),
-                        child: _HoverSlideButton(
-                          title: "Login",
-                          isSelected: false,
-                          onTap: () async {
-                            await FirebaseAuth.instance.signOut();
-                            if (context.mounted) {
+                      // Show logout button if user is logged in, otherwise show login/register
+                      if (_userEmail != null) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: _HoverSlideButton(
+                            title: "Logout",
+                            isSelected: false,
+                            onTap: () async {
+                              await FirebaseAuth.instance.signOut();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Successfully logged out'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
+                            },
+                            isAdmin: false,
+                            fontSize: isDesktop ? 16 : 14,
+                            padding: isDesktop
+                                ? const EdgeInsets.all(12)
+                                : const EdgeInsets.all(10),
+                          ),
+                        ),
+                      ] else ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: _HoverSlideButton(
+                            title: "Login",
+                            isSelected: false,
+                            onTap: () async {
+                              await FirebaseAuth.instance.signOut();
+                              if (context.mounted) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                                );
+                              }
+                            },
+                            isAdmin: false,
+                            fontSize: isDesktop ? 16 : 14,
+                            padding: isDesktop
+                                ? const EdgeInsets.all(12)
+                                : const EdgeInsets.all(10),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: _HoverSlideButton(
+                            title: "Register",
+                            isSelected: false,
+                            onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const LoginPage()),
+                                MaterialPageRoute(builder: (_) => const RegisterPage()),
                               );
-                            }
-                          },
-                          isAdmin: false,
-                          fontSize: isDesktop ? 16 : 14,
-                          padding: isDesktop
-                              ? const EdgeInsets.all(12)
-                              : const EdgeInsets.all(10),
+                            },
+                            isAdmin: false,
+                            fontSize: isDesktop ? 16 : 14,
+                            padding: isDesktop
+                                ? const EdgeInsets.all(12)
+                                : const EdgeInsets.all(10),
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6),
-                        child: _HoverSlideButton(
-                          title: "Register",
-                          isSelected: false,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const RegisterPage()),
-                            );
-                          },
-                          isAdmin: false,
-                          fontSize: isDesktop ? 16 : 14,
-                          padding: isDesktop
-                              ? const EdgeInsets.all(12)
-                              : const EdgeInsets.all(10),
-                        ),
-                      )
+                      ]
                     ],
                   ),
                 ),
@@ -1072,40 +1099,92 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _loading
                             ? const Center(child: CircularProgressIndicator())
                             : _isAdmin == true
-                                ? ReorderableListView.builder(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                                    itemCount: navigationButtons.length,
-                                    onReorder: _updateButtonOrder,
-                                    itemBuilder: (context, index) {
-                                      final button = navigationButtons[index];
-                                      final isSelected = selectedIndex == index;
-                                      return Padding(
-                                        key: ValueKey(button.id),
-                                        padding: const EdgeInsets.symmetric(vertical: 4),
+                                ? Column(
+                                    children: [
+                                      Expanded(
+                                        child: ReorderableListView.builder(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                                          itemCount: navigationButtons.length,
+                                          onReorder: _updateButtonOrder,
+                                          itemBuilder: (context, index) {
+                                            final button = navigationButtons[index];
+                                            final isSelected = selectedIndex == index;
+                                            return Padding(
+                                              key: ValueKey(button.id),
+                                              padding: const EdgeInsets.symmetric(vertical: 4),
+                                              child: ListTile(
+                                                onTap: () => onNavTap(index),
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                tileColor: isSelected ? Colors.cyan.withOpacity(0.18) : Colors.transparent,
+                                                leading: const Icon(Icons.drag_handle, color: Colors.white54, size: 20),
+                                                title: Text(
+                                                  button.title,
+                                                  style: GoogleFonts.montaga(
+                                                    fontSize: 18,
+                                                    color: isSelected ? Colors.cyanAccent : Colors.white,
+                                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                                  ),
+                                                ),
+                                                trailing: isSelected
+                                                    ? const Icon(Icons.check_circle, color: Colors.cyanAccent)
+                                                    : const SizedBox.shrink(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      // Add logout button for admin
+                                      const SizedBox(height: 12),
+                                      Divider(
+                                        color: Colors.white.withOpacity(0.25),
+                                        thickness: 1,
+                                        indent: 16,
+                                        endIndent: 16,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
                                         child: ListTile(
-                                          onTap: () => onNavTap(index),
+                                          onTap: () async {
+                                            await FirebaseAuth.instance.signOut();
+                                            if (context.mounted) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Successfully logged out'),
+                                                  backgroundColor: Colors.green,
+                                                ),
+                                              );
+                                            }
+                                          },
                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                          tileColor: isSelected ? Colors.cyan.withOpacity(0.18) : Colors.transparent,
-                                          leading: const Icon(Icons.drag_handle, color: Colors.white54, size: 20),
+                                          tileColor: Colors.transparent,
+                                          leading: const Icon(Icons.logout, color: Colors.redAccent),
                                           title: Text(
-                                            button.title,
+                                            'Logout',
                                             style: GoogleFonts.montaga(
                                               fontSize: 18,
-                                              color: isSelected ? Colors.cyanAccent : Colors.white,
-                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
-                                          trailing: isSelected
-                                              ? const Icon(Icons.check_circle, color: Colors.cyanAccent)
-                                              : const SizedBox.shrink(),
+                                          subtitle: _userEmail != null 
+                                            ? Text(
+                                                'Logged in as $_userEmail',
+                                                style: GoogleFonts.montaga(
+                                                  fontSize: 12,
+                                                  color: Colors.white70,
+                                                ),
+                                              )
+                                            : null,
                                         ),
-                                      );
-                                    },
+                                      ),
+                                    ],
                                   )
                                 : ListView.builder(
                                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                                    itemCount: navigationButtons.length + 2, // Increased to accommodate Register
+                                    itemCount: navigationButtons.length + (_userEmail != null ? 1 : 2), // Show logout if logged in, otherwise login+register
                                     itemBuilder: (context, index) {
+                                      debugPrint('🔍 Drawer item $index: userEmail=$_userEmail, navButtons=${navigationButtons.length}');
                                       if (index == navigationButtons.length) {
                                         return Column(
                                           children: [
@@ -1121,30 +1200,53 @@ class _HomeScreenState extends State<HomeScreen> {
                                               padding: const EdgeInsets.symmetric(vertical: 4),
                                               child: ListTile(
                                                 onTap: () async {
-                                                  await FirebaseAuth.instance.signOut();
-                                                  if (context.mounted) {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(builder: (_) => const LoginPage()),
-                                                    );
+                                                  if (_userEmail != null) {
+                                                    // Logout functionality
+                                                    await FirebaseAuth.instance.signOut();
+                                                    if (context.mounted) {
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text('Successfully logged out'),
+                                                          backgroundColor: Colors.green,
+                                                        ),
+                                                      );
+                                                    }
+                                                  } else {
+                                                    // Login functionality
+                                                    await FirebaseAuth.instance.signOut();
+                                                    if (context.mounted) {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                                                      );
+                                                    }
                                                   }
                                                 },
                                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                                 tileColor: Colors.transparent,
                                                 title: Text(
-                                                  'Login',
+                                                  _userEmail != null ? 'Logout' : 'Login',
                                                   style: GoogleFonts.montaga(
                                                     fontSize: 18,
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
+                                                subtitle: _userEmail != null 
+                                                  ? Text(
+                                                      'Logged in as $_userEmail',
+                                                      style: GoogleFonts.montaga(
+                                                        fontSize: 12,
+                                                        color: Colors.white70,
+                                                      ),
+                                                    )
+                                                  : null,
                                               ),
                                             ),
                                           ],
                                         );
                                       }
-                                      if (index == navigationButtons.length + 1) {
+                                      if (_userEmail == null && index == navigationButtons.length + 1) {
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(vertical: 4),
                                           child: ListTile(

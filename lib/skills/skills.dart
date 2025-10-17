@@ -1696,23 +1696,37 @@ class _SkillsScreenState extends State<SkillsScreen> {
   bool _loading = true;
   Map<String, int> categoryOrder = {};
   StreamSubscription<DocumentSnapshot>? _categoryOrderSubscription;
+  StreamSubscription<User?>? _authSubscription;
   bool _isUpdatingOrder = false;
 
   @override
   void initState() {
     super.initState();
-    _checkAdmin();
+    _listenToAuthState();
     _listenToCategoryOrder();
   }
 
   @override
   void dispose() {
     _categoryOrderSubscription?.cancel();
+    _authSubscription?.cancel();
     super.dispose();
   }
 
-  Future<void> _checkAdmin() async {
-    final user = FirebaseAuth.instance.currentUser;
+  void _listenToAuthState() {
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+      debugPrint('🔍 SkillsScreen auth state changed: ${user?.email}');
+      _checkAdmin(user);
+    }, onError: (error) {
+      debugPrint('❌ SkillsScreen auth state error: $error');
+      setState(() {
+        _isAdmin = false;
+        _loading = false;
+      });
+    });
+  }
+
+  Future<void> _checkAdmin(User? user) async {
     if (user == null) {
       setState(() {
         _isAdmin = false;
@@ -1720,11 +1734,19 @@ class _SkillsScreenState extends State<SkillsScreen> {
       });
       return;
     }
-    final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-    setState(() {
-      _isAdmin = doc.data()?['role'] == 'admin';
-      _loading = false;
-    });
+    try {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      setState(() {
+        _isAdmin = doc.data()?['role'] == 'admin';
+        _loading = false;
+      });
+    } catch (e) {
+      debugPrint('❌ Error checking admin in SkillsScreen: $e');
+      setState(() {
+        _isAdmin = false;
+        _loading = false;
+      });
+    }
   }
 
   void _listenToCategoryOrder() {

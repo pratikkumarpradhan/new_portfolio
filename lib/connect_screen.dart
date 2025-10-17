@@ -5,6 +5,7 @@ import 'package:portfolio/login/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui';
+import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -287,18 +288,33 @@ class GetInTouchCard extends StatefulWidget {
 class _GetInTouchCardState extends State<GetInTouchCard> {
   bool _isLoggedIn = false;
   String? _userEmail;
+  StreamSubscription<User?>? _authSubscription;
 
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
+    _listenToAuthState();
   }
 
-  Future<void> _checkLoginStatus() async {
-    final user = FirebaseAuth.instance.currentUser;
-    setState(() {
-      _isLoggedIn = user != null;
-      _userEmail = user?.email;
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _listenToAuthState() {
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+      debugPrint('🔍 ConnectScreen auth state changed: ${user?.email}');
+      setState(() {
+        _isLoggedIn = user != null;
+        _userEmail = user?.email;
+      });
+    }, onError: (error) {
+      debugPrint('❌ ConnectScreen auth state error: $error');
+      setState(() {
+        _isLoggedIn = false;
+        _userEmail = null;
+      });
     });
   }
 
