@@ -25,18 +25,33 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   bool _loading = true;
   List<QueryDocumentSnapshot> _docs = [];
   late StreamSubscription<QuerySnapshot> _subscription;
+  StreamSubscription<User?>? _authSubscription;
 
   @override
   void initState() {
     super.initState();
-    _checkAdmin();
+    _listenToAuthState();
     _listenToProjects();
   }
 
   @override
   void dispose() {
     _subscription.cancel();
+    _authSubscription?.cancel();
     super.dispose();
+  }
+
+  void _listenToAuthState() {
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+      debugPrint('🔍 PortfolioScreen auth state changed: ${user?.email}');
+      _checkAdmin(user);
+    }, onError: (error) {
+      debugPrint('❌ PortfolioScreen auth state error: $error');
+      setState(() {
+        _isAdmin = false;
+        _loading = false;
+      });
+    });
   }
 
   void _listenToProjects() {
@@ -51,8 +66,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     });
   }
 
-  Future<void> _checkAdmin() async {
-    final user = FirebaseAuth.instance.currentUser;
+  Future<void> _checkAdmin(User? user) async {
     if (user == null) {
       setState(() {
         _isAdmin = false;
@@ -60,11 +74,19 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       });
       return;
     }
-    final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-    setState(() {
-      _isAdmin = doc.data()?['role'] == 'admin';
-      _loading = false;
-    });
+    try {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      setState(() {
+        _isAdmin = doc.data()?['role'] == 'admin';
+        _loading = false;
+      });
+    } catch (e) {
+      debugPrint('❌ Error checking admin in PortfolioScreen: $e');
+      setState(() {
+        _isAdmin = false;
+        _loading = false;
+      });
+    }
   }
 
   @override
