@@ -1,6 +1,3 @@
-
-
-
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -85,7 +82,7 @@ class _LearningScreenState extends State<LearningScreen> {
                       labelText: "Description *",
                       hintText: "Write about your experience...",
                     ),
-                    maxLines: 3,
+                    maxLines: 5,
                   ),
                   const SizedBox(height: 8),
                   CheckboxListTile(
@@ -143,51 +140,83 @@ class _LearningScreenState extends State<LearningScreen> {
   }
 
   /// ✏️ Edit existing step
-  Future<void> _showEditDialog(
-      String docId, String currentTitle, String currentDescription) async {
-    final titleController = TextEditingController(text: currentTitle);
-    final descController = TextEditingController(text: currentDescription);
+Future<void> _showEditDialog(
+  String docId,
+  String currentTitle,
+  String currentDescription,
+) async {
+  final titleController = TextEditingController(text: currentTitle);
+  final descController = TextEditingController(text: currentDescription);
 
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Edit Step"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
+  bool isNewSection = false;
+
+  // Fetch the current isNewSection value before editing
+  final doc = await FirebaseFirestore.instance
+      .collection('journeySteps')
+      .doc(docId)
+      .get();
+  if (doc.exists && doc.data()?['isNewSection'] == true) {
+    isNewSection = true;
+  }
+
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text("Edit Step"),
+        content: StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
                   controller: titleController,
-                  decoration: const InputDecoration(labelText: "Title")),
-              TextField(
+                  decoration: const InputDecoration(labelText: "Title"),
+                ),
+                TextField(
                   controller: descController,
                   decoration:
                       const InputDecoration(labelText: "Description"),
-                  maxLines: 3),
-            ],
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 8),
+                CheckboxListTile(
+                  value: isNewSection,
+                  onChanged: (val) {
+                    setStateDialog(() => isNewSection = val ?? false);
+                  },
+                  title: const Text("Start new section (no line above)"),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ],
+            );
+          },
+        ),
+        actions: [
+          TextButton(
+            child: const Text("Cancel"),
+            onPressed: () => Navigator.pop(context),
           ),
-          actions: [
-            TextButton(
-                child: const Text("Cancel"),
-                onPressed: () => Navigator.pop(context)),
-            ElevatedButton(
-              child: const Text("Save"),
-              onPressed: () async {
-                await FirebaseFirestore.instance
-                    .collection('journeySteps')
-                    .doc(docId)
-                    .update({
-                  'title': titleController.text.trim(),
-                  'description': descController.text.trim(),
-                });
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+          ElevatedButton(
+            child: const Text("Save"),
+            onPressed: () async {
+              await FirebaseFirestore.instance
+                  .collection('journeySteps')
+                  .doc(docId)
+                  .update({
+                'title': titleController.text.trim(),
+                'description': descController.text.trim(),
+                'isNewSection': isNewSection,
+              });
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 
   Future<void> _deleteStep(String docId) async {
     await FirebaseFirestore.instance
@@ -379,15 +408,18 @@ Widget _buildOuterCard(
 
       return Column(
         children: [
-          // Connecting line immediately before next card
-          if (!isNewSection && index != 0)
-            Container(
-              width: 1.5,
-              height: 60,
-              color: Colors.cyanAccent.withOpacity(0.5),
-            ),
+          // 🔹 Add a small gap before a new section
+          if (isNewSection && index != 0)
+            const SizedBox(height: 40),
 
-          // Card
+         // 🔹 Line connecting previous card (no line for new section or first)
+if (!isNewSection && index != 0)
+  Container(
+    width: 1.5,
+    height: isMobile ? 20 : 40, // smaller line for mobile
+    color: Colors.cyanAccent.withOpacity(0.5),
+  ),
+          // 🔹 Card itself
           if (isMobile)
             boxes[index]['widget'] as Widget
           else
@@ -409,90 +441,96 @@ Widget _buildOuterCard(
   );
 }
 
-  Widget _buildInnerBox(String title, String description, bool isMobile,
-      {String? docId}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: Card(
-          elevation: 4,
-          shadowColor: Colors.cyanAccent.withOpacity(0.3),
-          color: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(
-                color: Colors.cyanAccent.withOpacity(0.18), width: 1.2),
-          ),
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xCC0B132B),
-                  Color(0x99112233),
-                  Color(0x66121A2E)
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: Colors.cyanAccent.withOpacity(0.14), width: 1.0),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.28),
-                    blurRadius: 20,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 10)),
-                BoxShadow(
-                    color: Colors.cyanAccent.withOpacity(0.05),
-                    blurRadius: 14,
-                    spreadRadius: 1),
+Widget _buildInnerBox(String title, String description, bool isMobile,
+    {String? docId}) {
+  final hasTitle = title.trim().isNotEmpty && title.trim() != 'Untitled Step';
+
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(12),
+    child: BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      child: Card(
+        elevation: 4,
+        shadowColor: Colors.cyanAccent.withOpacity(0.3),
+        color: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+              color: Colors.cyanAccent.withOpacity(0.18), width: 1.2),
+        ),
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xCC0B132B),
+                Color(0x99112233),
+                Color(0x66121A2E)
               ],
             ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 10 : 14,
-                  vertical: isMobile ? 10 : 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+                color: Colors.cyanAccent.withOpacity(0.14), width: 1.0),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.28),
+                  blurRadius: 20,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 10)),
+              BoxShadow(
+                  color: Colors.cyanAccent.withOpacity(0.05),
+                  blurRadius: 14,
+                  spreadRadius: 1),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 10 : 14,
+                vertical: isMobile ? 10 : 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment:
+                  hasTitle ? MainAxisAlignment.start : MainAxisAlignment.center,
+              children: [
+                if (hasTitle) ...[
                   Text(title,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.tinos(
                         color: Colors.cyanAccent,
                         fontSize: isMobile ? 13 : 15,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5,
                       )),
                   const SizedBox(height: 8),
-                  Text(description,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: isMobile ? 11.5 : 13,
-                        height: 1.45,
-                      )),
-                  if (_isAdmin)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                            icon: const Icon(Icons.edit,
-                                color: Colors.cyanAccent, size: 18),
-                            onPressed: () =>
-                                _showEditDialog(docId!, title, description)),
-                        IconButton(
-                            icon: const Icon(Icons.delete,
-                                color: Colors.redAccent, size: 18),
-                            onPressed: () => _deleteStep(docId!)),
-                      ],
-                    ),
                 ],
-              ),
+                Text(description,
+                    style: GoogleFonts.redHatDisplay(
+                      color: Colors.white,
+                      fontSize: isMobile ? 11.5 : 13,
+                      height: 1.45,
+                    )),
+                if (_isAdmin)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                          icon: const Icon(Icons.edit,
+                              color: Colors.cyanAccent, size: 18),
+                          onPressed: () =>
+                              _showEditDialog(docId!, title, description)),
+                      IconButton(
+                          icon: const Icon(Icons.delete,
+                              color: Colors.redAccent, size: 18),
+                          onPressed: () => _deleteStep(docId!)),
+                    ],
+                  ),
+              ],
             ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

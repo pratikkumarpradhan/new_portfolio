@@ -469,50 +469,44 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> _updateButtonOrder(int oldIndex, int newIndex) async {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
+  Future<void> _updateButtonOrder(int oldIndex, int newIndex, {bool fromReorderable = true}) async {
+    // Normalize only when coming from ReorderableListView
+    int targetIndex = newIndex;
+    if (fromReorderable && oldIndex < newIndex) {
+      targetIndex = newIndex - 1;
     }
 
-    debugPrint('🔄 Reordering button: $oldIndex → $newIndex');
+    debugPrint('🔄 Reordering (optimistic): $oldIndex → $targetIndex');
 
+    // Optimistic local update for instant UI feedback
+    final prevButtons = List<NavigationButton>.from(navigationButtons);
+    final updated = List<NavigationButton>.from(navigationButtons);
+    final moved = updated.removeAt(oldIndex);
+    updated.insert(targetIndex, moved);
+    setState(() {
+      navigationButtons = updated;
+    });
+
+    // Persist new order to Firestore
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Updating button order...'),
-          duration: Duration(seconds: 1),
-          backgroundColor: Colors.blue,
-        ),
-      );
-
-      final allButtonsQuery = await FirebaseFirestore.instance
-          .collection('navigationButtons')
-          .orderBy('order')
-          .get();
-
-      final allButtons = allButtonsQuery.docs
-          .map((doc) => NavigationButton.fromFirestore(doc))
-          .toList();
-
-      final movedButton = allButtons[oldIndex];
-      allButtons.removeAt(oldIndex);
-      allButtons.insert(newIndex, movedButton);
-
       final batch = FirebaseFirestore.instance.batch();
-      for (int i = 0; i < allButtons.length; i++) {
+      for (int i = 0; i < updated.length; i++) {
         batch.update(
-          FirebaseFirestore.instance.collection('navigationButtons').doc(allButtons[i].id),
+          FirebaseFirestore.instance.collection('navigationButtons').doc(updated[i].id),
           {'order': i},
         );
       }
       await batch.commit();
-
-      debugPrint('✅ Button order updated successfully');
+      debugPrint('✅ Button order saved');
     } catch (e) {
-      debugPrint('❌ Error updating button order: $e');
+      // Revert on error
+      debugPrint('❌ Error saving order, reverting: $e');
+      setState(() {
+        navigationButtons = prevButtons;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to update button order: $e'),
+          content: Text('Failed to update order: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -925,11 +919,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ? () => _showDeleteButtonDialog(button)
                                   : null,
                               onMoveUp: _isAdmin == true && index > 0
-                                  ? () => _updateButtonOrder(index, index - 1)
+                                  ? () => _updateButtonOrder(index, index - 1, fromReorderable: false)
                                   : null,
                               onMoveDown: _isAdmin == true &&
                                       index < navigationButtons.length - 1
-                                  ? () => _updateButtonOrder(index, index + 1)
+                                  ? () => _updateButtonOrder(index, index + 1, fromReorderable: false)
                                   : null,
                               fontSize: isDesktop ? 16 : 14,
                               padding: isDesktop
@@ -1656,7 +1650,7 @@ onTap: () async {
                   ? _ReorderableButtonGrid(
                       navigationButtons: context.findAncestorStateOfType<_HomeScreenState>()?.navigationButtons ?? [],
                       selectedIndex: context.findAncestorStateOfType<_HomeScreenState>()?.selectedIndex ?? 0,
-                      onReorder: (oldIndex, newIndex) => context.findAncestorStateOfType<_HomeScreenState>()?._updateButtonOrder(oldIndex, newIndex),
+                      onReorder: (oldIndex, newIndex) => context.findAncestorStateOfType<_HomeScreenState>()?._updateButtonOrder(oldIndex, newIndex, fromReorderable: true),
                       onTap: (index) => context.findAncestorStateOfType<_HomeScreenState>()?.changePageAnimated(index),
                       onEdit: (button) => context.findAncestorStateOfType<_HomeScreenState>()?._showEditButtonDialog(button),
                       onDelete: (button) => context.findAncestorStateOfType<_HomeScreenState>()?._showDeleteButtonDialog(button),
@@ -1809,8 +1803,8 @@ class _HoverZoomButtonState extends State<_HoverZoomButton> with SingleTickerPro
   Widget build(BuildContext context) {
     final showCyanBorder = widget.isSelected || _isHovered;
 
-    return Stack(
-      clipBehavior: Clip.none,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         MouseRegion(
           cursor: SystemMouseCursors.click,
@@ -1834,9 +1828,7 @@ class _HoverZoomButtonState extends State<_HoverZoomButton> with SingleTickerPro
                 ),
                 child: Text(
                   widget.title,
-                  //style: GoogleFonts.pacifico(
                   style: GoogleFonts.montaga(
-                    //fontWeight: FontWeight.w600,
                     fontSize: widget.fontSize ?? 18,
                     color: widget.isSelected ? Colors.cyanAccent : Colors.white,
                   ),
@@ -1845,54 +1837,42 @@ class _HoverZoomButtonState extends State<_HoverZoomButton> with SingleTickerPro
             ),
           ),
         ),
-        if (widget.isAdmin)
-          Positioned(
-            top: -8,
-            right: -8,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.cyanAccent, size: 16),
-                  onPressed: widget.onEdit,
-                  tooltip: 'Edit',
-                  padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.redAccent, size: 16),
-                  onPressed: widget.onDelete,
-                  tooltip: 'Delete',
-                  padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
-                ),
-              ],
-            ),
+        if (widget.isAdmin) ...[
+          const SizedBox(height: 6),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_upward, size: 16, color: Colors.white70),
+                padding: const EdgeInsets.all(4),
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                onPressed: widget.onMoveUp,
+                tooltip: 'Move up',
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_downward, size: 16, color: Colors.white70),
+                padding: const EdgeInsets.all(4),
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                onPressed: widget.onMoveDown,
+                tooltip: 'Move down',
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.cyanAccent, size: 16),
+                padding: const EdgeInsets.all(4),
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                onPressed: widget.onEdit,
+                tooltip: 'Edit',
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.redAccent, size: 16),
+                padding: const EdgeInsets.all(4),
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                onPressed: widget.onDelete,
+                tooltip: 'Delete',
+              ),
+            ],
           ),
-        if (widget.isAdmin)
-          Positioned(
-            top: -8,
-            left: -8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_upward, size: 16, color: Colors.white54),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: widget.onMoveUp,
-                  tooltip: 'Move up',
-                ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_downward, size: 16, color: Colors.white54),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: widget.onMoveDown,
-                  tooltip: 'Move down',
-                ),
-              ],
-            ),
-          ),
+        ],
       ],
     );
   }
@@ -2005,11 +1985,25 @@ class _HoverSlideButtonState extends State<_HoverSlideButton> with SingleTickerP
         ),
         if (widget.isAdmin)
           Positioned(
-            top: -8,
-            right: -8,
+            top: 2,
+            right: 2,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_upward, size: 16, color: Colors.white70),
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  onPressed: widget.onMoveUp,
+                  tooltip: 'Move up',
+                ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_downward, size: 16, color: Colors.white70),
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  onPressed: widget.onMoveDown,
+                  tooltip: 'Move down',
+                ),
                 IconButton(
                   icon: const Icon(Icons.edit, color: Colors.cyanAccent, size: 16),
                   onPressed: widget.onEdit,
@@ -2023,30 +2017,6 @@ class _HoverSlideButtonState extends State<_HoverSlideButton> with SingleTickerP
                   tooltip: 'Delete',
                   padding: const EdgeInsets.all(4),
                   constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
-                ),
-              ],
-            ),
-          ),
-        if (widget.isAdmin)
-          Positioned(
-            top: -8,
-            left: -8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_upward, size: 16, color: Colors.white54),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: widget.onMoveUp,
-                  tooltip: 'Move up',
-                ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_downward, size: 16, color: Colors.white54),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: widget.onMoveDown,
-                  tooltip: 'Move down',
                 ),
               ],
             ),
