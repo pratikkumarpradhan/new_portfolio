@@ -283,79 +283,102 @@ Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (_isAdmin == true)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_upward, color: Colors.orangeAccent),
-                        tooltip: 'Move Up',
-                        onPressed: () async {
-                          setState(() {
-                            int newIndex = index > 0 ? index - 1 : _docs.length - 1;
-                            final temp = _docs[newIndex];
-                            _docs[newIndex] = _docs[index];
-                            _docs[index] = temp;
-                          });
-                          for (int i = 0; i < _docs.length; i++) {
-                            final id = _docs[i].id;
-                            FirebaseFirestore.instance
-                                .collection('portfolio')
-                                .doc(id)
-                                .update({'order': i});
-                          }
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.arrow_downward, color: Colors.orangeAccent),
-                        tooltip: 'Move Down',
-                        onPressed: () async {
-                          setState(() {
-                            int newIndex = index < _docs.length - 1 ? index + 1 : 0;
-                            final temp = _docs[newIndex];
-                            _docs[newIndex] = _docs[index];
-                            _docs[index] = temp;
-                          });
-                          for (int i = 0; i < _docs.length; i++) {
-                            final id = _docs[i].id;
-                            FirebaseFirestore.instance
-                                .collection('portfolio')
-                                .doc(id)
-                                .update({'order': i});
-                          }
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.redAccent),
-                        tooltip: 'Delete Project',
-                        onPressed: () async {
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Delete Project'),
-                              content: const Text('Are you sure you want to delete this project?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                                ),
-                              ],
-                            ),
-                          );
-                          if (confirm == true) {
-                            await FirebaseFirestore.instance
-                                .collection('portfolio')
-                                .doc(docId)
-                                .delete();
-                          }
-                        },
-                      ),
-                    ],
-                  ),
+               if (_isAdmin == true)
+  Row(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+      // ===== Edit Button =====
+      IconButton(
+        icon: const Icon(Icons.edit, color: Colors.blueAccent),
+        tooltip: 'Edit Project',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AddProjectScreen(
+                project: app, // pass the current project
+                documentId: docId, // pass the Firestore doc ID
+                isWebDev: false, // App Dev tab
+              ),
+            ),
+          );
+        },
+      ),
+
+      // ===== Move Up =====
+      IconButton(
+        icon: const Icon(Icons.arrow_upward, color: Colors.orangeAccent),
+        tooltip: 'Move Up',
+        onPressed: () async {
+          setState(() {
+            int newIndex = index > 0 ? index - 1 : _docs.length - 1;
+            final temp = _docs[newIndex];
+            _docs[newIndex] = _docs[index];
+            _docs[index] = temp;
+          });
+          for (int i = 0; i < _docs.length; i++) {
+            final id = _docs[i].id;
+            FirebaseFirestore.instance
+                .collection('portfolio')
+                .doc(id)
+                .update({'order': i});
+          }
+        },
+      ),
+
+      // ===== Move Down =====
+      IconButton(
+        icon: const Icon(Icons.arrow_downward, color: Colors.orangeAccent),
+        tooltip: 'Move Down',
+        onPressed: () async {
+          setState(() {
+            int newIndex = index < _docs.length - 1 ? index + 1 : 0;
+            final temp = _docs[newIndex];
+            _docs[newIndex] = _docs[index];
+            _docs[index] = temp;
+          });
+          for (int i = 0; i < _docs.length; i++) {
+            final id = _docs[i].id;
+            FirebaseFirestore.instance
+                .collection('portfolio')
+                .doc(id)
+                .update({'order': i});
+          }
+        },
+      ),
+
+      // ===== Delete =====
+      IconButton(
+        icon: const Icon(Icons.delete, color: Colors.redAccent),
+        tooltip: 'Delete Project',
+        onPressed: () async {
+          final confirm = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Delete Project'),
+              content: const Text('Are you sure you want to delete this project?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ),
+          );
+          if (confirm == true) {
+            await FirebaseFirestore.instance
+                .collection('portfolio')
+                .doc(docId)
+                .delete();
+          }
+        },
+      ),
+    ],
+  ),
                 Stack(
                   children: [
                     ClipRRect(
