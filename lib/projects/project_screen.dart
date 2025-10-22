@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,10 +5,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:portfolio/home_screen.dart';
 import 'package:portfolio/projects/add_project.dart';
 import 'package:portfolio/projects/project_details_screen.dart';
+import 'package:portfolio/projects/web_dev_screen.dart';
 import 'dart:ui';
 import 'dart:async';
 
 import 'package:portfolio/services/firebase.dart';
+
 
 
 class PortfolioScreen extends StatefulWidget {
@@ -26,6 +26,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   List<QueryDocumentSnapshot> _docs = [];
   late StreamSubscription<QuerySnapshot> _subscription;
   StreamSubscription<User?>? _authSubscription;
+
+  int _selectedTab = 0; // 0 = App Dev, 1 = Web Dev
 
   @override
   void initState() {
@@ -145,7 +147,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ),
         ),
       ),
-      floatingActionButton: (_isAdmin == true)
+      floatingActionButton: (_isAdmin == true && _selectedTab == 0)
           ? FloatingActionButton(
               backgroundColor: Colors.cyanAccent,
               foregroundColor: Colors.black,
@@ -158,258 +160,342 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           : null,
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF090C1A), // Deep navy
-                    Color(0xFF0F172A), // Slate-900
-                    Color(0xFF1E293B), // Slate-800
-                  ],
-                  stops: [0.0, 0.55, 1.0],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+          : Column(
+              children: [
+                // ===== Spacer for transparent AppBar =====
+                SizedBox(height: kToolbarHeight + MediaQuery.of(context).padding.top),
+
+// ===== Navigation Row =====
+Container(
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  color: Colors.transparent,
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: [
+      // App Dev Button
+      Expanded(
+        child: TextButton(
+          onPressed: () {
+            setState(() {
+              _selectedTab = 0;
+            });
+          },
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "App Dev",
+                style: TextStyle(
+                  color: _selectedTab == 0 ? Colors.cyanAccent : Colors.white54,
+                  fontWeight: _selectedTab == 0 ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 16,
                 ),
               ),
-              child: ListView.builder(
-                padding: const EdgeInsets.fromLTRB(16, kToolbarHeight + 24, 16, 24),
-                itemCount: _docs.length,
-                itemBuilder: (context, index) {
-                  final doc = _docs[index];
-                  final app = PortfolioProject.fromMap(doc.data() as Map<String, dynamic>);
-                  final docId = doc.id;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 32),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        if (_isAdmin == true)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.arrow_upward, color: Colors.orangeAccent),
-                                tooltip: 'Move Up',
-                                onPressed: () async {
-                                  setState(() {
-                                    int newIndex = index > 0 ? index - 1 : _docs.length - 1;
-                                    final temp = _docs[newIndex];
-                                    _docs[newIndex] = _docs[index];
-                                    _docs[index] = temp;
-                                  });
-                                  for (int i = 0; i < _docs.length; i++) {
-                                    final id = _docs[i].id;
-                                    FirebaseFirestore.instance.collection('portfolio').doc(id).update({'order': i});
-                                  }
-                                },
+              const SizedBox(height: 4),
+              Container(
+                height: 2,
+                width: 60,
+                color: _selectedTab == 0 ? Colors.cyanAccent : Colors.transparent,
+              ),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(width: 16),
+      // Web Dev Button
+      Expanded(
+        child: TextButton(
+          onPressed: () {
+            setState(() {
+              _selectedTab = 1;
+            });
+          },
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Web Dev",
+                style: TextStyle(
+                  color: _selectedTab == 1 ? Colors.cyanAccent : Colors.white54,
+                  fontWeight: _selectedTab == 1 ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                height: 2,
+                width: 60,
+                color: _selectedTab == 1 ? Colors.cyanAccent : Colors.transparent,
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
+  ),
+),
+
+               // ===== Content based on selected tab =====
+Expanded(
+  child: IndexedStack(
+    index: _selectedTab,
+    children: [
+      _buildAppDevList(), // App Dev tab
+      const PortfolioWebScreen(), // Web Dev tab
+    ],
+  ),
+),
+              ],
+            ),
+    );
+  }
+
+  // ===== Build App Dev List =====
+  Widget _buildAppDevList() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF090C1A),
+            Color(0xFF0F172A),
+            Color(0xFF1E293B),
+          ],
+          stops: [0.0, 0.55, 1.0],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        itemCount: _docs.length,
+        itemBuilder: (context, index) {
+          final doc = _docs[index];
+          final app = PortfolioProject.fromMap(doc.data() as Map<String, dynamic>);
+          final docId = doc.id;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_isAdmin == true)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_upward, color: Colors.orangeAccent),
+                        tooltip: 'Move Up',
+                        onPressed: () async {
+                          setState(() {
+                            int newIndex = index > 0 ? index - 1 : _docs.length - 1;
+                            final temp = _docs[newIndex];
+                            _docs[newIndex] = _docs[index];
+                            _docs[index] = temp;
+                          });
+                          for (int i = 0; i < _docs.length; i++) {
+                            final id = _docs[i].id;
+                            FirebaseFirestore.instance
+                                .collection('portfolio')
+                                .doc(id)
+                                .update({'order': i});
+                          }
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_downward, color: Colors.orangeAccent),
+                        tooltip: 'Move Down',
+                        onPressed: () async {
+                          setState(() {
+                            int newIndex = index < _docs.length - 1 ? index + 1 : 0;
+                            final temp = _docs[newIndex];
+                            _docs[newIndex] = _docs[index];
+                            _docs[index] = temp;
+                          });
+                          for (int i = 0; i < _docs.length; i++) {
+                            final id = _docs[i].id;
+                            FirebaseFirestore.instance
+                                .collection('portfolio')
+                                .doc(id)
+                                .update({'order': i});
+                          }
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.redAccent),
+                        tooltip: 'Delete Project',
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Delete Project'),
+                              content: const Text('Are you sure you want to delete this project?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true) {
+                            await FirebaseFirestore.instance
+                                .collection('portfolio')
+                                .doc(docId)
+                                .delete();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(28),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xCC0B132B),
+                                Color(0x99112233),
+                                Color(0x66121A2E),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(28),
+                            border: Border.all(color: Colors.cyanAccent.withOpacity(0.14), width: 1.2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.35),
+                                blurRadius: 28,
+                                offset: Offset(0, 12),
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.arrow_downward, color: Colors.orangeAccent),
-                                tooltip: 'Move Down',
-                                onPressed: () async {
-                                  setState(() {
-                                    int newIndex = index < _docs.length - 1 ? index + 1 : 0;
-                                    final temp = _docs[newIndex];
-                                    _docs[newIndex] = _docs[index];
-                                    _docs[index] = temp;
-                                  });
-                                  for (int i = 0; i < _docs.length; i++) {
-                                    final id = _docs[i].id;
-                                    FirebaseFirestore.instance.collection('portfolio').doc(id).update({'order': i});
-                                  }
-                                },
-                              ),
-                              // IconButton(
-                              //   icon: const Icon(Icons.edit, color: Colors.cyanAccent),
-                              //   tooltip: 'Edit Project',
-                              //   onPressed: () {
-                              //     Navigator.push(
-                              //       context,
-                              //       MaterialPageRoute(
-                              //         builder: (_) => AddProjectScreen(project: app, documentId: docId),
-                              //       ),
-                              //     );
-                              //   },
-                              // ),
-                              IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.redAccent),
-                                tooltip: 'Delete Project',
-                                onPressed: () async {
-                                  final confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Delete Project'),
-                                      content: const Text('Are you sure you want to delete this project?'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context, false),
-                                          child: const Text('Cancel'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context, true),
-                                          child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                  if (confirm == true) {
-                                    await FirebaseFirestore.instance
-                                        .collection('portfolio')
-                                        .doc(docId)
-                                        .delete();
-                                  }
-                                },
+                              BoxShadow(
+                                color: Colors.cyanAccent.withOpacity(0.06),
+                                blurRadius: 20,
+                                spreadRadius: 1,
                               ),
                             ],
                           ),
-                        Stack(
-                          children: [
-                            // Glassmorphism card
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(28),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        Color(0xCC0B132B), // deep navy glass
-                                        Color(0x99112233), // slate glass
-                                        Color(0x66121A2E), // subtle violet tint
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(28),
-                                    border: Border.all(color: Colors.cyanAccent.withOpacity(0.14), width: 1.2),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.35),
-                                        blurRadius: 28,
-                                        offset: Offset(0, 12),
-                                      ),
-                                      BoxShadow(
-                                        color: Colors.cyanAccent.withOpacity(0.06),
-                                        blurRadius: 20,
-                                        spreadRadius: 1,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+                                  child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const SizedBox(width: 0),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Text(
-                                                          app.title,
-                                                          // style: GoogleFonts.permanentMarker(
-                                                          style: GoogleFonts.berkshireSwash(
-                                                            fontSize: 26,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: Colors.white,
-                                                          ),
-                                                        ),
-                                                        const SizedBox(height: 8),
-                                                        Text(
-                                                          app.overview,
-                                                          style: GoogleFonts.merienda(
-                                                            fontSize: 16,
-                                                            color: Colors.white70,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  app.title,
+                                                  style: GoogleFonts.berkshireSwash(
+                                                    fontSize: 26,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
                                                   ),
-                                                  FilledButton.icon(
-                                                    style: FilledButton.styleFrom(
-                                                      backgroundColor: Colors.cyanAccent,
-                                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(12),
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  app.overview,
+                                                  style: GoogleFonts.merienda(
+                                                    fontSize: 16,
+                                                    color: Colors.white70,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          FilledButton.icon(
+                                            style: FilledButton.styleFrom(
+                                              backgroundColor: Colors.cyanAccent,
+                                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => ProjectDetailScreen(project: app),
+                                                ),
+                                              );
+                                            },
+                                            icon: const Icon(Icons.arrow_forward, color: Colors.black),
+                                            label: const Text(
+                                              "More",
+                                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 18),
+                                      SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: app.images
+                                              .map((url) => Padding(
+                                                    padding: const EdgeInsets.only(right: 16),
+                                                    child: ClipRRect(
+                                                      borderRadius: BorderRadius.circular(18),
+                                                      child: Container(
+                                                        decoration: BoxDecoration(
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Colors.black.withOpacity(0.18),
+                                                              blurRadius: 12,
+                                                              offset: Offset(0, 4),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: GestureDetector(
+                                                          behavior: HitTestBehavior.opaque,
+                                                          child: PhoneMockupNetwork(imageUrl: url),
+                                                        ),
                                                       ),
                                                     ),
-                                                    onPressed: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (_) => ProjectDetailScreen(project: app),
-                                                        ),
-                                                      );
-                                                    },
-                                                    icon: const Icon(Icons.arrow_forward, color: Colors.black),
-                                                    label: const Text(
-                                                      "More",
-                                                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 18),
-                                              SingleChildScrollView(
-                                                scrollDirection: Axis.horizontal,
-                                                child: Row(
-                                                  children: app.images
-                                                      .map((url) => Padding(
-                                                            padding: const EdgeInsets.only(right: 16),
-                                                            child: ClipRRect(
-                                                              borderRadius: BorderRadius.circular(18),
-                                                              child: Container(
-                                                                decoration: BoxDecoration(
-                                                                  boxShadow: [
-                                                                    BoxShadow(
-                                                                      color: Colors.black.withOpacity(0.18),
-                                                                      blurRadius: 12,
-                                                                      offset: Offset(0, 4),
-                                                                    ),
-                                                                  ],
-                                                                ),
-child: GestureDetector(
-  behavior: HitTestBehavior.opaque,
-  onPanDown: (_) {}, // capture touch start
-  onPanUpdate: (_) {}, // absorb drag events
-  onPanEnd: (_) {}, // absorb end
-  child: AbsorbPointer(
-    absorbing: false, // still allow PhoneMockup gestures
-    child: PhoneMockupNetwork(imageUrl: url),
-  ),
-),                                                              ),
-                                                            ),
-                                                          ))
-                                                      .toList(),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                                  ))
+                                              .toList(),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ],
+                      ),
                     ),
-                  );
-                },
-              ),
+                  ],
+                ),
+              ],
             ),
+          );
+        },
+      ),
     );
   }
 }
+
 
 class PhoneMockupNetwork extends StatelessWidget {
   final String imageUrl;
@@ -470,17 +556,24 @@ class _PhoneMockupState extends State<PhoneMockup> {
     const borderRadius = BorderRadius.all(Radius.circular(36));
     const moveFactor = 12.0;
 
-    return Listener(
-      onPointerMove: (event) {
-        // This ensures it works with finger movement on mobile
-        final box = context.findRenderObject() as RenderBox?;
-        if (box != null) {
-          _updateTilt(box.globalToLocal(event.position), box.size);
-        }
-      },
-      onPointerUp: (_) => _resetTilt(),
-      onPointerCancel: (_) => _resetTilt(),
-      child: MouseRegion(
+  return Listener(
+  onPointerDown: (_) {
+    // When user touches phone area on mobile, stop parent scroll
+    if (Theme.of(context).platform == TargetPlatform.android ||
+        Theme.of(context).platform == TargetPlatform.iOS) {
+      ScrollableState? scrollableState = Scrollable.of(context);
+      scrollableState?.position?.activity?.dispose();
+    }
+  },
+  onPointerMove: (event) {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box != null) {
+      _updateTilt(box.globalToLocal(event.position), box.size);
+    }
+  },
+  onPointerUp: (_) => _resetTilt(),
+  onPointerCancel: (_) => _resetTilt(),
+  child: MouseRegion(
         onHover: (event) {
           // Desktop hover stays EXACTLY as before
           final box = context.findRenderObject() as RenderBox?;
