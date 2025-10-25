@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolio/projects/add_project.dart';
-import 'package:portfolio/projects/project_details_screen.dart';
+import 'package:portfolio/projects/web_project_detail.dart';
 import 'package:portfolio/services/firebase.dart';
 
 class PortfolioWebScreen extends StatefulWidget {
