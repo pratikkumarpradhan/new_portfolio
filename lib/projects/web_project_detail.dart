@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:portfolio/projects/project_screen.dart';
+import 'package:portfolio/projects/web_dev_screen.dart';
 import 'package:portfolio/services/firebase.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -172,154 +172,96 @@ margin: EdgeInsets.symmetric(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               // Carousel
-                              SizedBox(
-                                height: 600,
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      child: Stack(
-                                        children: [
-                                          PageView.builder(
-                                            controller: _pageController,
-                                            itemCount: project.images.length,
-                                            physics: const BouncingScrollPhysics(),
-                                            onPageChanged: (index) {
-                                              setState(() => _currentIndex = index);
-                                            },
-                                            itemBuilder: (context, index) {
-                                              return Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                                child: ClipRect(
-                                                  child: Align(
-                                                    alignment: Alignment.center,
-                                                    heightFactor: 1.0,
-                                                    child: PhoneMockupNetwork(imageUrl: project.images[index]),
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-
-                                  // Arrows (square shape for all screens)
-Positioned(
-  left: 12,
-  top: 0,
-  bottom: 0,
-  child: Center(
-    child: Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
+          SizedBox(
+  height: 360, // slightly bigger than TabletMockup height (300)
+  child: Stack(
+    alignment: Alignment.center,
+    children: [
+      PageView.builder(
+        controller: _pageController,
+        itemCount: project.images.length,
+        physics: const BouncingScrollPhysics(),
+        onPageChanged: (index) => setState(() => _currentIndex = index),
+        itemBuilder: (context, index) {
+          return Center(
+            child: TabletMockupNetwork(imageUrl: project.images[index]),
+          );
+        },
       ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: () => _goToPage(_currentIndex - 1),
-        child: const SizedBox(
-          width: 42,
-          height: 42,
-          child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
+
+      // Left arrow
+      Positioned(
+        left: 8,
+        child: GestureDetector(
+          onTap: () => _goToPage(_currentIndex - 1),
+          child: Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
+          ),
         ),
       ),
-    ),
-  ),
-),
-// // Square Arrow Buttons (adjusted for mobile)
-// Positioned(
-//   left: MediaQuery.of(context).size.width < 600 ? 2 : 12,
-//   top: 0,
-//   bottom: 0,
-//   child: Center(
-//     child: Container(
-//       decoration: BoxDecoration(
-//         color: Colors.white.withOpacity(0.15),
-//         borderRadius: BorderRadius.circular(8),
-//         border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
-//         boxShadow: [
-//           BoxShadow(
-//             color: Colors.black.withOpacity(0.3),
-//             blurRadius: 8,
-//             offset: const Offset(0, 3),
-//           ),
-//         ],
-//       ),
-//       child: InkWell(
-//         borderRadius: BorderRadius.circular(8),
-//         onTap: () => _goToPage(_currentIndex - 1),
-//         child: const SizedBox(
-//           width: 42,
-//           height: 42,
-//           child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
-//         ),
-//       ),
-//     ),
-//   ),
-// ),
 
-Positioned(
-  right: MediaQuery.of(context).size.width < 600 ? 2 : 12,
-  top: 0,
-  bottom: 0,
-  child: Center(
-    child: Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+      // Right arrow
+      Positioned(
+        right: 8,
+        child: GestureDetector(
+          onTap: () => _goToPage(_currentIndex + 1),
+          child: Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 22),
           ),
-        ],
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: () => _goToPage(_currentIndex + 1),
-        child: const SizedBox(
-          width: 42,
-          height: 42,
-          child: Icon(Icons.arrow_forward_ios, color: Colors.white, size: 22),
         ),
       ),
-    ),
+
+      // Bottom indicator dots
+      Positioned(
+        bottom: 8,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            project.images.length,
+            (index) => AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: _currentIndex == index ? 12 : 8,
+              height: _currentIndex == index ? 12 : 8,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _currentIndex == index ? Colors.white : Colors.white54,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ],
   ),
 ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-
-                                    // Indicator Dots
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: List.generate(
-                                        project.images.length,
-                                        (index) => AnimatedContainer(
-                                          duration: const Duration(milliseconds: 300),
-                                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                                          width: _currentIndex == index ? 12 : 8,
-                                          height: _currentIndex == index ? 12 : 8,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: _currentIndex == index ? Colors.white : Colors.white54,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                  ],
-                                ),
-                              ),
-
                               // Title and Overview in a centered container
                               Container(
                                 width: double.infinity,
