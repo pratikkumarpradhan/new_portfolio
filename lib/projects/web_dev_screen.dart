@@ -421,134 +421,143 @@ class _TabletMockupState extends State<TabletMockup> {
           if (box != null) _updateTilt(box.globalToLocal(event.position), box.size);
         },
         onExit: (_) => _resetTilt(),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          transform: _build3DMatrix(),
-          transformAlignment: Alignment.center,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // ===== Shadow beneath tablet =====
-              AnimatedOpacity(
-                opacity: _hovering ? 1 : 0.7,
-                duration: const Duration(milliseconds: 300),
-                child: Transform.translate(
-                  offset: const Offset(0, 28),
-                  child: Container(
-                    width: 440,
-                    height: 310,
-                    decoration: BoxDecoration(
-                      borderRadius: borderRadius,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.55),
-                          blurRadius: 40,
-                          spreadRadius: 10,
-                        ),
-                      ],
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent, // keep original look
+          shadowColor: Colors.transparent, // shadows are handled in your widget
+          padding: EdgeInsets.zero, // remove default padding
+          shape: RoundedRectangleBorder(borderRadius: borderRadius),
+        ),
+        onPressed: () {},
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            transform: _build3DMatrix(),
+            transformAlignment: Alignment.center,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // ===== Shadow beneath tablet =====
+                AnimatedOpacity(
+                  opacity: _hovering ? 1 : 0.7,
+                  duration: const Duration(milliseconds: 300),
+                  child: Transform.translate(
+                    offset: const Offset(0, 28),
+                    child: Container(
+                      width: 440,
+                      height: 310,
+                      decoration: BoxDecoration(
+                        borderRadius: borderRadius,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.55),
+                            blurRadius: 40,
+                            spreadRadius: 10,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-
-              // ===== Tablet body =====
-              Container(
-                width: 440,
-                height: 300,
-                decoration: BoxDecoration(
-                  borderRadius: borderRadius,
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF1F2124),
-                      Color(0xFF2C2E31),
-                      Color(0xFF18191B),
-                    ],
+          
+                // ===== Tablet body =====
+                Container(
+                  width: 440,
+                  height: 300,
+                  decoration: BoxDecoration(
+                    borderRadius: borderRadius,
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF1F2124),
+                        Color(0xFF2C2E31),
+                        Color(0xFF18191B),
+                      ],
+                    ),
+                    border: Border.all(color: Colors.white12, width: 1.2),
                   ),
-                  border: Border.all(color: Colors.white12, width: 1.2),
-                ),
-                child: ClipRRect(
-                  borderRadius: borderRadius,
-                  child: Stack(
-                    children: [
-                      // ===== Inner screen (added padding so not hidden) =====
-                      AnimatedPositioned(
-                        duration: const Duration(milliseconds: 150),
-                        top: 12 - _tiltX * moveFactor,
-                        left: 12 + _tiltY * moveFactor,
-                        right: 12 - _tiltY * moveFactor,
-                        bottom: 12 + _tiltX * moveFactor,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Container(
-                            color: Colors.black,
-                            padding: const EdgeInsets.all(6),
-                            child: widget.isNetwork
-                                ? Image.network(widget.imagePath, fit: BoxFit.contain)
-                                : Image.asset(widget.imagePath, fit: BoxFit.contain),
+                  child: ClipRRect(
+                    borderRadius: borderRadius,
+                    child: Stack(
+                      children: [
+                        // ===== Inner screen (added padding so not hidden) =====
+                        AnimatedPositioned(
+                          duration: const Duration(milliseconds: 150),
+                          top: 12 - _tiltX * moveFactor,
+                          left: 12 + _tiltY * moveFactor,
+                          right: 12 - _tiltY * moveFactor,
+                          bottom: 12 + _tiltX * moveFactor,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              color: Colors.black,
+                              padding: const EdgeInsets.all(6),
+                              child: widget.isNetwork
+                                  ? Image.network(widget.imagePath, fit: BoxFit.contain)
+                                  : Image.asset(widget.imagePath, fit: BoxFit.contain),
+                            ),
                           ),
                         ),
-                      ),
-
-                      // ===== Glossy reflection =====
-                      Positioned(
-                        top: 0 - _tiltX * 3,
-                        left: 0 + _tiltY * 3,
-                        right: 0 - _tiltY * 3,
-                        height: 60,
-                        child: IgnorePointer(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.white.withOpacity(0.08),
-                                  Colors.transparent,
-                                ],
+          
+                        // ===== Glossy reflection =====
+                        Positioned(
+                          top: 0 - _tiltX * 3,
+                          left: 0 + _tiltY * 3,
+                          right: 0 - _tiltY * 3,
+                          height: 60,
+                          child: IgnorePointer(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.white.withOpacity(0.08),
+                                    Colors.transparent,
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-
-                      // ===== Camera Bar =====
-                      Positioned(
-                        top: 5 - _tiltX * 2,
-                        left: 0 + _tiltY * 2,
-                        right: 0 - _tiltY * 2,
-                        child: Transform.translate(
-                          offset: Offset(_tiltY * 4, -_tiltX * 3),
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            child: Container(
-                              width: 80,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.9),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: Colors.white10, width: 0.8),
-                              ),
-                              child: Center(
-                                child: Container(
-                                  width: 6,
-                                  height: 6,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white30,
-                                      width: 0.8,
+          
+                        // ===== Camera Bar =====
+                        Positioned(
+                          top: 5 - _tiltX * 2,
+                          left: 0 + _tiltY * 2,
+                          right: 0 - _tiltY * 2,
+                          child: Transform.translate(
+                            offset: Offset(_tiltY * 4, -_tiltX * 3),
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                width: 80,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: Colors.white10, width: 0.8),
+                                ),
+                                child: Center(
+                                  child: Container(
+                                    width: 6,
+                                    height: 6,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white30,
+                                        width: 0.8,
+                                      ),
                                     ),
-                                  ),
-                                  child: Center(
-                                    child: Container(
-                                      width: 2.2,
-                                      height: 2.2,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white24,
-                                        shape: BoxShape.circle,
+                                    child: Center(
+                                      child: Container(
+                                        width: 2.2,
+                                        height: 2.2,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white24,
+                                          shape: BoxShape.circle,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -557,16 +566,16 @@ class _TabletMockupState extends State<TabletMockup> {
                             ),
                           ),
                         ),
-                      ),
-
-                      // ===== Slim Side Buttons (always visible) =====
-                      _buildSideButton(top: 100, height: 50, delay: 4),
-                      _buildSideButton(top: 165, height: 65, delay: 5),
-                    ],
+          
+                        // ===== Slim Side Buttons (always visible) =====
+                        _buildSideButton(top: 100, height: 50, delay: 4),
+                        _buildSideButton(top: 165, height: 65, delay: 5),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

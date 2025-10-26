@@ -181,8 +181,10 @@ void _scrollToCurrentMonth() {
   final monthGroups = _groupByMonth();
   if (monthGroups.isEmpty) return;
 
-  // Target June month always
-  const targetMonth = '2025-08';
+  // Decide target month based on screen width
+  final isMobile = MediaQuery.of(context).size.width < 600;
+  final targetMonth = isMobile ? '2025-06' : '2025-08';
+
   double offset = 0;
 
   for (final entry in monthGroups.entries) {
@@ -198,16 +200,16 @@ void _scrollToCurrentMonth() {
     final targetOffset =
         (offset - viewportWidth / 2 + 100).clamp(0.0, maxScrollExtent);
 
-    scrollController.jumpTo(targetOffset); // instantly go to June
+    scrollController.jumpTo(targetOffset); // instantly go to target month
 
-    // ✅ Update scrollbar state so buttons and slider know correct positions
+    // ✅ Update scrollbar state
     setState(() {
       _scrollPosition = targetOffset;
       _maxScrollExtent = maxScrollExtent;
       _showScrollbar = true;
     });
 
-    // Keep scrollbar visible briefly, same behavior as manual scroll
+    // Hide scrollbar after 2 seconds
     _scrollbarTimer?.cancel();
     _scrollbarTimer = Timer(const Duration(seconds: 2), () {
       if (mounted) {
@@ -216,11 +218,6 @@ void _scrollToCurrentMonth() {
         });
       }
     });
-
-    // Notify parent about slider
-    if (widget.onSliderReady != null) {
-      widget.onSliderReady!(buildSlider());
-    }
   });
 }
 

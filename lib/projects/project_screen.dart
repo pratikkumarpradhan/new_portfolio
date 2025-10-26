@@ -189,7 +189,7 @@ Container(
               Text(
                 "App Dev",
                 style: TextStyle(
-                  color: _selectedTab == 0 ? Colors.cyanAccent : Colors.white54,
+                  color: _selectedTab == 0 ? Colors.cyanAccent : Colors.white,
                   fontWeight: _selectedTab == 0 ? FontWeight.bold : FontWeight.normal,
                   fontSize: 16,
                 ),
@@ -197,7 +197,7 @@ Container(
               const SizedBox(height: 4),
               Container(
                 height: 2,
-                width: 60,
+                width: 200,
                 color: _selectedTab == 0 ? Colors.cyanAccent : Colors.transparent,
               ),
             ],
@@ -222,7 +222,7 @@ Container(
               Text(
                 "Web Dev",
                 style: TextStyle(
-                  color: _selectedTab == 1 ? Colors.cyanAccent : Colors.white54,
+                  color: _selectedTab == 1 ? Colors.cyanAccent : Colors.white,
                   fontWeight: _selectedTab == 1 ? FontWeight.bold : FontWeight.normal,
                   fontSize: 16,
                 ),
@@ -230,7 +230,7 @@ Container(
               const SizedBox(height: 4),
               Container(
                 height: 2,
-                width: 60,
+                width: 200,
                 color: _selectedTab == 1 ? Colors.cyanAccent : Colors.transparent,
               ),
             ],
@@ -605,181 +605,190 @@ class _PhoneMockupState extends State<PhoneMockup> {
           }
         },
         onExit: (_) => _resetTilt(),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          transform: _build3DMatrix(),
-          transformAlignment: Alignment.center,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Shadow behind phone
-              AnimatedOpacity(
-                opacity: _hovering ? 1 : 0.7,
-                duration: const Duration(milliseconds: 300),
-                child: Transform.translate(
-                  offset: const Offset(0, 18),
-                  child: Container(
-                    width: 220,
-                    height: 470,
-                    decoration: BoxDecoration(
-                      borderRadius: borderRadius,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          blurRadius: 35,
-                          spreadRadius: 8,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent, // keep original look
+          shadowColor: Colors.transparent, // shadows are handled in your widget
+          padding: EdgeInsets.zero, // remove default padding
+          shape: RoundedRectangleBorder(borderRadius: borderRadius),
+        ),
+        onPressed: () {},
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            transform: _build3DMatrix(),
+            transformAlignment: Alignment.center,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Shadow behind phone
+                AnimatedOpacity(
+                  opacity: _hovering ? 1 : 0.7,
+                  duration: const Duration(milliseconds: 300),
+                  child: Transform.translate(
+                    offset: const Offset(0, 18),
+                    child: Container(
+                      width: 220,
+                      height: 470,
+                      decoration: BoxDecoration(
+                        borderRadius: borderRadius,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            blurRadius: 35,
+                            spreadRadius: 8,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+          
+                // Main phone body
+                Container(
+                  width: 230,
+                  height: 490,
+                  decoration: BoxDecoration(
+                    borderRadius: borderRadius,
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF1F2124),
+                        Color(0xFF2C2E31),
+                        Color(0xFF18191B),
+                      ],
+                    ),
+                    border: Border.all(color: Colors.white10, width: 0.8),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: borderRadius,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        // Screen
+                        AnimatedPositioned(
+                          duration: const Duration(milliseconds: 150),
+                          top: 14 - _tiltX * moveFactor,
+                          left: 14 + _tiltY * moveFactor,
+                          right: 14 - _tiltY * moveFactor,
+                          bottom: 14 + _tiltX * moveFactor,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(28),
+                            child: widget.isNetwork
+                                ? Image.network(widget.imagePath, fit: BoxFit.cover)
+                                : Image.asset(widget.imagePath, fit: BoxFit.cover),
+                          ),
+                        ),
+          
+                        // Glossy highlight
+                        Positioned(
+                          top: 0 - _tiltX * 3,
+                          left: 0 + _tiltY * 3,
+                          right: 0 - _tiltY * 3,
+                          height: 40,
+                          child: IgnorePointer(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.white.withOpacity(0.10),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+          
+                        // Selfie camera
+                        Positioned(
+                          top: 8 - _tiltX * 2,
+                          left: 0 + _tiltY * 2,
+                          right: 0 - _tiltY * 2,
+                          child: Transform.translate(
+                            offset: Offset(_tiltY * 4, -_tiltX * 3),
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                width: 80,
+                                height: 18,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.white12, width: 0.8),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 9,
+                                      height: 9,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white30, width: 0.7),
+                                      ),
+                                      child: Center(
+                                        child: Container(
+                                          width: 3,
+                                          height: 3,
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white24,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Container(
+                                      width: 7,
+                                      height: 2.5,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFF9C4),
+                                        borderRadius: BorderRadius.circular(1.5),
+                                        border: Border.all(color: Colors.white30, width: 0.5),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+          
+                        // Side buttons
+                        Positioned(
+                          top: 120 - _tiltX * 5,
+                          left: -3 + _tiltY * 5,
+                          child: Transform.translate(
+                            offset: Offset(_tiltY * 2, -_tiltX * 2),
+                            child: _sideButton(height: 35),
+                          ),
+                        ),
+                        Positioned(
+                          top: 160 - _tiltX * 7,
+                          left: -3 + _tiltY * 7,
+                          child: Transform.translate(
+                            offset: Offset(_tiltY * 3, -_tiltX * 3),
+                            child: _sideButton(height: 50),
+                          ),
+                        ),
+                        Positioned(
+                          top: 150 - _tiltX * 6,
+                          right: -3 - _tiltY * 6,
+                          child: Transform.translate(
+                            offset: Offset(_tiltY * -2, -_tiltX * 2),
+                            child: _sideButton(height: 45),
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
-
-              // Main phone body
-              Container(
-                width: 230,
-                height: 490,
-                decoration: BoxDecoration(
-                  borderRadius: borderRadius,
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF1F2124),
-                      Color(0xFF2C2E31),
-                      Color(0xFF18191B),
-                    ],
-                  ),
-                  border: Border.all(color: Colors.white10, width: 0.8),
-                ),
-                child: ClipRRect(
-                  borderRadius: borderRadius,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      // Screen
-                      AnimatedPositioned(
-                        duration: const Duration(milliseconds: 150),
-                        top: 14 - _tiltX * moveFactor,
-                        left: 14 + _tiltY * moveFactor,
-                        right: 14 - _tiltY * moveFactor,
-                        bottom: 14 + _tiltX * moveFactor,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(28),
-                          child: widget.isNetwork
-                              ? Image.network(widget.imagePath, fit: BoxFit.cover)
-                              : Image.asset(widget.imagePath, fit: BoxFit.cover),
-                        ),
-                      ),
-
-                      // Glossy highlight
-                      Positioned(
-                        top: 0 - _tiltX * 3,
-                        left: 0 + _tiltY * 3,
-                        right: 0 - _tiltY * 3,
-                        height: 40,
-                        child: IgnorePointer(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.white.withOpacity(0.10),
-                                  Colors.transparent,
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Selfie camera
-                      Positioned(
-                        top: 8 - _tiltX * 2,
-                        left: 0 + _tiltY * 2,
-                        right: 0 - _tiltY * 2,
-                        child: Transform.translate(
-                          offset: Offset(_tiltY * 4, -_tiltX * 3),
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            child: Container(
-                              width: 80,
-                              height: 18,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.9),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.white12, width: 0.8),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 9,
-                                    height: 9,
-                                    decoration: BoxDecoration(
-                                      color: Colors.black,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white30, width: 0.7),
-                                    ),
-                                    child: Center(
-                                      child: Container(
-                                        width: 3,
-                                        height: 3,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white24,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Container(
-                                    width: 7,
-                                    height: 2.5,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFFF9C4),
-                                      borderRadius: BorderRadius.circular(1.5),
-                                      border: Border.all(color: Colors.white30, width: 0.5),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Side buttons
-                      Positioned(
-                        top: 120 - _tiltX * 5,
-                        left: -3 + _tiltY * 5,
-                        child: Transform.translate(
-                          offset: Offset(_tiltY * 2, -_tiltX * 2),
-                          child: _sideButton(height: 35),
-                        ),
-                      ),
-                      Positioned(
-                        top: 160 - _tiltX * 7,
-                        left: -3 + _tiltY * 7,
-                        child: Transform.translate(
-                          offset: Offset(_tiltY * 3, -_tiltX * 3),
-                          child: _sideButton(height: 50),
-                        ),
-                      ),
-                      Positioned(
-                        top: 150 - _tiltX * 6,
-                        right: -3 - _tiltY * 6,
-                        child: Transform.translate(
-                          offset: Offset(_tiltY * -2, -_tiltX * 2),
-                          child: _sideButton(height: 45),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
