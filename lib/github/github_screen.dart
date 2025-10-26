@@ -453,7 +453,8 @@ class _GitHubScreenState extends State<GitHubScreen> {
                                       autofocus: true,
                                       child: GitHubContributionsWidget(
                                         username: 'pratikkumarpradhan',
-                                        token: 'token',
+                                       token: 'token',
+
                                         height: 180,
                                         contributionColors: const [
                                           Color(0xFF40C463),
@@ -515,25 +516,25 @@ class _GitHubScreenState extends State<GitHubScreen> {
               ),
               // Bottom slider positioned at the bottom of the screen
               Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        const Color(0xff0f0f1a).withOpacity(0.8),
-                        const Color(0xff0f0f1a),
-                      ],
-                    ),
-                  ),
-                  child: _sliderWidget ?? const SizedBox.shrink(),
-                ),
-              ),
+  bottom: 0,
+  left: 0,
+  right: 0,
+  child: Container(
+    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Colors.transparent,
+          Color(0xCC0F0F1A), // 80% opacity
+          Color(0xFF0F0F1A), // solid dark bottom
+        ],
+      ),
+    ),
+    child: _sliderWidget ?? const SizedBox.shrink(),
+  ),
+),
             ],
           );
         },
