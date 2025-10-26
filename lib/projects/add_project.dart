@@ -1,18 +1,15 @@
-
-
 import 'dart:io' as io show File;
 import 'package:flutter/foundation.dart' show Uint8List, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolio/services/cloudinary.dart';
 import 'package:portfolio/services/firebase.dart';
 
 class AddProjectScreen extends StatefulWidget {
   final PortfolioProject? project;
   final String? documentId;
-
-  /// Whether this is for web dev or app dev
   final bool isWebDev;
 
   const AddProjectScreen({
@@ -44,7 +41,6 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
 
   bool _isLoading = false;
   bool _isWebDevSelected = false;
-
   final List<XFile> _pickedImages = [];
   final ImagePicker _picker = ImagePicker();
   List<String> _existingImageUrls = [];
@@ -52,9 +48,7 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
   @override
   void initState() {
     super.initState();
-
     _isWebDevSelected = widget.isWebDev;
-
     if (widget.project != null) {
       final p = widget.project!;
       _titleController.text = p.title;
@@ -91,15 +85,14 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
         (_pickedImages.isEmpty && _existingImageUrls.isEmpty)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text(
-                'Please fill title, overview, first description and pick at least one image.')),
+          content: Text(
+              'Please fill title, overview, first description and pick at least one image.'),
+        ),
       );
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final imageUrls = <String>[];
@@ -110,7 +103,6 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
       }
 
       final collectionName = _isWebDevSelected ? 'portfolio_web' : 'portfolio';
-
       int order = 0;
       if (widget.project != null) {
         order = widget.project!.order;
@@ -145,211 +137,377 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
         'order': order,
       };
 
+      final ref = FirebaseFirestore.instance.collection(collectionName);
       if (widget.project != null && widget.documentId != null) {
-        await FirebaseFirestore.instance
-            .collection(collectionName)
-            .doc(widget.documentId)
-            .update(data);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Project updated successfully!')),
-          );
-          Navigator.pop(context);
-        }
+        await ref.doc(widget.documentId).update(data);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('✅ Project updated successfully!')),
+        );
       } else {
-        await FirebaseFirestore.instance.collection(collectionName).add(data);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Project uploaded successfully!')),
-          );
-          Navigator.pop(context);
-        }
+        await ref.add(data);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('🚀 Project uploaded successfully!')),
+        );
       }
+      if (mounted) Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Something went wrong: $e')),
+        SnackBar(content: Text('⚠️ Something went wrong: $e')),
       );
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.project != null;
+
     return Scaffold(
-      appBar: AppBar(title: Text(isEdit ? "Edit Project" : "Add Project")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            // Collection Selector
-            Row(
-              children: [
-                const Text("Project Type: "),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text("App Dev"),
-                  selected: !_isWebDevSelected,
-                  onSelected: (val) {
-                    setState(() {
-                      _isWebDevSelected = false;
-                    });
-                  },
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text("Web Dev"),
-                  selected: _isWebDevSelected,
-                  onSelected: (val) {
-                    setState(() {
-                      _isWebDevSelected = true;
-                    });
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Title Field
-            TextField(
-              controller: _titleController,
-              textAlign: TextAlign.center,
-              decoration: const InputDecoration(labelText: 'Project Title'),
-            ),
-            const SizedBox(height: 12),
-
-            TextField(
-              controller: _overviewController,
-              decoration: const InputDecoration(
-                labelText: 'Project Overview',
-                border: OutlineInputBorder(),
-                hintText: 'Brief overview of the project',
+      backgroundColor: const Color(0xFF0B1020),
+appBar: AppBar(
+  elevation: 0,
+  centerTitle: true,
+  backgroundColor: Colors.transparent,
+  leadingWidth: 140,
+  leading: Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        label: MediaQuery.of(context).size.width < 600
+            ? const Text(
+                "Back",
+                style: TextStyle(color: Colors.white, fontSize: 14),
+              )
+            : const Text(
+                "Back",
+                style: TextStyle(color: Colors.white, fontSize: 16),
               ),
-              maxLines: 2,
-            ),
-            const SizedBox(height: 24),
-
-            TextField(
-              controller: _taglineController,
-              decoration: const InputDecoration(
-                labelText: 'Project Tagline',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            TextField(
-              controller: _youtubeController,
-              decoration: const InputDecoration(
-                labelText: 'YouTube Video URL',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.url,
-            ),
-            const SizedBox(height: 24),
-
-            _buildDescriptionField(1, _desc1HeadingController, _desc1Controller),
-            _buildDescriptionField(2, _desc2HeadingController, _desc2Controller),
-            _buildDescriptionField(3, _desc3HeadingController, _desc3Controller),
-            _buildDescriptionField(4, _desc4HeadingController, _desc4Controller),
-            _buildDescriptionField(5, _desc5HeadingController, _desc5Controller),
-
-            const SizedBox(height: 16),
-
-            // Existing images
-            if (_existingImageUrls.isNotEmpty)
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.white),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: Colors.transparent,
+          padding: MediaQuery.of(context).size.width < 600
+              ? const EdgeInsets.symmetric(horizontal: 8, vertical: 8)
+              : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+      ),
+    ),
+  ),
+  title: Text(
+    isEdit ? "Edit Project" : "Add Project",
+    style: GoogleFonts.poppins(
+      fontWeight: FontWeight.w600,
+      color: Colors.white,
+    ),
+  ),
+),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0B1020), Color(0xFF101828)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _sectionHeader("Project Type"),
+              const SizedBox(height: 8),
               Wrap(
-                spacing: 8,
-                children: _existingImageUrls.map((url) {
-                  return Stack(
-                    alignment: Alignment.topRight,
-                    children: [
-                      Image.network(url, width: 80, height: 80, fit: BoxFit.cover),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.red, size: 18),
-                        onPressed: () {
-                          setState(() {
-                            _existingImageUrls.remove(url);
-                          });
-                        },
-                      ),
-                    ],
-                  );
-                }).toList(),
+                spacing: 12,
+                children: [
+                  _modernChip("App Dev", !_isWebDevSelected, () {
+                    setState(() => _isWebDevSelected = false);
+                  }),
+                  _modernChip("Web Dev", _isWebDevSelected, () {
+                    setState(() => _isWebDevSelected = true);
+                  }),
+                ],
               ),
-
-            // Picked images
-            Wrap(
-              spacing: 8,
-              children: _pickedImages.map((x) {
-                return kIsWeb
-                    ? FutureBuilder<Uint8List>(
-                        future: x.readAsBytes(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.done &&
-                              snapshot.hasData) {
-                            return Image.memory(snapshot.data!,
-                                width: 80, height: 80, fit: BoxFit.cover);
-                          } else {
-                            return const SizedBox(
-                              width: 80,
-                              height: 80,
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                        },
-                      )
-                    : Image.file(io.File(x.path),
-                        width: 80, height: 80, fit: BoxFit.cover);
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-
-            ElevatedButton(
-              onPressed: _pickImages,
-              child: const Text("Pick Images"),
-            ),
-            const SizedBox(height: 20),
-
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : ElevatedButton.icon(
-                    onPressed: _submitProject,
-                    icon: Icon(isEdit ? Icons.save : Icons.cloud_upload),
-                    label: Text(isEdit ? "Save Changes" : "Upload Project"),
+              const SizedBox(height: 24),
+              _sectionHeader("Basic Info"),
+              _styledField(_titleController, "Project Title"),
+              _styledField(_overviewController, "Overview", maxLines: 3),
+              _styledField(_taglineController, "Tagline"),
+              _styledField(_youtubeController, "YouTube URL"),
+              const SizedBox(height: 24),
+              _sectionHeader("Descriptions"),
+              for (int i = 1; i <= 5; i++)
+                _buildDescriptionField(
+                  i,
+                  [
+                    _desc1HeadingController,
+                    _desc2HeadingController,
+                    _desc3HeadingController,
+                    _desc4HeadingController,
+                    _desc5HeadingController,
+                  ][i - 1],
+                  [
+                    _desc1Controller,
+                    _desc2Controller,
+                    _desc3Controller,
+                    _desc4Controller,
+                    _desc5Controller,
+                  ][i - 1],
+                ),
+              const SizedBox(height: 24),
+              _sectionHeader("Images"),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  ..._existingImageUrls.map((url) => _imagePreview(url: url)),
+                  ..._pickedImages.map((x) => _imagePreview(xfile: x)),
+                  GestureDetector(
+                    onTap: _pickImages,
+                    child: Container(
+                      width: 85,
+                      height: 85,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.white24),
+                        color: Colors.white.withOpacity(0.05),
+                      ),
+                      child: const Icon(Icons.add_photo_alternate_rounded,
+                          color: Colors.white70),
+                    ),
                   ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 40),
+              Center(
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white70)
+                    : ElevatedButton.icon(
+                        onPressed: _submitProject,
+                        icon: Icon(isEdit ? Icons.save_rounded : Icons.cloud_upload_rounded),
+                        label: Text(
+                          isEdit ? "Save Changes" : "Upload Project",
+                          style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600, fontSize: 16),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF4ECDC4),
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 14, horizontal: 28),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          elevation: 6,
+                          shadowColor: const Color(0xFF4ECDC4).withOpacity(0.4),
+                        ),
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildDescriptionField(
-    int index,
-    TextEditingController headingController,
-    TextEditingController descController,
-  ) {
-    return Column(
+  Widget _sectionHeader(String title) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Text(
+          title,
+          style: GoogleFonts.poppins(
+              color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18),
+        ),
+      );
+
+  Widget _styledField(TextEditingController c, String label,
+      {int maxLines = 1}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: TextField(
+        controller: c,
+        maxLines: maxLines,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.white70),
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.06),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    );
+  }
+
+Widget _buildDescriptionField(
+    int index, TextEditingController h, TextEditingController d) {
+  return Container(
+    margin: const EdgeInsets.symmetric(vertical: 12),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.05),
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: Colors.white.withOpacity(0.08)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.25),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          controller: headingController,
-          decoration:
-              InputDecoration(labelText: 'Description $index Heading'),
+        // Number box
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: const Color(0xFF4ECDC4).withOpacity(0.15),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Text(
+              "$index",
+              style: GoogleFonts.poppins(
+                color: const Color(0xFF4ECDC4),
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
         ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: descController,
-          decoration: InputDecoration(labelText: 'Description $index'),
-          maxLines: 3,
+        const SizedBox(width: 16),
+
+        // Heading + Description
+        Expanded(
+          child: Column(
+            children: [
+              TextField(
+                controller: h,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: "Heading",
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.06),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: d,
+                maxLines: 3,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: "Description",
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.06),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 16),
+      ],
+    ),
+  );
+}
+
+  Widget _imagePreview({String? url, XFile? xfile}) {
+    return Stack(
+      alignment: Alignment.topRight,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: url != null
+              ? Image.network(url, width: 85, height: 85, fit: BoxFit.cover)
+              : kIsWeb
+                  ? FutureBuilder<Uint8List>(
+                      future: xfile!.readAsBytes(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done &&
+                            snapshot.hasData) {
+                          return Image.memory(snapshot.data!,
+                              width: 85, height: 85, fit: BoxFit.cover);
+                        }
+                        return const SizedBox(
+                          width: 85,
+                          height: 85,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        );
+                      },
+                    )
+                  : Image.file(io.File(xfile!.path),
+                      width: 85, height: 85, fit: BoxFit.cover),
+        ),
+        Positioned(
+          top: 4,
+          right: 4,
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                if (url != null) {
+                  _existingImageUrls.remove(url);
+                } else {
+                  _pickedImages.remove(xfile);
+                }
+              });
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white24),
+              ),
+              child:
+                  const Icon(Icons.close_rounded, size: 18, color: Colors.white),
+            ),
+          ),
+        ),
       ],
     );
   }
+
+ Widget _modernChip(String label, bool selected, VoidCallback onTap) {
+  return ChoiceChip(
+    label: Text(
+      label,
+      style: GoogleFonts.poppins(
+        color: selected ? const Color(0xFF0B1020) : Colors.black.withOpacity(0.9),
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.3,
+      ),
+    ),
+    selected: selected,
+    onSelected: (_) => onTap(),
+    selectedColor: const Color(0xFF4ECDC4),
+    backgroundColor: Colors.white.withOpacity(0.07),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(14),
+      side: BorderSide(
+        color: selected ? const Color(0xFF4ECDC4) : Colors.white.withOpacity(0.15),
+        width: 1,
+      ),
+    ),
+  );
+}
 }
