@@ -38,7 +38,9 @@ class _PortfolioWebScreenState extends State<PortfolioWebScreen> {
   }
 
   void _listenToAuth() {
-    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) async {
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((
+      user,
+    ) async {
       if (user == null) {
         setState(() {
           _isAdmin = false;
@@ -46,7 +48,11 @@ class _PortfolioWebScreenState extends State<PortfolioWebScreen> {
         });
       } else {
         try {
-          final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+          final doc =
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(user.uid)
+                  .get();
           setState(() {
             _isAdmin = doc.data()?['role'] == 'admin';
             _loading = false;
@@ -68,290 +74,420 @@ class _PortfolioWebScreenState extends State<PortfolioWebScreen> {
         .orderBy('order')
         .snapshots()
         .listen((snapshot) {
-      setState(() {
-        _docs = snapshot.docs;
-      });
-    });
+          setState(() {
+            _docs = snapshot.docs;
+          });
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF090C1A),
-                    Color(0xFF0F172A),
-                    Color(0xFF1E293B),
-                  ],
-                  stops: [0.0, 0.55, 1.0],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+      body:
+          _loading
+              ? const Center(child: CircularProgressIndicator())
+              : Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF090C1A),
+                      Color(0xFF0F172A),
+                      Color(0xFF1E293B),
+                    ],
+                    stops: [0.0, 0.55, 1.0],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
-              ),
-              child: _docs.isEmpty
-                  ? const Center(
-                      child: Text(
-                        "No Web Projects Found",
-                        style: TextStyle(color: Colors.white70, fontSize: 18),
-                      ),
-                    )
-                  : ListView.builder(
-                      // padding: const EdgeInsets.fromLTRB(16, 80, 16, 24),
-                        padding: EdgeInsets.fromLTRB(16, _isAdmin == true ? 80 : 16, 16, 24),
-                      itemCount: _docs.length,
-                      itemBuilder: (context, index) {
-                        final doc = _docs[index];
-                        final app = PortfolioProject.fromMap(doc.data() as Map<String, dynamic>);
-                        final docId = doc.id;
+                child:
+                    _docs.isEmpty
+                        ? const Center(
+                          child: Text(
+                            "No Web Projects Found",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 18,
+                            ),
+                          ),
+                        )
+                        : ListView.builder(
+                          // padding: const EdgeInsets.fromLTRB(16, 80, 16, 24),
+                          padding: EdgeInsets.fromLTRB(
+                            16,
+                            _isAdmin == true ? 80 : 16,
+                            16,
+                            24,
+                          ),
+                          itemCount: _docs.length,
+                          itemBuilder: (context, index) {
+                            final doc = _docs[index];
+                            final app = PortfolioProject.fromMap(
+                              doc.data() as Map<String, dynamic>,
+                            );
+                            final docId = doc.id;
 
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 32),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                            if (_isAdmin == true)
-  Row(
-    mainAxisAlignment: MainAxisAlignment.end,
-    children: [
-      IconButton(
-        icon: const Icon(Icons.edit, color: Colors.blueAccent),
-        tooltip: 'Edit Project',
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => AddProjectScreen(
-                project: app,
-                documentId: docId,
-                isWebDev: true,
-              ),
-            ),
-          );
-        },
-      ),
-      IconButton(
-        icon: const Icon(Icons.arrow_upward, color: Colors.orangeAccent),
-        tooltip: 'Move Up',
-        onPressed: () async {
-          setState(() {
-            int newIndex = index > 0 ? index - 1 : _docs.length - 1; // 👈 works for first card too
-            final temp = _docs[newIndex];
-            _docs[newIndex] = _docs[index];
-            _docs[index] = temp;
-          });
-          for (int i = 0; i < _docs.length; i++) {
-            final id = _docs[i].id;
-            FirebaseFirestore.instance
-                .collection('portfolio_web')
-                .doc(id)
-                .update({'order': i});
-          }
-        },
-      ),
-      IconButton(
-        icon: const Icon(Icons.arrow_downward, color: Colors.orangeAccent),
-        tooltip: 'Move Down',
-        onPressed: () async {
-          setState(() {
-            int newIndex = index < _docs.length - 1 ? index + 1 : 0;
-            final temp = _docs[newIndex];
-            _docs[newIndex] = _docs[index];
-            _docs[index] = temp;
-          });
-          for (int i = 0; i < _docs.length; i++) {
-            final id = _docs[i].id;
-            FirebaseFirestore.instance
-                .collection('portfolio_web')
-                .doc(id)
-                .update({'order': i});
-          }
-        },
-      ),
-      IconButton(
-        icon: const Icon(Icons.delete, color: Colors.redAccent),
-        tooltip: 'Delete Project',
-        onPressed: () async {
-          final confirm = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Delete Project'),
-              content: const Text('Are you sure you want to delete this project?'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                ),
-              ],
-            ),
-          );
-          if (confirm == true) {
-            await FirebaseFirestore.instance.collection('portfolio_web').doc(docId).delete();
-          }
-        },
-      ),
-    ],
-  ),
-                              Stack(
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 32),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(28),
-                                    child: BackdropFilter(
-                                      filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                            colors: [
-                                              Color(0xCC0B132B),
-                                              Color(0x99112233),
-                                              Color(0x66121A2E),
-                                            ],
+                                  if (_isAdmin == true)
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.edit,
+                                            color: Colors.blueAccent,
                                           ),
-                                          borderRadius: BorderRadius.circular(28),
-                                          border: Border.all(
-                                            color: Colors.cyanAccent.withOpacity(0.14),
-                                            width: 1.2,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(0.35),
-                                              blurRadius: 28,
-                                              offset: const Offset(0, 12),
-                                            ),
-                                            BoxShadow(
-                                              color: Colors.cyanAccent.withOpacity(0.06),
-                                              blurRadius: 20,
-                                              spreadRadius: 1,
-                                            ),
-                                          ],
+                                          tooltip: 'Edit Project',
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (_) => AddProjectScreen(
+                                                      project: app,
+                                                      documentId: docId,
+                                                      isWebDev: true,
+                                                    ),
+                                              ),
+                                            );
+                                          },
                                         ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Text(
-                                                          app.title,
-                                                          style: GoogleFonts.berkshireSwash(
-                                                            fontSize: 26,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: Colors.white,
-                                                          ),
-                                                        ),
-                                                        const SizedBox(height: 8),
-                                                        Text(
-                                                          app.overview,
-                                                          style: GoogleFonts.merienda(
-                                                            fontSize: 16,
-                                                            color: Colors.white70,
-                                                          ),
-                                                        ),
-                                                      ],
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.arrow_upward,
+                                            color: Colors.orangeAccent,
+                                          ),
+                                          tooltip: 'Move Up',
+                                          onPressed: () async {
+                                            setState(() {
+                                              int newIndex =
+                                                  index > 0
+                                                      ? index - 1
+                                                      : _docs.length -
+                                                          1; // 👈 works for first card too
+                                              final temp = _docs[newIndex];
+                                              _docs[newIndex] = _docs[index];
+                                              _docs[index] = temp;
+                                            });
+                                            for (
+                                              int i = 0;
+                                              i < _docs.length;
+                                              i++
+                                            ) {
+                                              final id = _docs[i].id;
+                                              FirebaseFirestore.instance
+                                                  .collection('portfolio_web')
+                                                  .doc(id)
+                                                  .update({'order': i});
+                                            }
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.arrow_downward,
+                                            color: Colors.orangeAccent,
+                                          ),
+                                          tooltip: 'Move Down',
+                                          onPressed: () async {
+                                            setState(() {
+                                              int newIndex =
+                                                  index < _docs.length - 1
+                                                      ? index + 1
+                                                      : 0;
+                                              final temp = _docs[newIndex];
+                                              _docs[newIndex] = _docs[index];
+                                              _docs[index] = temp;
+                                            });
+                                            for (
+                                              int i = 0;
+                                              i < _docs.length;
+                                              i++
+                                            ) {
+                                              final id = _docs[i].id;
+                                              FirebaseFirestore.instance
+                                                  .collection('portfolio_web')
+                                                  .doc(id)
+                                                  .update({'order': i});
+                                            }
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.delete,
+                                            color: Colors.redAccent,
+                                          ),
+                                          tooltip: 'Delete Project',
+                                          onPressed: () async {
+                                            final confirm = await showDialog<
+                                              bool
+                                            >(
+                                              context: context,
+                                              builder:
+                                                  (context) => AlertDialog(
+                                                    title: const Text(
+                                                      'Delete Project',
                                                     ),
-                                                  ),
-                                                  FilledButton.icon(
-                                                    style: FilledButton.styleFrom(
-                                                      backgroundColor: Colors.cyanAccent,
-                                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(12),
+                                                    content: const Text(
+                                                      'Are you sure you want to delete this project?',
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed:
+                                                            () => Navigator.pop(
+                                                              context,
+                                                              false,
+                                                            ),
+                                                        child: const Text(
+                                                          'Cancel',
+                                                        ),
                                                       ),
-                                                    ),
-                                                    onPressed: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (_) => ProjectDetailScreen(project: app),
+                                                      TextButton(
+                                                        onPressed:
+                                                            () => Navigator.pop(
+                                                              context,
+                                                              true,
+                                                            ),
+                                                        child: const Text(
+                                                          'Delete',
+                                                          style: TextStyle(
+                                                            color: Colors.red,
+                                                          ),
                                                         ),
-                                                      );
-                                                    },
-                                                    icon: const Icon(Icons.arrow_forward, color: Colors.black),
-                                                    label: const Text(
-                                                      "More",
-                                                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                                      ),
+                                                    ],
+                                                  ),
+                                            );
+                                            if (confirm == true) {
+                                              await FirebaseFirestore.instance
+                                                  .collection('portfolio_web')
+                                                  .doc(docId)
+                                                  .delete();
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(28),
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(
+                                            sigmaX: 16,
+                                            sigmaY: 16,
+                                          ),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              gradient: const LinearGradient(
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                                colors: [
+                                                  Color(0xCC0B132B),
+                                                  Color(0x99112233),
+                                                  Color(0x66121A2E),
+                                                ],
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(28),
+                                              border: Border.all(
+                                                color: Colors.cyanAccent
+                                                    .withOpacity(0.14),
+                                                width: 1.2,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.35),
+                                                  blurRadius: 28,
+                                                  offset: const Offset(0, 12),
+                                                ),
+                                                BoxShadow(
+                                                  color: Colors.cyanAccent
+                                                      .withOpacity(0.06),
+                                                  blurRadius: 20,
+                                                  spreadRadius: 1,
+                                                ),
+                                              ],
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 24,
+                                                    horizontal: 8,
+                                                  ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              app.title,
+                                                              style: GoogleFonts.berkshireSwash(
+                                                                fontSize: 26,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color:
+                                                                    Colors
+                                                                        .white,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 8,
+                                                            ),
+                                                            Text(
+                                                              app.overview,
+                                                              style: GoogleFonts.merienda(
+                                                                fontSize: 16,
+                                                                color:
+                                                                    Colors
+                                                                        .white70,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      FilledButton.icon(
+                                                        style: FilledButton.styleFrom(
+                                                          backgroundColor:
+                                                              Colors.cyanAccent,
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 16,
+                                                                vertical: 10,
+                                                              ),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  12,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                        onPressed: () {
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder:
+                                                                  (_) =>
+                                                                      ProjectDetailScreen(
+                                                                        project:
+                                                                            app,
+                                                                      ),
+                                                            ),
+                                                          );
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons.arrow_forward,
+                                                          color: Colors.black,
+                                                        ),
+                                                        label: const Text(
+                                                          "More",
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 18),
+                                                  SingleChildScrollView(
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    child: Row(
+                                                      children:
+                                                          app.images
+                                                              .map(
+                                                                (
+                                                                  url,
+                                                                ) => Padding(
+                                                                  padding:
+                                                                      const EdgeInsets.only(
+                                                                        right:
+                                                                            16,
+                                                                      ),
+                                                                  child: ClipRRect(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                          18,
+                                                                        ),
+                                                                    child: Container(
+                                                                      decoration: BoxDecoration(
+                                                                        boxShadow: [
+                                                                          BoxShadow(
+                                                                            color: Colors.black.withOpacity(
+                                                                              0.18,
+                                                                            ),
+                                                                            blurRadius:
+                                                                                12,
+                                                                            offset: const Offset(
+                                                                              0,
+                                                                              4,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      child: TabletMockupNetwork(
+                                                                        imageUrl:
+                                                                            url,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              )
+                                                              .toList(),
                                                     ),
                                                   ),
                                                 ],
                                               ),
-                                              const SizedBox(height: 18),
-                                              SingleChildScrollView(
-                                                scrollDirection: Axis.horizontal,
-                                                child: Row(
-                                                  children: app.images
-                                                      .map((url) => Padding(
-                                                            padding: const EdgeInsets.only(right: 16),
-                                                            child: ClipRRect(
-                                                              borderRadius: BorderRadius.circular(18),
-                                                              child: Container(
-                                                                decoration: BoxDecoration(
-                                                                  boxShadow: [
-                                                                    BoxShadow(
-                                                                      color: Colors.black.withOpacity(0.18),
-                                                                      blurRadius: 12,
-                                                                      offset: const Offset(0, 4),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                child: TabletMockupNetwork(imageUrl: url),
-                                                              ),
-                                                            ),
-                                                          ))
-                                                      .toList(),
-                                                ),
-                                              ),
-                                            ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        );
-                      },
+                            );
+                          },
+                        ),
+              ),
+      floatingActionButton:
+          (_isAdmin == true)
+              ? FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const AddProjectScreen(isWebDev: true),
                     ),
-            ),
-    floatingActionButton: (_isAdmin == true)
-    ? FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const AddProjectScreen(isWebDev: true),
-            ),
-          );
-        },
-        child: const Icon(Icons.add), // Only + icon
-        backgroundColor: Colors.cyanAccent,
-        foregroundColor: Colors.black,
-      )
-    : null,
+                  );
+                },
+                child: const Icon(Icons.add), // Only + icon
+                backgroundColor: Colors.cyanAccent,
+                foregroundColor: Colors.black,
+              )
+              : null,
     );
   }
 }
 
-
 // === Tablet Mockup for Web Projects =====
-
 
 class TabletMockupNetwork extends StatelessWidget {
   final String imageUrl;
@@ -359,10 +495,7 @@ class TabletMockupNetwork extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TabletMockup(
-      imagePath: imageUrl,
-      isNetwork: true,
-    );
+    return TabletMockup(imagePath: imageUrl, isNetwork: true);
   }
 }
 
@@ -411,24 +544,27 @@ class _TabletMockupState extends State<TabletMockup> {
     return Listener(
       onPointerMove: (event) {
         final box = context.findRenderObject() as RenderBox?;
-        if (box != null) _updateTilt(box.globalToLocal(event.position), box.size);
+        if (box != null)
+          _updateTilt(box.globalToLocal(event.position), box.size);
       },
       onPointerUp: (_) => _resetTilt(),
       onPointerCancel: (_) => _resetTilt(),
       child: MouseRegion(
         onHover: (event) {
           final box = context.findRenderObject() as RenderBox?;
-          if (box != null) _updateTilt(box.globalToLocal(event.position), box.size);
+          if (box != null)
+            _updateTilt(box.globalToLocal(event.position), box.size);
         },
         onExit: (_) => _resetTilt(),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent, // keep original look
-          shadowColor: Colors.transparent, // shadows are handled in your widget
-          padding: EdgeInsets.zero, // remove default padding
-          shape: RoundedRectangleBorder(borderRadius: borderRadius),
-        ),
-        onPressed: () {},
+            backgroundColor: Colors.transparent, // keep original look
+            shadowColor:
+                Colors.transparent, // shadows are handled in your widget
+            padding: EdgeInsets.zero, // remove default padding
+            shape: RoundedRectangleBorder(borderRadius: borderRadius),
+          ),
+          onPressed: () {},
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 220),
             transform: _build3DMatrix(),
@@ -458,7 +594,7 @@ class _TabletMockupState extends State<TabletMockup> {
                     ),
                   ),
                 ),
-          
+
                 // ===== Tablet body =====
                 Container(
                   width: 440,
@@ -492,13 +628,20 @@ class _TabletMockupState extends State<TabletMockup> {
                             child: Container(
                               color: Colors.black,
                               padding: const EdgeInsets.all(6),
-                              child: widget.isNetwork
-                                  ? Image.network(widget.imagePath, fit: BoxFit.contain)
-                                  : Image.asset(widget.imagePath, fit: BoxFit.contain),
+                              child:
+                                  widget.isNetwork
+                                      ? Image.network(
+                                        widget.imagePath,
+                                        fit: BoxFit.contain,
+                                      )
+                                      : Image.asset(
+                                        widget.imagePath,
+                                        fit: BoxFit.contain,
+                                      ),
                             ),
                           ),
                         ),
-          
+
                         // ===== Glossy reflection =====
                         Positioned(
                           top: 0 - _tiltX * 3,
@@ -520,7 +663,7 @@ class _TabletMockupState extends State<TabletMockup> {
                             ),
                           ),
                         ),
-          
+
                         // ===== Camera Bar =====
                         Positioned(
                           top: 5 - _tiltX * 2,
@@ -536,7 +679,10 @@ class _TabletMockupState extends State<TabletMockup> {
                                 decoration: BoxDecoration(
                                   color: Colors.black.withOpacity(0.9),
                                   borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: Colors.white10, width: 0.8),
+                                  border: Border.all(
+                                    color: Colors.white10,
+                                    width: 0.8,
+                                  ),
                                 ),
                                 child: Center(
                                   child: Container(
@@ -566,7 +712,7 @@ class _TabletMockupState extends State<TabletMockup> {
                             ),
                           ),
                         ),
-          
+
                         // ===== Slim Side Buttons (always visible) =====
                         _buildSideButton(top: 100, height: 50, delay: 4),
                         _buildSideButton(top: 165, height: 65, delay: 5),
