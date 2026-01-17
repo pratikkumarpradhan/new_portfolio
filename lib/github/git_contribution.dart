@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -138,14 +137,14 @@ class _GitHubContributionsWidgetState extends State<GitHubContributionsWidget> {
             }
           }
         }
-        '''
+        ''',
       }),
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      final weeks = data['data']['user']['contributionsCollection']
-          ['contributionCalendar']['weeks'];
+      final weeks =
+          data['data']['user']['contributionsCollection']['contributionCalendar']['weeks'];
       final yearDays = <ContributionDay>[];
 
       for (var week in weeks) {
@@ -177,50 +176,51 @@ class _GitHubContributionsWidgetState extends State<GitHubContributionsWidget> {
     return widget.contributionColors[index];
   }
 
-void _scrollToCurrentMonth() {
-  final monthGroups = _groupByMonth();
-  if (monthGroups.isEmpty) return;
+  void _scrollToCurrentMonth() {
+    final monthGroups = _groupByMonth();
+    if (monthGroups.isEmpty) return;
 
-  // Decide target month based on screen width
-  final isMobile = MediaQuery.of(context).size.width < 600;
-  final targetMonth = isMobile ? '2025-06' : '2025-08';
+    // Decide target month based on screen width
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    final targetMonth = isMobile ? '2025-06' : '2025-08';
 
-  double offset = 0;
+    double offset = 0;
 
-  for (final entry in monthGroups.entries) {
-    if (entry.key == targetMonth) break;
-    offset += (entry.value.length / 7).ceil() * 18 + 12;
+    for (final entry in monthGroups.entries) {
+      if (entry.key == targetMonth) break;
+      offset += (entry.value.length / 7).ceil() * 18 + 12;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!scrollController.hasClients) return;
+
+      final viewportWidth = scrollController.position.viewportDimension;
+      final maxScrollExtent = scrollController.position.maxScrollExtent;
+      final targetOffset = (offset - viewportWidth / 2 + 100).clamp(
+        0.0,
+        maxScrollExtent,
+      );
+
+      scrollController.jumpTo(targetOffset); // instantly go to target month
+
+      // ✅ Update scrollbar state
+      setState(() {
+        _scrollPosition = targetOffset;
+        _maxScrollExtent = maxScrollExtent;
+        _showScrollbar = true;
+      });
+
+      // Hide scrollbar after 2 seconds
+      _scrollbarTimer?.cancel();
+      _scrollbarTimer = Timer(const Duration(seconds: 2), () {
+        if (mounted) {
+          setState(() {
+            _showScrollbar = false;
+          });
+        }
+      });
+    });
   }
-
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    if (!scrollController.hasClients) return;
-
-    final viewportWidth = scrollController.position.viewportDimension;
-    final maxScrollExtent = scrollController.position.maxScrollExtent;
-    final targetOffset =
-        (offset - viewportWidth / 2 + 100).clamp(0.0, maxScrollExtent);
-
-    scrollController.jumpTo(targetOffset); // instantly go to target month
-
-    // ✅ Update scrollbar state
-    setState(() {
-      _scrollPosition = targetOffset;
-      _maxScrollExtent = maxScrollExtent;
-      _showScrollbar = true;
-    });
-
-    // Hide scrollbar after 2 seconds
-    _scrollbarTimer?.cancel();
-    _scrollbarTimer = Timer(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _showScrollbar = false;
-        });
-      }
-    });
-  });
-}
-
 
   void _onScrollbarDrag(double value) {
     final newOffset = value * _maxScrollExtent;
@@ -230,7 +230,9 @@ void _scrollToCurrentMonth() {
   Map<String, List<ContributionDay>> _groupByMonth() {
     final Map<String, List<ContributionDay>> monthGroups = {};
     for (var day in _allDays) {
-      if (day.date.year == 2025 && day.date.month >= 4 && day.date.month <= 12) {
+      if (day.date.year == 2025 &&
+          day.date.month >= 4 &&
+          day.date.month <= 12) {
         final key = DateFormat('yyyy-MM').format(day.date);
         monthGroups.putIfAbsent(key, () => []).add(day);
       }
@@ -238,259 +240,358 @@ void _scrollToCurrentMonth() {
     return monthGroups;
   }
 
-@override
-Widget build(BuildContext context) {
-  if (_isLoading) {
-    return widget.loadingWidget ??
-        const Center(
-            child: CircularProgressIndicator(color: Colors.cyanAccent));
-  }
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return widget.loadingWidget ??
+          const Center(
+            child: CircularProgressIndicator(color: Colors.cyanAccent),
+          );
+    }
 
-  if (_error != null) {
-    return Center(
-        child: Text(_error!, style: const TextStyle(color: Colors.red)));
-  }
+    if (_error != null) {
+      return Center(
+        child: Text(_error!, style: const TextStyle(color: Colors.red)),
+      );
+    }
 
-  final cellSize = 14.0;
-  final cellSpacing = 4.0;
-  final monthGroups = _groupByMonth();
+    final cellSize = 14.0;
+    final cellSpacing = 4.0;
+    final monthGroups = _groupByMonth();
 
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(24),
-      border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.2),
-      gradient: const LinearGradient(
-        colors: [Color(0xFF0B1020), Color(0xFF101828), Color(0xFF0B1020)],
-        stops: [0.0, 0.6, 1.0],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.25),
-          blurRadius: 20,
-          offset: const Offset(0, 8),
-        ),
-      ],
-    ),
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: SizedBox(
-        height: widget.height + 50,
-        child: Stack(
-          children: [
-            // 🔹 Scrollable graph
-            Positioned.fill(
-              child: SingleChildScrollView(
-                controller: scrollController,
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 40.0, vertical: 8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: monthGroups.entries.map((entry) {
-                      final days = entry.value;
-                      days.sort((a, b) => a.date.compareTo(b.date));
-
-                      final List<List<ContributionDay?>> weeks = [];
-                      List<ContributionDay?> currentWeek = List.filled(7, null);
-                      for (var day in days) {
-                        final weekday = day.date.weekday % 7;
-                        currentWeek[weekday] = day;
-                        if (weekday == 6) {
-                          weeks.add(currentWeek);
-                          currentWeek = List.filled(7, null);
-                        }
-                      }
-                      if (currentWeek.any((d) => d != null)) {
-                        weeks.add(currentWeek);
-                      }
-
-                      final monthLabel =
-                          DateFormat.MMM().format(days.first.date);
-
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 12.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Center(
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(bottom: 6.0),
-                                child: Text(
-                                  monthLabel,
-                                  style: widget.monthLabelStyle ??
-                                      const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                            Row(
-                              children: weeks.map((week) {
-                                return Column(
-                                  children: List.generate(7, (i) {
-                                    final day = week[i];
-                                    return Tooltip(
-                                      message: day != null
-                                          ? "${day.count} contributions on ${DateFormat('MMM d, yyyy').format(day.date)}"
-                                          : "No contributions",
-                                      textStyle: const TextStyle(
-                                          color: Colors.white, fontSize: 12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black87,
-                                        borderRadius:
-                                            BorderRadius.circular(6),
-                                      ),
-                                      waitDuration:
-                                          const Duration(milliseconds: 300),
-                                      child: Container(
-                                        margin: EdgeInsets.only(
-                                            bottom: cellSpacing,
-                                            right: cellSpacing),
-                                        width: cellSize,
-                                        height: cellSize,
-                                        decoration: BoxDecoration(
-                                          color: day != null
-                                              ? _getColor(day.count)
-                                              : widget.emptyColor
-                                                  .withOpacity(0.2),
-                                          borderRadius:
-                                              BorderRadius.circular(2),
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ),
-
-           // 🔹 Left button
-Positioned(
-  left: 8,
-  top: 0,
-  bottom: 0,
-  child: Center(
-    child: Container(
+    return Container(
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.2),
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF0B1020),
-            Color(0xFF101828),
-          ],
+          colors: [Color(0xFF0B1020), Color(0xFF101828), Color(0xFF0B1020)],
+          stops: [0.0, 0.6, 1.0],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(8), // Square with slightly rounded edges
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 6,
-            offset: const Offset(2, 2),
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
-        onPressed: () {
-          final newOffset =
-              (scrollController.offset - 150).clamp(0.0, _maxScrollExtent);
-          scrollController.animateTo(
-            newOffset,
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeOut,
-          );
-        },
-      ),
-    ),
-  ),
-),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: SizedBox(
+          height: widget.height + 50,
+          child: Stack(
+            children: [
+              // 🔹 Scrollable graph
+              Positioned.fill(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40.0,
+                      vertical: 8.0,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children:
+                          monthGroups.entries.map((entry) {
+                            final days = entry.value;
+                            days.sort((a, b) => a.date.compareTo(b.date));
 
-// 🔹 Right button
-Positioned(
-  right: 8,
-  top: 0,
-  bottom: 0,
-  child: Center(
-    child: Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF101828),
-            Color(0xFF0B1020),
-          ],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        ),
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 6,
-            offset: const Offset(-2, 2),
+                            final List<List<ContributionDay?>> weeks = [];
+                            List<ContributionDay?> currentWeek = List.filled(
+                              7,
+                              null,
+                            );
+                            for (var day in days) {
+                              final weekday = day.date.weekday % 7;
+                              currentWeek[weekday] = day;
+                              if (weekday == 6) {
+                                weeks.add(currentWeek);
+                                currentWeek = List.filled(7, null);
+                              }
+                            }
+                            if (currentWeek.any((d) => d != null)) {
+                              weeks.add(currentWeek);
+                            }
+
+                            final monthLabel = DateFormat.MMM().format(
+                              days.first.date,
+                            );
+
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 6.0,
+                                      ),
+                                      child: Text(
+                                        monthLabel,
+                                        style:
+                                            widget.monthLabelStyle ??
+                                            const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    children:
+                                        weeks.map((week) {
+                                          return Column(
+                                            children: List.generate(7, (i) {
+                                              final day = week[i];
+                                              return Tooltip(
+                                                message:
+                                                    day != null
+                                                        ? "${day.count} contributions on ${DateFormat('MMM d, yyyy').format(day.date)}"
+                                                        : "No contributions",
+                                                textStyle: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black87,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                waitDuration: const Duration(
+                                                  milliseconds: 300,
+                                                ),
+                                                child: Container(
+                                                  margin: EdgeInsets.only(
+                                                    bottom: cellSpacing,
+                                                    right: cellSpacing,
+                                                  ),
+                                                  width: cellSize,
+                                                  height: cellSize,
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        day != null
+                                                            ? _getColor(
+                                                              day.count,
+                                                            )
+                                                            : widget.emptyColor
+                                                                .withOpacity(
+                                                                  0.2,
+                                                                ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          2,
+                                                        ),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                          );
+                                        }).toList(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                    ),
+                  ),
+                ),
+              ),
+
+              // 🔹 Left button
+              Positioned(
+                left: 8,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF0B1020), Color(0xFF101828)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        8,
+                      ), // Square with slightly rounded edges
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 6,
+                          offset: const Offset(2, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        final newOffset = (scrollController.offset - 150).clamp(
+                          0.0,
+                          _maxScrollExtent,
+                        );
+                        scrollController.animateTo(
+                          newOffset,
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeOut,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+
+              // 🔹 Right button
+              Positioned(
+                right: 8,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF101828), Color(0xFF0B1020)],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 6,
+                          offset: const Offset(-2, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        final newOffset = (scrollController.offset + 150).clamp(
+                          0.0,
+                          _maxScrollExtent,
+                        );
+                        scrollController.animateTo(
+                          newOffset,
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeOut,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: IconButton(
-        icon: const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 20),
-        onPressed: () {
-          final newOffset =
-              (scrollController.offset + 150).clamp(0.0, _maxScrollExtent);
-          scrollController.animateTo(
-            newOffset,
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeOut,
-          );
-        },
-      ),
-    ),
-  ),
-),
-          ],
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   // Method to get the slider widget separately
-  Widget buildSlider() {
-    if (_maxScrollExtent > 0 && _showScrollbar) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40.0),
-        child: SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            activeTrackColor: Colors.cyanAccent.withOpacity(0.8),
-            inactiveTrackColor: Colors.white.withOpacity(0.1),
-            thumbColor: Colors.cyanAccent,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-            trackHeight: 6,
-          ),
-          child: Slider(
-            value: _maxScrollExtent > 0
-                ? (_scrollPosition / _maxScrollExtent).clamp(0.0, 1.0)
-                : 0.0,
-            onChanged: _onScrollbarDrag,
-            min: 0.0,
-            max: 1.0,
-          ),
+Widget buildSlider() {
+  if (_maxScrollExtent > 0 && _showScrollbar) {
+    final viewportFraction =
+        (scrollController.position.viewportDimension /
+                (scrollController.position.maxScrollExtent +
+                    scrollController.position.viewportDimension))
+            .clamp(0.1, 1.0);
+
+    final scrollFraction =
+        (_scrollPosition / _maxScrollExtent).clamp(0.0, 1.0);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
+      child: Container(
+        height: 8,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(8),
         ),
-      );
-    }
-    return const SizedBox.shrink();
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final barWidth = constraints.maxWidth * viewportFraction;
+            final maxLeft = constraints.maxWidth - barWidth;
+            final left = maxLeft * scrollFraction;
+
+            return Stack(
+              children: [
+                Positioned(
+                  left: left,
+                  top: 0,
+                  bottom: 0,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onPanUpdate: (details) {
+                        final localX =
+                            details.localPosition.dx - barWidth / 2;
+
+                        final clampedLeft =
+                            localX.clamp(0.0, maxLeft);
+
+                        final fraction =
+                            maxLeft == 0 ? 0 : clampedLeft / maxLeft;
+
+                        scrollController.jumpTo(
+                          fraction * _maxScrollExtent,
+                        );
+                      },
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          splashColor:
+                              Colors.cyanAccent.withOpacity(0.2),
+                          highlightColor:
+                              Colors.cyanAccent.withOpacity(0.1),
+                          onTap: () {}, // keeps button behavior
+                          child: Container(
+                            width: barWidth,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Colors.cyanAccent,
+                                  Color(0xFF00E5FF),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.cyanAccent.withOpacity(0.35),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
+  return const SizedBox.shrink();
+}
 }
 
 class ContributionDay {
