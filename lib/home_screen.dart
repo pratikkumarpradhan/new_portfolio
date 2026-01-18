@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -82,7 +81,8 @@ class TypewriterText extends StatefulWidget {
   State<TypewriterText> createState() => _TypewriterTextState();
 }
 
-class _TypewriterTextState extends State<TypewriterText> with TickerProviderStateMixin {
+class _TypewriterTextState extends State<TypewriterText>
+    with TickerProviderStateMixin {
   late AnimationController _controller;
   late AnimationController _cursorController;
   late Animation<int> _animation;
@@ -95,7 +95,9 @@ class _TypewriterTextState extends State<TypewriterText> with TickerProviderStat
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: Duration(milliseconds: widget.text.length * widget.duration.inMilliseconds),
+      duration: Duration(
+        milliseconds: widget.text.length * widget.duration.inMilliseconds,
+      ),
       vsync: this,
     );
 
@@ -107,18 +109,11 @@ class _TypewriterTextState extends State<TypewriterText> with TickerProviderStat
     _animation = IntTween(
       begin: 0,
       end: widget.text.length,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _cursorAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _cursorController,
-      curve: Curves.easeInOut,
-    ));
+    _cursorAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _cursorController, curve: Curves.easeInOut),
+    );
 
     _animation.addListener(() {
       setState(() {
@@ -214,12 +209,13 @@ class _ReorderableButtonGrid extends StatefulWidget {
 class _ReorderableButtonGridState extends State<_ReorderableButtonGrid> {
   @override
   Widget build(BuildContext context) {
-    final filteredButtons = widget.navigationButtons
-        .asMap()
-        .entries
-        .where((entry) => entry.value.showOnHome)
-        .map((entry) => MapEntry(entry.key, entry.value))
-        .toList();
+    final filteredButtons =
+        widget.navigationButtons
+            .asMap()
+            .entries
+            .where((entry) => entry.value.showOnHome)
+            .map((entry) => MapEntry(entry.key, entry.value))
+            .toList();
 
     return Wrap(
       spacing: 30,
@@ -238,13 +234,15 @@ class _ReorderableButtonGridState extends State<_ReorderableButtonGrid> {
             isAdmin: true,
             onEdit: () => widget.onEdit(button),
             onDelete: () => widget.onDelete(button),
-            onMoveUp: index > 0 ? () => widget.onReorder(index, index - 1) : null,
-            onMoveDown: index < widget.navigationButtons.length - 1 ? () => widget.onReorder(index, index + 1) : null,
+            onMoveUp:
+                index > 0 ? () => widget.onReorder(index, index - 1) : null,
+            onMoveDown:
+                index < widget.navigationButtons.length - 1
+                    ? () => widget.onReorder(index, index + 1)
+                    : null,
           );
         }),
-        _AddButtonWidget(
-          onAdd: widget.onAdd,
-        ),
+        _AddButtonWidget(onAdd: widget.onAdd),
       ],
     );
   }
@@ -260,7 +258,8 @@ class _AddButtonWidget extends StatefulWidget {
   State<_AddButtonWidget> createState() => _AddButtonWidgetState();
 }
 
-class _AddButtonWidgetState extends State<_AddButtonWidget> with SingleTickerProviderStateMixin {
+class _AddButtonWidgetState extends State<_AddButtonWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scale;
   bool _isHovered = false;
@@ -309,7 +308,10 @@ class _AddButtonWidgetState extends State<_AddButtonWidget> with SingleTickerPro
             decoration: BoxDecoration(
               color: Colors.cyanAccent.withOpacity(0.1),
               border: Border.all(
-                color: _isHovered ? Colors.cyanAccent : Colors.cyanAccent.withOpacity(0.5),
+                color:
+                    _isHovered
+                        ? Colors.cyanAccent
+                        : Colors.cyanAccent.withOpacity(0.5),
                 width: 2,
               ),
               borderRadius: BorderRadius.circular(24),
@@ -317,11 +319,7 @@ class _AddButtonWidgetState extends State<_AddButtonWidget> with SingleTickerPro
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.add,
-                  color: Colors.cyanAccent,
-                  size: 18,
-                ),
+                Icon(Icons.add, color: Colors.cyanAccent, size: 18),
                 const SizedBox(width: 8),
                 Text(
                   'Add',
@@ -341,7 +339,7 @@ class _AddButtonWidgetState extends State<_AddButtonWidget> with SingleTickerPro
 }
 
 // Main HomeScreen widget
-// ... (All imports, NavigationButton, TypewriterText, _ReorderableButtonGrid, 
+// ... (All imports, NavigationButton, TypewriterText, _ReorderableButtonGrid,
 // _AddButtonWidget, HomePage, _HoverZoomButton, and _HoverSlideButton classes remain unchanged)
 
 // Main HomeScreen widget
@@ -393,18 +391,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _listenToAuthState() {
-    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
-      debugPrint('🔍 Auth state changed: ${user?.email}');
-      _checkAdmin(user);
-    }, onError: (error) {
-      debugPrint('❌ Auth state error: $error');
-      setState(() {
-        _isAdmin = false;
-        _loading = false;
-        _userEmail = null;
-        _showLoginMessage = false;
-      });
-    });
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen(
+      (user) {
+        debugPrint('🔍 Auth state changed: ${user?.email}');
+        _checkAdmin(user);
+      },
+      onError: (error) {
+        debugPrint('❌ Auth state error: $error');
+        setState(() {
+          _isAdmin = false;
+          _loading = false;
+          _userEmail = null;
+          _showLoginMessage = false;
+        });
+      },
+    );
   }
 
   Future<void> _checkAdmin(User? user) async {
@@ -419,14 +420,20 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
     try {
-      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
       setState(() {
         _isAdmin = doc.data()?['role'] == 'admin';
         _userEmail = user.email ?? 'Unknown User';
         _loading = false;
         _showLoginMessage = true;
       });
-      debugPrint('✅ User: $_userEmail, Admin: $_isAdmin, Showing message: $_showLoginMessage');
+      debugPrint(
+        '✅ User: $_userEmail, Admin: $_isAdmin, Showing message: $_showLoginMessage',
+      );
       _messageTimer?.cancel(); // Cancel any existing timer
       _messageTimer = Timer(const Duration(seconds: 3), () {
         if (mounted) {
@@ -452,22 +459,32 @@ class _HomeScreenState extends State<HomeScreen> {
         .collection('navigationButtons')
         .orderBy('order')
         .snapshots()
-        .listen((snapshot) {
-      setState(() {
-        navigationButtons = snapshot.docs
-            .map((doc) => NavigationButton.fromFirestore(doc))
-            .where((button) => button.isActive)
-            .toList();
-        _loading = false;
-      });
-      debugPrint('📋 Loaded ${navigationButtons.length} navigation buttons');
-    }, onError: (error) {
-      debugPrint('❌ Error loading navigation buttons: $error');
-      setState(() => _loading = false);
-    });
+        .listen(
+          (snapshot) {
+            setState(() {
+              navigationButtons =
+                  snapshot.docs
+                      .map((doc) => NavigationButton.fromFirestore(doc))
+                      .where((button) => button.isActive)
+                      .toList();
+              _loading = false;
+            });
+            debugPrint(
+              '📋 Loaded ${navigationButtons.length} navigation buttons',
+            );
+          },
+          onError: (error) {
+            debugPrint('❌ Error loading navigation buttons: $error');
+            setState(() => _loading = false);
+          },
+        );
   }
 
-  Future<void> _updateButtonOrder(int oldIndex, int newIndex, {bool fromReorderable = true}) async {
+  Future<void> _updateButtonOrder(
+    int oldIndex,
+    int newIndex, {
+    bool fromReorderable = true,
+  }) async {
     // Normalize only when coming from ReorderableListView
     int targetIndex = newIndex;
     if (fromReorderable && oldIndex < newIndex) {
@@ -490,7 +507,9 @@ class _HomeScreenState extends State<HomeScreen> {
       final batch = FirebaseFirestore.instance.batch();
       for (int i = 0; i < updated.length; i++) {
         batch.update(
-          FirebaseFirestore.instance.collection('navigationButtons').doc(updated[i].id),
+          FirebaseFirestore.instance
+              .collection('navigationButtons')
+              .doc(updated[i].id),
           {'order': i},
         );
       }
@@ -512,7 +531,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Widget> get screens {
-    return navigationButtons.map((button) => screenMap[button.screenType] ?? const SizedBox()).toList();
+    return navigationButtons
+        .map((button) => screenMap[button.screenType] ?? const SizedBox())
+        .toList();
   }
 
   List<String> get navTitles {
@@ -524,17 +545,32 @@ class _HomeScreenState extends State<HomeScreen> {
     String title = '';
     String screenType = 'home';
     bool showOnHome = true;
-    final screenTypes = ['home', 'projects', 'skills', 'experience', 'github', 'leetcode', 'about', 'blog'];
+    final screenTypes = [
+      'home',
+      'projects',
+      'skills',
+      'experience',
+      'github',
+      'leetcode',
+      'about',
+      'blog',
+    ];
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xff23243a),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
             'Add Navigation Button',
-            style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           content: Form(
             key: _formKey,
@@ -547,29 +583,49 @@ class _HomeScreenState extends State<HomeScreen> {
                     labelStyle: const TextStyle(color: Colors.cyanAccent),
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.05),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   style: const TextStyle(color: Colors.white),
                   onChanged: (val) => title = val,
-                  validator: (val) => val == null || val.isEmpty ? 'Enter button title' : null,
+                  validator:
+                      (val) =>
+                          val == null || val.isEmpty
+                              ? 'Enter button title'
+                              : null,
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: screenType,
-                  items: screenTypes.map((type) => DropdownMenuItem(
-                    value: type,
-                    child: Text(type.toUpperCase(), style: const TextStyle(color: Colors.white)),
-                  )).toList(),
+                  items:
+                      screenTypes
+                          .map(
+                            (type) => DropdownMenuItem(
+                              value: type,
+                              child: Text(
+                                type.toUpperCase(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          )
+                          .toList(),
                   onChanged: (val) => screenType = val ?? 'home',
                   decoration: InputDecoration(
                     labelText: 'Screen Type',
                     labelStyle: const TextStyle(color: Colors.cyanAccent),
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.05),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   dropdownColor: const Color(0xff23243a),
-                  validator: (val) => val == null || val.isEmpty ? 'Select screen type' : null,
+                  validator:
+                      (val) =>
+                          val == null || val.isEmpty
+                              ? 'Select screen type'
+                              : null,
                 ),
                 const SizedBox(height: 16),
                 StatefulBuilder(
@@ -580,7 +636,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(color: Colors.white),
                       ),
                       value: showOnHome,
-                      onChanged: (val) => setState(() => showOnHome = val ?? true),
+                      onChanged:
+                          (val) => setState(() => showOnHome = val ?? true),
                       activeColor: Colors.cyanAccent,
                       checkColor: Colors.black,
                     );
@@ -592,29 +649,44 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyanAccent,
                 foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   try {
-                    final newOrder = navigationButtons.isEmpty ? 0 : navigationButtons.map((b) => b.order).reduce((a, b) => a > b ? a : b) + 1;
-                    await FirebaseFirestore.instance.collection('navigationButtons').add({
-                      'title': title,
-                      'screenType': screenType,
-                      'order': newOrder,
-                      'isActive': true,
-                      'showOnHome': showOnHome,
-                    });
+                    final newOrder =
+                        navigationButtons.isEmpty
+                            ? 0
+                            : navigationButtons
+                                    .map((b) => b.order)
+                                    .reduce((a, b) => a > b ? a : b) +
+                                1;
+                    await FirebaseFirestore.instance
+                        .collection('navigationButtons')
+                        .add({
+                          'title': title,
+                          'screenType': screenType,
+                          'order': newOrder,
+                          'isActive': true,
+                          'showOnHome': showOnHome,
+                        });
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Navigation button "$title" added successfully!'),
+                        content: Text(
+                          'Navigation button "$title" added successfully!',
+                        ),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -628,7 +700,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 }
               },
-              child: const Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text(
+                'Add',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         );
@@ -641,17 +716,32 @@ class _HomeScreenState extends State<HomeScreen> {
     String title = button.title;
     String screenType = button.screenType;
     bool showOnHome = button.showOnHome;
-    final screenTypes = ['home', 'projects', 'skills', 'experience', 'github', 'leetcode', 'about', 'blog'];
+    final screenTypes = [
+      'home',
+      'projects',
+      'skills',
+      'experience',
+      'github',
+      'leetcode',
+      'about',
+      'blog',
+    ];
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xff23243a),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
             'Edit Navigation Button',
-            style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           content: Form(
             key: _formKey,
@@ -665,29 +755,49 @@ class _HomeScreenState extends State<HomeScreen> {
                     labelStyle: const TextStyle(color: Colors.cyanAccent),
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.05),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   style: const TextStyle(color: Colors.white),
                   onChanged: (val) => title = val,
-                  validator: (val) => val == null || val.isEmpty ? 'Enter button title' : null,
+                  validator:
+                      (val) =>
+                          val == null || val.isEmpty
+                              ? 'Enter button title'
+                              : null,
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: screenType,
-                  items: screenTypes.map((type) => DropdownMenuItem(
-                    value: type,
-                    child: Text(type.toUpperCase(), style: const TextStyle(color: Colors.white)),
-                  )).toList(),
+                  items:
+                      screenTypes
+                          .map(
+                            (type) => DropdownMenuItem(
+                              value: type,
+                              child: Text(
+                                type.toUpperCase(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          )
+                          .toList(),
                   onChanged: (val) => screenType = val ?? 'home',
                   decoration: InputDecoration(
                     labelText: 'Screen Type',
                     labelStyle: const TextStyle(color: Colors.cyanAccent),
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.05),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   dropdownColor: const Color(0xff23243a),
-                  validator: (val) => val == null || val.isEmpty ? 'Select screen type' : null,
+                  validator:
+                      (val) =>
+                          val == null || val.isEmpty
+                              ? 'Select screen type'
+                              : null,
                 ),
                 const SizedBox(height: 16),
                 StatefulBuilder(
@@ -698,7 +808,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(color: Colors.white),
                       ),
                       value: showOnHome,
-                      onChanged: (val) => setState(() => showOnHome = val ?? true),
+                      onChanged:
+                          (val) => setState(() => showOnHome = val ?? true),
                       activeColor: Colors.cyanAccent,
                       checkColor: Colors.black,
                     );
@@ -710,26 +821,36 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyanAccent,
                 foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   try {
-                    await FirebaseFirestore.instance.collection('navigationButtons').doc(button.id).update({
-                      'title': title,
-                      'screenType': screenType,
-                      'showOnHome': showOnHome,
-                    });
+                    await FirebaseFirestore.instance
+                        .collection('navigationButtons')
+                        .doc(button.id)
+                        .update({
+                          'title': title,
+                          'screenType': screenType,
+                          'showOnHome': showOnHome,
+                        });
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Navigation button updated successfully!'),
+                        content: Text(
+                          'Navigation button updated successfully!',
+                        ),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -743,7 +864,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 }
               },
-              child: const Text('Update', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text(
+                'Update',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         );
@@ -757,10 +881,16 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xff23243a),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
             'Delete Navigation Button',
-            style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           content: Text(
             'Are you sure you want to delete "${button.title}"? This action cannot be undone.',
@@ -769,21 +899,31 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               onPressed: () async {
                 try {
-                  await FirebaseFirestore.instance.collection('navigationButtons').doc(button.id).delete();
+                  await FirebaseFirestore.instance
+                      .collection('navigationButtons')
+                      .doc(button.id)
+                      .delete();
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Navigation button "${button.title}" deleted successfully!'),
+                      content: Text(
+                        'Navigation button "${button.title}" deleted successfully!',
+                      ),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -832,467 +972,663 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     bool isDesktop = MediaQuery.of(context).size.width > 600;
-    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: PreferredSize(
-  preferredSize: const Size.fromHeight(64),
-  child: AppBar(
-    backgroundColor: Colors.transparent,
-    elevation: 4,
-    automaticallyImplyLeading: false,
-    flexibleSpace: Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF0B1020),
-            Color(0xFF101828),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-    ),
-    title: LayoutBuilder(
-      builder: (context, constraints) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Portfolio title on the left
-            MouseRegion(
-              onEnter: (_) => setState(() => _isHovered = true),
-              onExit: (_) => setState(() => _isHovered = false),
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () {
-                  changePageAnimated(0);
-                },
-                child: AnimatedScale(
-                  scale: _isHovered ? 1.1 : 1.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 16),
-                      const Icon(Icons.home, color: Colors.white),
-                      const SizedBox(width: 8),
-                      Text(
-                        "Portfolio",
-                        style: GoogleFonts.varelaRound(
-                          color: Colors.cyanAccent,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+        preferredSize: const Size.fromHeight(64),
+        child: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 4,
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF0B1020), Color(0xFF101828)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
-            // Navigation buttons on the right for desktop or mobile landscape
-            if (isDesktop || (isLandscape && !isDesktop))
-              Flexible(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ...List.generate(
-                        navigationButtons.length,
-                        (index) {
-                          final button = navigationButtons[index];
-                          final isSelected = selectedIndex == index;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: _HoverSlideButton(
-                              title: button.title,
-                              isSelected: isSelected,
-                              onTap: () => changePageAnimated(index),
-                              isAdmin: _isAdmin == true,
-                              onEdit: _isAdmin == true
-                                  ? () => _showEditButtonDialog(button)
-                                  : null,
-                              onDelete: _isAdmin == true
-                                  ? () => _showDeleteButtonDialog(button)
-                                  : null,
-                              onMoveUp: _isAdmin == true && index > 0
-                                  ? () => _updateButtonOrder(index, index - 1, fromReorderable: false)
-                                  : null,
-                              onMoveDown: _isAdmin == true &&
-                                      index < navigationButtons.length - 1
-                                  ? () => _updateButtonOrder(index, index + 1, fromReorderable: false)
-                                  : null,
-                              fontSize: isDesktop ? 16 : 14,
-                              padding: isDesktop
-                                  ? const EdgeInsets.all(12)
-                                  : const EdgeInsets.all(10),
-                            ),
-                          );
-                        },
-                      ),
-                      // Show logout button if user is logged in, otherwise show login/register
-                      if (_userEmail != null) ...[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: _HoverSlideButton(
-                            title: "Logout",
-                            isSelected: false,
-                            onTap: () async {
-                              await FirebaseAuth.instance.signOut();
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Successfully logged out'),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                              }
-                            },
-                            isAdmin: false,
-                            fontSize: isDesktop ? 16 : 14,
-                            padding: isDesktop
-                                ? const EdgeInsets.all(12)
-                                : const EdgeInsets.all(10),
-                          ),
-                        ),
-                      ] else ...[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: _HoverSlideButton(
-                            title: "Login",
-                            isSelected: false,
-                            onTap: () async {
-                              await FirebaseAuth.instance.signOut();
-                              if (context.mounted) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                                );
-                              }
-                            },
-                            isAdmin: false,
-                            fontSize: isDesktop ? 16 : 14,
-                            padding: isDesktop
-                                ? const EdgeInsets.all(12)
-                                : const EdgeInsets.all(10),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: _HoverSlideButton(
-                            title: "Register",
-                            isSelected: false,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const RegisterPage()),
-                              );
-                            },
-                            isAdmin: false,
-                            fontSize: isDesktop ? 16 : 14,
-                            padding: isDesktop
-                                ? const EdgeInsets.all(12)
-                                : const EdgeInsets.all(10),
-                          ),
-                        ),
-                      ]
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
-    ),
-    actions: [
-      if (!isDesktop && !isLandscape)
-        Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
           ),
-        ),
-    ],
-  ),
-),
-     endDrawer: (isDesktop || isLandscape)
-    ? null
-    : Drawer(
-        backgroundColor: Colors.transparent,
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xCC0B132B),
-                        Color(0x99112233),
-                        Color(0x66121A2E),
-                      ],
-                    ),
-                    border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.28),
-                        blurRadius: 24,
-                        offset: const Offset(0, 10),
-                      ),
-                      BoxShadow(
-                        color: Colors.cyanAccent.withOpacity(0.05),
-                        blurRadius: 16,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
-                        child: Text(
-                          'Navigation',
-                          style: GoogleFonts.varelaRound(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      if (_isAdmin == true) ...[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: ListTile(
-                            onTap: _showAddButtonDialog,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            tileColor: Colors.cyanAccent.withOpacity(0.08),
-                            leading: const Icon(Icons.add, color: Colors.cyanAccent),
-                            title: Text(
-                              'Add New Button',
-                              style: GoogleFonts.montaga(
-                                fontSize: 16,
+          title: LayoutBuilder(
+            builder: (context, constraints) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Portfolio title on the left
+                  MouseRegion(
+                    onEnter: (_) => setState(() => _isHovered = true),
+                    onExit: (_) => setState(() => _isHovered = false),
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        changePageAnimated(0);
+                      },
+                      child: AnimatedScale(
+                        scale: _isHovered ? 1.1 : 1.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 16),
+                            const Icon(Icons.home, color: Colors.white),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Portfolio",
+                              style: GoogleFonts.varelaRound(
                                 color: Colors.cyanAccent,
-                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                decoration: TextDecoration.underline,
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                      ],
-                      Expanded(
-                        child: _loading
-                            ? const Center(child: CircularProgressIndicator())
-                            : _isAdmin == true
-                                ? Column(
-                                    children: [
-                                      Expanded(
-                                        child: ReorderableListView.builder(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                                          itemCount: navigationButtons.length,
-                                          onReorder: _updateButtonOrder,
-                                          itemBuilder: (context, index) {
-                                            final button = navigationButtons[index];
-                                            final isSelected = selectedIndex == index;
-                                            return Padding(
-                                              key: ValueKey(button.id),
-                                              padding: const EdgeInsets.symmetric(vertical: 4),
-                                              child: ListTile(
-                                                onTap: () => onNavTap(index),
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                                tileColor: isSelected ? Colors.cyan.withOpacity(0.18) : Colors.transparent,
-                                                leading: const Icon(Icons.drag_handle, color: Colors.white54, size: 20),
-                                                title: Text(
-                                                  button.title,
-                                                  style: GoogleFonts.montaga(
-                                                    fontSize: 18,
-                                                    color: isSelected ? Colors.cyanAccent : Colors.white,
-                                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                                  ),
-                                                ),
-                                                trailing: isSelected
-                                                    ? const Icon(Icons.check_circle, color: Colors.cyanAccent)
-                                                    : const SizedBox.shrink(),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      // Add logout button for admin
-                                      const SizedBox(height: 12),
-                                      Divider(
-                                        color: Colors.white.withOpacity(0.25),
-                                        thickness: 1,
-                                        indent: 16,
-                                        endIndent: 16,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-                                        child: ListTile(
-                                          onTap: () async {
-                                            await FirebaseAuth.instance.signOut();
-                                            if (context.mounted) {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text('Successfully logged out'),
-                                                  backgroundColor: Colors.green,
-                                                ),
-                                              );
-                                            }
-                                          },
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                          tileColor: Colors.transparent,
-                                          leading: const Icon(Icons.logout, color: Colors.redAccent),
-                                          title: Text(
-                                            'Logout',
-                                            style: GoogleFonts.montaga(
-                                              fontSize: 18,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                            ),
+                      ),
+                    ),
+                  ),
+                  // Navigation buttons on the right for desktop or mobile landscape
+                  if (isDesktop || (isLandscape && !isDesktop))
+                    Flexible(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ...List.generate(navigationButtons.length, (index) {
+                              final button = navigationButtons[index];
+                              final isSelected = selectedIndex == index;
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                ),
+                                child: _HoverSlideButton(
+                                  title: button.title,
+                                  isSelected: isSelected,
+                                  onTap: () => changePageAnimated(index),
+                                  isAdmin: _isAdmin == true,
+                                  onEdit:
+                                      _isAdmin == true
+                                          ? () => _showEditButtonDialog(button)
+                                          : null,
+                                  onDelete:
+                                      _isAdmin == true
+                                          ? () =>
+                                              _showDeleteButtonDialog(button)
+                                          : null,
+                                  onMoveUp:
+                                      _isAdmin == true && index > 0
+                                          ? () => _updateButtonOrder(
+                                            index,
+                                            index - 1,
+                                            fromReorderable: false,
+                                          )
+                                          : null,
+                                  onMoveDown:
+                                      _isAdmin == true &&
+                                              index <
+                                                  navigationButtons.length - 1
+                                          ? () => _updateButtonOrder(
+                                            index,
+                                            index + 1,
+                                            fromReorderable: false,
+                                          )
+                                          : null,
+                                  fontSize: isDesktop ? 16 : 14,
+                                  padding:
+                                      isDesktop
+                                          ? const EdgeInsets.all(12)
+                                          : const EdgeInsets.all(10),
+                                ),
+                              );
+                            }),
+                            // Show logout button if user is logged in, otherwise show login/register
+                            if (_userEmail != null) ...[
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                ),
+                                child: _HoverSlideButton(
+                                  title: "Logout",
+                                  isSelected: false,
+                                  onTap: () async {
+                                    await FirebaseAuth.instance.signOut();
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Successfully logged out',
                                           ),
-                                          subtitle: _userEmail != null 
-                                            ? Text(
-                                                'Logged in as $_userEmail',
-                                                style: GoogleFonts.montaga(
-                                                  fontSize: 12,
-                                                  color: Colors.white70,
-                                                ),
-                                              )
-                                            : null,
+                                          backgroundColor: Colors.green,
                                         ),
+                                      );
+                                    }
+                                  },
+                                  isAdmin: false,
+                                  fontSize: isDesktop ? 16 : 14,
+                                  padding:
+                                      isDesktop
+                                          ? const EdgeInsets.all(12)
+                                          : const EdgeInsets.all(10),
+                                ),
+                              ),
+                            ] else ...[
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                ),
+                                child: _HoverSlideButton(
+                                  title: "Login",
+                                  isSelected: false,
+                                  onTap: () async {
+                                    await FirebaseAuth.instance.signOut();
+                                    if (context.mounted) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const LoginPage(),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  isAdmin: false,
+                                  fontSize: isDesktop ? 16 : 14,
+                                  padding:
+                                      isDesktop
+                                          ? const EdgeInsets.all(12)
+                                          : const EdgeInsets.all(10),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                ),
+                                child: _HoverSlideButton(
+                                  title: "Register",
+                                  isSelected: false,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const RegisterPage(),
                                       ),
-                                    ],
-                                  )
-                                : ListView.builder(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                                    itemCount: navigationButtons.length + (_userEmail != null ? 1 : 2), // Show logout if logged in, otherwise login+register
-                                    itemBuilder: (context, index) {
-                                      debugPrint('🔍 Drawer item $index: userEmail=$_userEmail, navButtons=${navigationButtons.length}');
-                                      if (index == navigationButtons.length) {
-                                        return Column(
+                                    );
+                                  },
+                                  isAdmin: false,
+                                  fontSize: isDesktop ? 16 : 14,
+                                  padding:
+                                      isDesktop
+                                          ? const EdgeInsets.all(12)
+                                          : const EdgeInsets.all(10),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+          actions: [
+            if (!isDesktop && !isLandscape)
+              Builder(
+                builder:
+                    (context) => IconButton(
+                      icon: const Icon(Icons.menu, color: Colors.white),
+                      onPressed: () => Scaffold.of(context).openEndDrawer(),
+                    ),
+              ),
+          ],
+        ),
+      ),
+      endDrawer:
+          (isDesktop || isLandscape)
+              ? null
+              : Drawer(
+                backgroundColor: Colors.transparent,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(24),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(24),
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xCC0B132B),
+                                Color(0x99112233),
+                                Color(0x66121A2E),
+                              ],
+                            ),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.18),
+                              width: 1.2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.28),
+                                blurRadius: 24,
+                                offset: const Offset(0, 10),
+                              ),
+                              BoxShadow(
+                                color: Colors.cyanAccent.withOpacity(0.05),
+                                blurRadius: 16,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 24,
+                                  horizontal: 24,
+                                ),
+                                child: Text(
+                                  'Navigation',
+                                  style: GoogleFonts.varelaRound(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              if (_isAdmin == true) ...[
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: ListTile(
+                                    onTap: _showAddButtonDialog,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    tileColor: Colors.cyanAccent.withOpacity(
+                                      0.08,
+                                    ),
+                                    leading: const Icon(
+                                      Icons.add,
+                                      color: Colors.cyanAccent,
+                                    ),
+                                    title: Text(
+                                      'Add New Button',
+                                      style: GoogleFonts.montaga(
+                                        fontSize: 16,
+                                        color: Colors.cyanAccent,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                              Expanded(
+                                child:
+                                    _loading
+                                        ? const Center(
+                                          child: CircularProgressIndicator(),
+                                        )
+                                        : _isAdmin == true
+                                        ? Column(
                                           children: [
+                                            Expanded(
+                                              child: ReorderableListView.builder(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                    ),
+                                                itemCount:
+                                                    navigationButtons.length,
+                                                onReorder: _updateButtonOrder,
+                                                itemBuilder: (context, index) {
+                                                  final button =
+                                                      navigationButtons[index];
+                                                  final isSelected =
+                                                      selectedIndex == index;
+                                                  return Padding(
+                                                    key: ValueKey(button.id),
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          vertical: 4,
+                                                        ),
+                                                    child: ListTile(
+                                                      onTap:
+                                                          () => onNavTap(index),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              16,
+                                                            ),
+                                                      ),
+                                                      tileColor:
+                                                          isSelected
+                                                              ? Colors.cyan
+                                                                  .withOpacity(
+                                                                    0.18,
+                                                                  )
+                                                              : Colors
+                                                                  .transparent,
+                                                      leading: const Icon(
+                                                        Icons.drag_handle,
+                                                        color: Colors.white54,
+                                                        size: 20,
+                                                      ),
+                                                      title: Text(
+                                                        button.title,
+                                                        style: GoogleFonts.montaga(
+                                                          fontSize: 18,
+                                                          color:
+                                                              isSelected
+                                                                  ? Colors
+                                                                      .cyanAccent
+                                                                  : Colors
+                                                                      .white,
+                                                          fontWeight:
+                                                              isSelected
+                                                                  ? FontWeight
+                                                                      .bold
+                                                                  : FontWeight
+                                                                      .w500,
+                                                        ),
+                                                      ),
+                                                      trailing:
+                                                          isSelected
+                                                              ? const Icon(
+                                                                Icons
+                                                                    .check_circle,
+                                                                color:
+                                                                    Colors
+                                                                        .cyanAccent,
+                                                              )
+                                                              : const SizedBox.shrink(),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            // Add logout button for admin
                                             const SizedBox(height: 12),
                                             Divider(
-                                              color: Colors.white.withOpacity(0.25),
+                                              color: Colors.white.withOpacity(
+                                                0.25,
+                                              ),
                                               thickness: 1,
                                               indent: 16,
                                               endIndent: 16,
                                             ),
                                             const SizedBox(height: 8),
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 4),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 4,
+                                                    horizontal: 12,
+                                                  ),
                                               child: ListTile(
                                                 onTap: () async {
-                                                  if (_userEmail != null) {
-                                                    // Logout functionality
-                                                    await FirebaseAuth.instance.signOut();
-                                                    if (context.mounted) {
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        const SnackBar(
-                                                          content: Text('Successfully logged out'),
-                                                          backgroundColor: Colors.green,
+                                                  await FirebaseAuth.instance
+                                                      .signOut();
+                                                  if (context.mounted) {
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                          'Successfully logged out',
                                                         ),
-                                                      );
-                                                    }
-                                                  } else {
-                                                    // Login functionality
-                                                    await FirebaseAuth.instance.signOut();
-                                                    if (context.mounted) {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(builder: (_) => const LoginPage()),
-                                                      );
-                                                    }
+                                                        backgroundColor:
+                                                            Colors.green,
+                                                      ),
+                                                    );
                                                   }
                                                 },
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                ),
                                                 tileColor: Colors.transparent,
+                                                leading: const Icon(
+                                                  Icons.logout,
+                                                  color: Colors.redAccent,
+                                                ),
                                                 title: Text(
-                                                  _userEmail != null ? 'Logout' : 'Login',
+                                                  'Logout',
                                                   style: GoogleFonts.montaga(
                                                     fontSize: 18,
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
-                                                subtitle: _userEmail != null 
-                                                  ? Text(
-                                                      'Logged in as $_userEmail',
-                                                      style: GoogleFonts.montaga(
-                                                        fontSize: 12,
-                                                        color: Colors.white70,
-                                                      ),
-                                                    )
-                                                  : null,
+                                                subtitle:
+                                                    _userEmail != null
+                                                        ? Text(
+                                                          'Logged in as $_userEmail',
+                                                          style:
+                                                              GoogleFonts.montaga(
+                                                                fontSize: 12,
+                                                                color:
+                                                                    Colors
+                                                                        .white70,
+                                                              ),
+                                                        )
+                                                        : null,
                                               ),
                                             ),
                                           ],
-                                        );
-                                      }
-                                      if (_userEmail == null && index == navigationButtons.length + 1) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 4),
-                                          child: ListTile(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(builder: (_) => const RegisterPage()),
+                                        )
+                                        : ListView.builder(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                          ),
+                                          itemCount:
+                                              navigationButtons.length +
+                                              (_userEmail != null
+                                                  ? 1
+                                                  : 2), // Show logout if logged in, otherwise login+register
+                                          itemBuilder: (context, index) {
+                                            debugPrint(
+                                              '🔍 Drawer item $index: userEmail=$_userEmail, navButtons=${navigationButtons.length}',
+                                            );
+                                            if (index ==
+                                                navigationButtons.length) {
+                                              return Column(
+                                                children: [
+                                                  const SizedBox(height: 12),
+                                                  Divider(
+                                                    color: Colors.white
+                                                        .withOpacity(0.25),
+                                                    thickness: 1,
+                                                    indent: 16,
+                                                    endIndent: 16,
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          vertical: 4,
+                                                        ),
+                                                    child: ListTile(
+                                                      onTap: () async {
+                                                        if (_userEmail !=
+                                                            null) {
+                                                          // Logout functionality
+                                                          await FirebaseAuth
+                                                              .instance
+                                                              .signOut();
+                                                          if (context.mounted) {
+                                                            ScaffoldMessenger.of(
+                                                              context,
+                                                            ).showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text(
+                                                                  'Successfully logged out',
+                                                                ),
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .green,
+                                                              ),
+                                                            );
+                                                          }
+                                                        } else {
+                                                          // Login functionality
+                                                          await FirebaseAuth
+                                                              .instance
+                                                              .signOut();
+                                                          if (context.mounted) {
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder:
+                                                                    (_) =>
+                                                                        const LoginPage(),
+                                                              ),
+                                                            );
+                                                          }
+                                                        }
+                                                      },
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              16,
+                                                            ),
+                                                      ),
+                                                      tileColor:
+                                                          Colors.transparent,
+                                                      title: Text(
+                                                        _userEmail != null
+                                                            ? 'Logout'
+                                                            : 'Login',
+                                                        style:
+                                                            GoogleFonts.montaga(
+                                                              fontSize: 18,
+                                                              color:
+                                                                  Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                      ),
+                                                      subtitle:
+                                                          _userEmail != null
+                                                              ? Text(
+                                                                'Logged in as $_userEmail',
+                                                                style: GoogleFonts.montaga(
+                                                                  fontSize: 12,
+                                                                  color:
+                                                                      Colors
+                                                                          .white70,
+                                                                ),
+                                                              )
+                                                              : null,
+                                                    ),
+                                                  ),
+                                                ],
                                               );
-                                            },
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                            tileColor: Colors.transparent,
-                                            title: Text(
-                                              'Register',
-                                              style: GoogleFonts.montaga(
-                                                fontSize: 18,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500,
+                                            }
+                                            if (_userEmail == null &&
+                                                index ==
+                                                    navigationButtons.length +
+                                                        1) {
+                                              return Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 4,
+                                                    ),
+                                                child: ListTile(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder:
+                                                            (_) =>
+                                                                const RegisterPage(),
+                                                      ),
+                                                    );
+                                                  },
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          16,
+                                                        ),
+                                                  ),
+                                                  tileColor: Colors.transparent,
+                                                  title: Text(
+                                                    'Register',
+                                                    style: GoogleFonts.montaga(
+                                                      fontSize: 18,
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                            final button =
+                                                navigationButtons[index];
+                                            final isSelected =
+                                                selectedIndex == index;
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 4,
+                                                  ),
+                                              child: ListTile(
+                                                onTap: () => onNavTap(index),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                ),
+                                                tileColor:
+                                                    isSelected
+                                                        ? Colors.cyan
+                                                            .withOpacity(0.18)
+                                                        : Colors.transparent,
+                                                title: Text(
+                                                  button.title,
+                                                  style: GoogleFonts.montaga(
+                                                    fontSize: 18,
+                                                    color:
+                                                        isSelected
+                                                            ? Colors.cyanAccent
+                                                            : Colors.white,
+                                                    fontWeight:
+                                                        isSelected
+                                                            ? FontWeight.bold
+                                                            : FontWeight.w500,
+                                                  ),
+                                                ),
+                                                trailing:
+                                                    isSelected
+                                                        ? const Icon(
+                                                          Icons.check_circle,
+                                                          color:
+                                                              Colors.cyanAccent,
+                                                        )
+                                                        : const SizedBox.shrink(),
                                               ),
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                      final button = navigationButtons[index];
-                                      final isSelected = selectedIndex == index;
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 4),
-                                        child: ListTile(
-                                          onTap: () => onNavTap(index),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                          tileColor: isSelected ? Colors.cyan.withOpacity(0.18) : Colors.transparent,
-                                          title: Text(
-                                            button.title,
-                                            style: GoogleFonts.montaga(
-                                              fontSize: 18,
-                                              color: isSelected ? Colors.cyanAccent : Colors.white,
-                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                            ),
-                                          ),
-                                          trailing: isSelected
-                                              ? const Icon(Icons.check_circle, color: Colors.cyanAccent)
-                                              : const SizedBox.shrink(),
+                                            );
+                                          },
                                         ),
-                                      );
-                                    },
-                                  ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ),
-      ),
       body: Stack(
         children: [
           Container(
@@ -1311,9 +1647,10 @@ class _HomeScreenState extends State<HomeScreen> {
             child: PageView(
               controller: _pageController,
               scrollDirection: Axis.vertical,
-              physics: selectedIndex == 0
-                  ? const AlwaysScrollableScrollPhysics()
-                  : const NeverScrollableScrollPhysics(),
+              physics:
+                  selectedIndex == 0
+                      ? const AlwaysScrollableScrollPhysics()
+                      : const NeverScrollableScrollPhysics(),
               onPageChanged: (index) {
                 setState(() {
                   selectedIndex = index;
@@ -1330,7 +1667,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 opacity: _showLoginMessage ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 500),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.cyanAccent.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(12),
@@ -1345,7 +1685,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text(
                     'Signed in as $_userEmail',
                     style: GoogleFonts.poppins(
-                      fontSize: MediaQuery.of(context).size.width <= 600 ? 12 : 14,
+                      fontSize:
+                          MediaQuery.of(context).size.width <= 600 ? 12 : 14,
                       fontWeight: FontWeight.w500,
                       color: Colors.black87,
                     ),
@@ -1369,7 +1710,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   double _opacity = 0.0;
   late AnimationController _controller;
   late Animation<double> _bounceAnimation;
@@ -1388,9 +1730,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       duration: const Duration(seconds: 1),
     )..repeat(reverse: true);
 
-    _bounceAnimation = Tween<double>(begin: 0, end: 10).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _bounceAnimation = Tween<double>(
+      begin: 0,
+      end: 10,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -1421,19 +1764,20 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   LayoutBuilder(
-        builder: (context, constraints) {
-          bool isMobile = constraints.maxWidth < 600; // <600 = mobile
-          return Text(
-            "Hello, I'm ",
-            style: GoogleFonts.saira(
-              color: Colors.white,
-              fontSize: isMobile ? 27 : 40, // smaller on mobile
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-          );
-        },
-      ),
+                    builder: (context, constraints) {
+                      bool isMobile =
+                          constraints.maxWidth < 600; // <600 = mobile
+                      return Text(
+                        "Hello, I'm ",
+                        style: GoogleFonts.saira(
+                          color: Colors.white,
+                          fontSize: isMobile ? 27 : 40, // smaller on mobile
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      );
+                    },
+                  ),
                   const SizedBox(height: 8),
                   Flexible(
                     child: ClipRRect(
@@ -1441,7 +1785,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             gradient: LinearGradient(
@@ -1452,7 +1799,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
-                            border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.0),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.18),
+                              width: 1.0,
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.18),
@@ -1462,30 +1812,39 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             ],
                           ),
                           child: LayoutBuilder(
-  builder: (context, constraints) {
-    // check screen width
-    bool isMobile = constraints.maxWidth < 600; // <600 means mobile
-    return TypewriterText(
-      text: "Pratik Kumar Pradhan",
-      style: GoogleFonts.cinzelDecorative(
-        fontSize: isMobile ? 33 : 45, // small on mobile
-        fontWeight: FontWeight.w700,
-        foreground: Paint()
-          ..shader = const LinearGradient(
-            colors: [
-              Colors.tealAccent,
-              Colors.lightBlueAccent,
-              Colors.cyanAccent,
-            ],
-          ).createShader(
-            const Rect.fromLTWH(0.0, 0.0, 300.0, 70.0),
-          ),
-      ),
-      duration: const Duration(milliseconds: 150),
-      delay: const Duration(milliseconds: 500),
-    );
-  },
-),
+                            builder: (context, constraints) {
+                              // check screen width
+                              bool isMobile =
+                                  constraints.maxWidth <
+                                  600; // <600 means mobile
+                              return TypewriterText(
+                                text: "Pratik Kumar Pradhan",
+                                style: GoogleFonts.cinzelDecorative(
+                                  fontSize:
+                                      isMobile ? 33 : 45, // small on mobile
+                                  fontWeight: FontWeight.w700,
+                                  foreground:
+                                      Paint()
+                                        ..shader = const LinearGradient(
+                                          colors: [
+                                            Colors.tealAccent,
+                                            Colors.lightBlueAccent,
+                                            Colors.cyanAccent,
+                                          ],
+                                        ).createShader(
+                                          const Rect.fromLTWH(
+                                            0.0,
+                                            0.0,
+                                            300.0,
+                                            70.0,
+                                          ),
+                                        ),
+                                ),
+                                duration: const Duration(milliseconds: 150),
+                                delay: const Duration(milliseconds: 500),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -1503,7 +1862,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   onExit: (_) => setState(() => isHovered = false),
                   child: GestureDetector(
                     onTap: () {
-                      final state = context.findAncestorStateOfType<_HomeScreenState>();
+                      final state =
+                          context.findAncestorStateOfType<_HomeScreenState>();
                       if (state != null) {
                         state.changePageAnimated(0);
                       }
@@ -1512,10 +1872,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       borderRadius: BorderRadius.circular(30),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: AnimatedContainer
-                        (
+                        child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                            horizontal: 28,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
                             gradient: LinearGradient(
@@ -1527,28 +1889,36 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               end: Alignment.bottomRight,
                             ),
                             border: Border.all(
-                              color: isHovered ? Colors.cyanAccent : Colors.white.withOpacity(0.18),
+                              color:
+                                  isHovered
+                                      ? Colors.cyanAccent
+                                      : Colors.white.withOpacity(0.18),
                               width: isHovered ? 2.0 : 1.2,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(isHovered ? 0.28 : 0.20),
+                                color: Colors.black.withOpacity(
+                                  isHovered ? 0.28 : 0.20,
+                                ),
                                 blurRadius: isHovered ? 18 : 12,
                                 offset: const Offset(0, 8),
                               ),
                             ],
                           ),
-                         child: TypewriterText(
-  text: 'App Developer . Web Developer',
-  style: GoogleFonts.comfortaa(
-    fontSize: MediaQuery.of(context).size.width < 600 ? 16 : 18, // smaller on mobile
-    fontWeight: FontWeight.w700,
-    color: Colors.white,
-    letterSpacing: 1.1,
-  ),
-  duration: const Duration(milliseconds: 100),
-  delay: const Duration(milliseconds: 500),
-),
+                          child: TypewriterText(
+                            text: 'App Developer . Web Developer',
+                            style: GoogleFonts.comfortaa(
+                              fontSize:
+                                  MediaQuery.of(context).size.width < 600
+                                      ? 16
+                                      : 18, // smaller on mobile
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 1.1,
+                            ),
+                            duration: const Duration(milliseconds: 100),
+                            delay: const Duration(milliseconds: 500),
+                          ),
                         ),
                       ),
                     ),
@@ -1565,24 +1935,27 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   onEnter: (_) => setState(() => isHovered = true),
                   onExit: (_) => setState(() => isHovered = false),
                   child: GestureDetector(
-onTap: () async {
-  const url = 'https://qrr.to/bf04e34f';
-  final uri = Uri.parse(url);
+                    onTap: () async {
+                      // const url = 'https://qrr.to/bf04e34f';
+                      const url = 'https://drive.google.com/file/d/1veGLSM5Z2nX0DRHuXFI6DQLNfxDNoLYo/view?';
+                      final uri = Uri.parse(url);
 
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication, // opens in default browser
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Could not open PDF link'),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-},
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(
+                          uri,
+                          mode:
+                              LaunchMode
+                                  .externalApplication, // opens in default browser
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Could not open PDF link'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(32),
                       child: BackdropFilter(
@@ -1590,7 +1963,10 @@ onTap: () async {
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 180),
                           curve: Curves.easeInOut,
-                          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 28,
+                            vertical: 14,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(32),
                             gradient: LinearGradient(
@@ -1602,12 +1978,17 @@ onTap: () async {
                               end: Alignment.bottomRight,
                             ),
                             border: Border.all(
-                              color: isHovered ? Colors.cyanAccent : Colors.white.withOpacity(0.18),
+                              color:
+                                  isHovered
+                                      ? Colors.cyanAccent
+                                      : Colors.white.withOpacity(0.18),
                               width: isHovered ? 2.0 : 1.4,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(isHovered ? 0.28 : 0.18),
+                                color: Colors.black.withOpacity(
+                                  isHovered ? 0.28 : 0.18,
+                                ),
                                 blurRadius: isHovered ? 18 : 12,
                                 offset: const Offset(0, 6),
                               ),
@@ -1618,19 +1999,25 @@ onTap: () async {
                             children: [
                               Icon(
                                 Icons.description_outlined,
-                                color: isHovered ? Colors.cyanAccent.shade200 : Colors.cyanAccent,
+                                color:
+                                    isHovered
+                                        ? Colors.cyanAccent.shade200
+                                        : Colors.cyanAccent,
                                 size: 22,
                               ),
                               const SizedBox(width: 10),
-                           Text(
-  'View CV',
-  style: GoogleFonts.playwriteAuNsw(
-    fontSize: MediaQuery.of(context).size.width < 600 ? 14 : 17, // smaller on mobile
-    fontWeight: FontWeight.w700,
-    color: Colors.white,
-    letterSpacing: 0.5,
-  ),
-),
+                              Text(
+                                'View CV',
+                                style: GoogleFonts.playwriteAuNsw(
+                                  fontSize:
+                                      MediaQuery.of(context).size.width < 600
+                                          ? 14
+                                          : 17, // smaller on mobile
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -1641,43 +2028,79 @@ onTap: () async {
               },
             ),
             const SizedBox(height: 30),
-            if (context.findAncestorStateOfType<_HomeScreenState>()?._loading == true)
+            if (context.findAncestorStateOfType<_HomeScreenState>()?._loading ==
+                true)
               const Center(child: CircularProgressIndicator())
             else
-              context.findAncestorStateOfType<_HomeScreenState>()?._isAdmin == true
+              context.findAncestorStateOfType<_HomeScreenState>()?._isAdmin ==
+                      true
                   ? _ReorderableButtonGrid(
-                      navigationButtons: context.findAncestorStateOfType<_HomeScreenState>()?.navigationButtons ?? [],
-                      selectedIndex: context.findAncestorStateOfType<_HomeScreenState>()?.selectedIndex ?? 0,
-                      onReorder: (oldIndex, newIndex) => context.findAncestorStateOfType<_HomeScreenState>()?._updateButtonOrder(oldIndex, newIndex, fromReorderable: true),
-                      onTap: (index) => context.findAncestorStateOfType<_HomeScreenState>()?.changePageAnimated(index),
-                      onEdit: (button) => context.findAncestorStateOfType<_HomeScreenState>()?._showEditButtonDialog(button),
-                      onDelete: (button) => context.findAncestorStateOfType<_HomeScreenState>()?._showDeleteButtonDialog(button),
-                      onAdd: () => context.findAncestorStateOfType<_HomeScreenState>()?._showAddButtonDialog(),
-                    )
+                    navigationButtons:
+                        context
+                            .findAncestorStateOfType<_HomeScreenState>()
+                            ?.navigationButtons ??
+                        [],
+                    selectedIndex:
+                        context
+                            .findAncestorStateOfType<_HomeScreenState>()
+                            ?.selectedIndex ??
+                        0,
+                    onReorder:
+                        (oldIndex, newIndex) => context
+                            .findAncestorStateOfType<_HomeScreenState>()
+                            ?._updateButtonOrder(
+                              oldIndex,
+                              newIndex,
+                              fromReorderable: true,
+                            ),
+                    onTap:
+                        (index) => context
+                            .findAncestorStateOfType<_HomeScreenState>()
+                            ?.changePageAnimated(index),
+                    onEdit:
+                        (button) => context
+                            .findAncestorStateOfType<_HomeScreenState>()
+                            ?._showEditButtonDialog(button),
+                    onDelete:
+                        (button) => context
+                            .findAncestorStateOfType<_HomeScreenState>()
+                            ?._showDeleteButtonDialog(button),
+                    onAdd:
+                        () =>
+                            context
+                                .findAncestorStateOfType<_HomeScreenState>()
+                                ?._showAddButtonDialog(),
+                  )
                   : Wrap(
-                      spacing: 30,
-                      runSpacing: 26,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        ...List.generate(
-                          context.findAncestorStateOfType<_HomeScreenState>()?.navigationButtons.length ?? 0,
-                          (index) {
-                            final homeState = context.findAncestorStateOfType<_HomeScreenState>();
-                            final button = homeState?.navigationButtons[index];
-                            final isSelected = homeState?.selectedIndex == index;
-                            if (button != null && button.showOnHome) {
-                              return _HoverZoomButton(
-                                title: button.title,
-                                isSelected: isSelected ?? false,
-                                onTap: () => homeState?.changePageAnimated(index),
-                                isAdmin: false,
-                              );
-                            }
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                      ],
-                    ),
+                    spacing: 30,
+                    runSpacing: 26,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      ...List.generate(
+                        context
+                                .findAncestorStateOfType<_HomeScreenState>()
+                                ?.navigationButtons
+                                .length ??
+                            0,
+                        (index) {
+                          final homeState =
+                              context
+                                  .findAncestorStateOfType<_HomeScreenState>();
+                          final button = homeState?.navigationButtons[index];
+                          final isSelected = homeState?.selectedIndex == index;
+                          if (button != null && button.showOnHome) {
+                            return _HoverZoomButton(
+                              title: button.title,
+                              isSelected: isSelected ?? false,
+                              onTap: () => homeState?.changePageAnimated(index),
+                              isAdmin: false,
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ],
+                  ),
             const SizedBox(height: 40),
             StatefulBuilder(
               builder: (context, setState) {
@@ -1698,25 +2121,37 @@ onTap: () async {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: isHovered ? Colors.cyanAccent.shade400 : Colors.cyanAccent,
+                                color:
+                                    isHovered
+                                        ? Colors.cyanAccent.shade400
+                                        : Colors.cyanAccent,
                                 width: isHovered ? 3 : 2,
                               ),
-                              color: isHovered ? Colors.cyanAccent.withOpacity(0.1) : Colors.transparent,
-                              boxShadow: isHovered
-                                  ? [
-                                      BoxShadow(
-                                        color: Colors.cyanAccent.withOpacity(0.3),
-                                        blurRadius: 8,
-                                        spreadRadius: 2,
-                                      ),
-                                    ]
-                                  : [],
+                              color:
+                                  isHovered
+                                      ? Colors.cyanAccent.withOpacity(0.1)
+                                      : Colors.transparent,
+                              boxShadow:
+                                  isHovered
+                                      ? [
+                                        BoxShadow(
+                                          color: Colors.cyanAccent.withOpacity(
+                                            0.3,
+                                          ),
+                                          blurRadius: 8,
+                                          spreadRadius: 2,
+                                        ),
+                                      ]
+                                      : [],
                             ),
                             padding: const EdgeInsets.all(8),
                             child: Icon(
                               Icons.keyboard_arrow_down,
                               size: 30,
-                              color: isHovered ? Colors.cyanAccent.shade200 : Colors.cyanAccent,
+                              color:
+                                  isHovered
+                                      ? Colors.cyanAccent.shade200
+                                      : Colors.cyanAccent,
                             ),
                           ),
                         ),
@@ -1764,7 +2199,8 @@ class _HoverZoomButton extends StatefulWidget {
   State<_HoverZoomButton> createState() => _HoverZoomButtonState();
 }
 
-class _HoverZoomButtonState extends State<_HoverZoomButton> with SingleTickerProviderStateMixin {
+class _HoverZoomButtonState extends State<_HoverZoomButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scale;
   bool _isHovered = false;
@@ -1814,9 +2250,14 @@ class _HoverZoomButtonState extends State<_HoverZoomButton> with SingleTickerPro
               scale: _scale,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    widget.padding ??
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 decoration: BoxDecoration(
-                  color: widget.isSelected ? Colors.cyanAccent.withOpacity(0.2) : Colors.transparent,
+                  color:
+                      widget.isSelected
+                          ? Colors.cyanAccent.withOpacity(0.2)
+                          : Colors.transparent,
                   border: Border.all(
                     color: showCyanBorder ? Colors.cyanAccent : Colors.white,
                     width: 2,
@@ -1841,28 +2282,44 @@ class _HoverZoomButtonState extends State<_HoverZoomButton> with SingleTickerPro
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_upward, size: 16, color: Colors.white70),
+                icon: const Icon(
+                  Icons.arrow_upward,
+                  size: 16,
+                  color: Colors.white70,
+                ),
                 padding: const EdgeInsets.all(4),
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                 onPressed: widget.onMoveUp,
                 tooltip: 'Move up',
               ),
               IconButton(
-                icon: const Icon(Icons.arrow_downward, size: 16, color: Colors.white70),
+                icon: const Icon(
+                  Icons.arrow_downward,
+                  size: 16,
+                  color: Colors.white70,
+                ),
                 padding: const EdgeInsets.all(4),
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                 onPressed: widget.onMoveDown,
                 tooltip: 'Move down',
               ),
               IconButton(
-                icon: const Icon(Icons.edit, color: Colors.cyanAccent, size: 16),
+                icon: const Icon(
+                  Icons.edit,
+                  color: Colors.cyanAccent,
+                  size: 16,
+                ),
                 padding: const EdgeInsets.all(4),
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                 onPressed: widget.onEdit,
                 tooltip: 'Edit',
               ),
               IconButton(
-                icon: const Icon(Icons.delete, color: Colors.redAccent, size: 16),
+                icon: const Icon(
+                  Icons.delete,
+                  color: Colors.redAccent,
+                  size: 16,
+                ),
                 padding: const EdgeInsets.all(4),
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                 onPressed: widget.onDelete,
@@ -1906,7 +2363,8 @@ class _HoverSlideButton extends StatefulWidget {
   State<_HoverSlideButton> createState() => _HoverSlideButtonState();
 }
 
-class _HoverSlideButtonState extends State<_HoverSlideButton> with SingleTickerProviderStateMixin {
+class _HoverSlideButtonState extends State<_HoverSlideButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _slide;
   bool _isHovered = false;
@@ -1921,9 +2379,7 @@ class _HoverSlideButtonState extends State<_HoverSlideButton> with SingleTickerP
     _slide = Tween<Offset>(
       begin: Offset.zero,
       end: const Offset(0, -0.1),
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
   }
 
   @override
@@ -1961,7 +2417,10 @@ class _HoverSlideButtonState extends State<_HoverSlideButton> with SingleTickerP
                 duration: const Duration(milliseconds: 200),
                 padding: widget.padding ?? const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: widget.isSelected ? Colors.cyanAccent.withOpacity(0.2) : Colors.transparent,
+                  color:
+                      widget.isSelected
+                          ? Colors.cyanAccent.withOpacity(0.2)
+                          : Colors.transparent,
                   border: Border.all(
                     color: showCyanBorder ? Colors.cyanAccent : Colors.white,
                     width: 2,
@@ -1989,32 +2448,60 @@ class _HoverSlideButtonState extends State<_HoverSlideButton> with SingleTickerP
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_upward, size: 16, color: Colors.white70),
+                  icon: const Icon(
+                    Icons.arrow_upward,
+                    size: 16,
+                    color: Colors.white70,
+                  ),
                   padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  constraints: const BoxConstraints(
+                    minWidth: 24,
+                    minHeight: 24,
+                  ),
                   onPressed: widget.onMoveUp,
                   tooltip: 'Move up',
                 ),
                 IconButton(
-                  icon: const Icon(Icons.arrow_downward, size: 16, color: Colors.white70),
+                  icon: const Icon(
+                    Icons.arrow_downward,
+                    size: 16,
+                    color: Colors.white70,
+                  ),
                   padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  constraints: const BoxConstraints(
+                    minWidth: 24,
+                    minHeight: 24,
+                  ),
                   onPressed: widget.onMoveDown,
                   tooltip: 'Move down',
                 ),
                 IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.cyanAccent, size: 16),
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.cyanAccent,
+                    size: 16,
+                  ),
                   onPressed: widget.onEdit,
                   tooltip: 'Edit',
                   padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  constraints: const BoxConstraints(
+                    minWidth: 24,
+                    minHeight: 24,
+                  ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.redAccent, size: 16),
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Colors.redAccent,
+                    size: 16,
+                  ),
                   onPressed: widget.onDelete,
                   tooltip: 'Delete',
                   padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  constraints: const BoxConstraints(
+                    minWidth: 24,
+                    minHeight: 24,
+                  ),
                 ),
               ],
             ),
