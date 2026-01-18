@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:portfolio/login/login_screen.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -33,11 +33,11 @@ class _RegisterPageState extends State<RegisterPage> {
           .collection('users')
           .doc(cred.user!.uid)
           .set({
-        'uid': cred.user!.uid,
-        'email': cred.user!.email,
-        'createdAt': FieldValue.serverTimestamp(),
-        'role': 'normaluser',
-      });
+            'uid': cred.user!.uid,
+            'email': cred.user!.email,
+            'createdAt': FieldValue.serverTimestamp(),
+            'role': 'normaluser',
+          });
       if (mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -78,10 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                );
+                context.go('/login');
               },
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               label: Text(
@@ -94,10 +91,13 @@ class _RegisterPageState extends State<RegisterPage> {
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.white54, width: 1),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 backgroundColor: Colors.transparent,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
               ),
             ),
           ),
@@ -160,8 +160,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.stretch,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Text(
                                     'Register',
@@ -178,69 +177,77 @@ class _RegisterPageState extends State<RegisterPage> {
                                     Text(
                                       _error!,
                                       style: const TextStyle(
-                                          color: Colors.redAccent),
+                                        color: Colors.redAccent,
+                                      ),
                                       textAlign: TextAlign.center,
                                     ),
                                     const SizedBox(height: 16),
                                   ],
                                   TextField(
                                     controller: _emailController,
-                                    style:
-                                        const TextStyle(color: Colors.white),
+                                    style: const TextStyle(color: Colors.white),
                                     decoration: InputDecoration(
                                       labelText: 'Email',
                                       labelStyle: const TextStyle(
-                                          color: Colors.white70),
+                                        color: Colors.white70,
+                                      ),
                                       filled: true,
-                                      fillColor:
-                                          Colors.white.withOpacity(0.04),
+                                      fillColor: Colors.white.withOpacity(0.04),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide: BorderSide(
-                                            color: Colors.cyanAccent
-                                                .withOpacity(0.14),
-                                            width: 1.2),
+                                          color: Colors.cyanAccent.withOpacity(
+                                            0.14,
+                                          ),
+                                          width: 1.2,
+                                        ),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide: const BorderSide(
-                                            color: Colors.cyanAccent,
-                                            width: 1.6),
+                                          color: Colors.cyanAccent,
+                                          width: 1.6,
+                                        ),
                                       ),
-                                      prefixIcon: const Icon(Icons.email,
-                                          color: Colors.cyanAccent),
+                                      prefixIcon: const Icon(
+                                        Icons.email,
+                                        color: Colors.cyanAccent,
+                                      ),
                                     ),
-                                    keyboardType:
-                                        TextInputType.emailAddress,
+                                    keyboardType: TextInputType.emailAddress,
                                   ),
                                   const SizedBox(height: 20),
                                   TextField(
                                     controller: _passwordController,
-                                    style:
-                                        const TextStyle(color: Colors.white),
+                                    style: const TextStyle(color: Colors.white),
                                     obscureText: _obscure,
                                     decoration: InputDecoration(
                                       labelText: 'Password',
                                       labelStyle: const TextStyle(
-                                          color: Colors.white70),
+                                        color: Colors.white70,
+                                      ),
                                       filled: true,
-                                      fillColor:
-                                          Colors.white.withOpacity(0.04),
+                                      fillColor: Colors.white.withOpacity(0.04),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide: BorderSide(
-                                            color: Colors.cyanAccent
-                                                .withOpacity(0.14),
-                                            width: 1.2),
+                                          color: Colors.cyanAccent.withOpacity(
+                                            0.14,
+                                          ),
+                                          width: 1.2,
+                                        ),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide: const BorderSide(
-                                            color: Colors.cyanAccent,
-                                            width: 1.6),
+                                          color: Colors.cyanAccent,
+                                          width: 1.6,
+                                        ),
                                       ),
-                                      prefixIcon: const Icon(Icons.lock,
-                                          color: Colors.cyanAccent),
+                                      prefixIcon: const Icon(
+                                        Icons.lock,
+                                        color: Colors.cyanAccent,
+                                      ),
                                       suffixIcon: IconButton(
                                         icon: Icon(
                                           _obscure
@@ -248,8 +255,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                               : Icons.visibility_off,
                                           color: Colors.cyanAccent,
                                         ),
-                                        onPressed: () => setState(
-                                            () => _obscure = !_obscure),
+                                        onPressed:
+                                            () => setState(
+                                              () => _obscure = !_obscure,
+                                            ),
                                       ),
                                     ),
                                   ),
@@ -259,47 +268,47 @@ class _RegisterPageState extends State<RegisterPage> {
                                       backgroundColor: Colors.cyanAccent,
                                       foregroundColor: Colors.black,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(40),
+                                        borderRadius: BorderRadius.circular(40),
                                       ),
                                       padding: const EdgeInsets.symmetric(
-                                          vertical: 16),
+                                        vertical: 16,
+                                      ),
                                       shadowColor: Colors.cyanAccent
                                           .withOpacity(0.3),
                                       elevation: 6,
                                     ),
                                     onPressed: _loading ? null : _register,
-                                    child: _loading
-                                        ? const SizedBox(
-                                            height: 18,
-                                            width: 18,
-                                            child: CircularProgressIndicator(
-                                                strokeWidth: 2),
-                                          )
-                                        : const Text(
-                                            'Register',
-                                            style: TextStyle(
+                                    child:
+                                        _loading
+                                            ? const SizedBox(
+                                              height: 18,
+                                              width: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                            : const Text(
+                                              'Register',
+                                              style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 18),
-                                          ),
+                                                fontSize: 18,
+                                              ),
+                                            ),
                                   ),
                                   const SizedBox(height: 16),
                                   TextButton(
-                                    onPressed: _loading
-                                        ? null
-                                        : () {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      const LoginPage()),
-                                            );
-                                          },
+                                    onPressed:
+                                        _loading
+                                            ? null
+                                            : () {
+                                              context.go('/login');
+                                            },
                                     child: const Text(
                                       'Already have an account? Login',
                                       style: TextStyle(
-                                          color: Colors.cyanAccent,
-                                          fontSize: 15),
+                                        color: Colors.cyanAccent,
+                                        fontSize: 15,
+                                      ),
                                     ),
                                   ),
                                 ],

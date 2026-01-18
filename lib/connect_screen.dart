@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:portfolio/home_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:portfolio/login/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,10 +27,7 @@ class AboutScreen extends StatelessWidget {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color(0xFF0B1020),
-                Color(0xFF101828),
-              ],
+              colors: [Color(0xFF0B1020), Color(0xFF101828)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -42,17 +39,15 @@ class AboutScreen extends StatelessWidget {
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
-                );
+                context.go('/home');
               },
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               label: Text(
                 "Back",
                 style: TextStyle(
-                    color: Colors.white,
-                    fontSize: screenWidth < 600 ? 14 : 16),
+                  color: Colors.white,
+                  fontSize: screenWidth < 600 ? 14 : 16,
+                ),
               ),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.white),
@@ -60,9 +55,13 @@ class AboutScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 backgroundColor: Colors.transparent,
-                padding: screenWidth < 600
-                    ? const EdgeInsets.symmetric(horizontal: 8, vertical: 8)
-                    : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    screenWidth < 600
+                        ? const EdgeInsets.symmetric(horizontal: 8, vertical: 8)
+                        : const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
               ),
             ),
           ),
@@ -98,7 +97,10 @@ class AboutScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(36.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(32),
-                          border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.4),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.18),
+                            width: 1.4,
+                          ),
                           gradient: const LinearGradient(
                             colors: [
                               Color(0xFF090C1A),
@@ -117,18 +119,17 @@ class AboutScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: isMobile
-                            ? SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
+                        child:
+                            isMobile
+                                ? SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(children: _buildSocialButtons()),
+                                )
+                                : Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: _buildSocialButtons(),
                                 ),
-                              )
-                            : Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: _buildSocialButtons(),
-                              ),
                       );
                     },
                   ),
@@ -164,7 +165,8 @@ class AboutScreen extends StatelessWidget {
           isLinkedIn: true,
           onTap: () async {
             final url = Uri.parse(
-                'https://www.linkedin.com/in/pratik-kumar-pradhan-692a19301/');
+              'https://www.linkedin.com/in/pratik-kumar-pradhan-692a19301/',
+            );
             if (await canLaunchUrl(url)) {
               await launchUrl(url, mode: LaunchMode.externalApplication);
             }
@@ -178,8 +180,9 @@ class AboutScreen extends StatelessWidget {
           title: 'Instagram',
           isInstagram: true,
           onTap: () async {
-            final url =
-                Uri.parse('https://instagram.com/pratik_kumar_pradhan._');
+            final url = Uri.parse(
+              'https://instagram.com/pratik_kumar_pradhan._',
+            );
             if (await canLaunchUrl(url)) {
               await launchUrl(url, mode: LaunchMode.externalApplication);
             }
@@ -229,8 +232,9 @@ class _YouTubeCircleButtonState extends State<_YouTubeCircleButton> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOut,
-          transform: Matrix4.identity()
-            ..scale(_pressed ? 0.93 : (_hovered ? 1.07 : 1.0)),
+          transform:
+              Matrix4.identity()
+                ..scale(_pressed ? 0.93 : (_hovered ? 1.07 : 1.0)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -239,7 +243,7 @@ class _YouTubeCircleButtonState extends State<_YouTubeCircleButton> {
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
                   backgroundColor: Colors.transparent,
-                 // shadowColor: Colors.redAccent.withOpacity(0.6),
+                  // shadowColor: Colors.redAccent.withOpacity(0.6),
                   elevation: 8,
                   side: const BorderSide(color: Colors.white, width: 1),
                   padding: EdgeInsets.zero,
@@ -247,9 +251,7 @@ class _YouTubeCircleButtonState extends State<_YouTubeCircleButton> {
                 child: Container(
                   width: 90,
                   height: 90,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: const BoxDecoration(shape: BoxShape.circle),
                   child: Center(
                     child: Image.asset(
                       'assets/images/youtube.png',
@@ -303,139 +305,142 @@ class _GetInTouchCardState extends State<GetInTouchCard> {
   }
 
   void _listenToAuthState() {
-    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
-      debugPrint('🔍 ConnectScreen auth state changed: ${user?.email}');
-      setState(() {
-        _isLoggedIn = user != null;
-        _userEmail = user?.email;
-      });
-    }, onError: (error) {
-      debugPrint('❌ ConnectScreen auth state error: $error');
-      setState(() {
-        _isLoggedIn = false;
-        _userEmail = null;
-      });
-    });
-  }
-
-Future<void> _sendEmail() async {
-  final Uri emailUri = Uri(
-    scheme: 'mailto',
-    path: 'pratikkumarpradhan2006@gmail.com',
-    queryParameters: {
-      'subject': 'Message from Portfolio App',
-      'body': 'Hello Pratik,\n\n',
-    },
-  );
-
-  try {
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri, mode: LaunchMode.externalApplication);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No email app found on this device')),
-      );
-    }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error opening email: $e')),
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen(
+      (user) {
+        debugPrint('🔍 ConnectScreen auth state changed: ${user?.email}');
+        setState(() {
+          _isLoggedIn = user != null;
+          _userEmail = user?.email;
+        });
+      },
+      onError: (error) {
+        debugPrint('❌ ConnectScreen auth state error: $error');
+        setState(() {
+          _isLoggedIn = false;
+          _userEmail = null;
+        });
+      },
     );
   }
-}
 
-@override
-Widget build(BuildContext context) {
-  return StreamBuilder<User?>(
-    stream: FirebaseAuth.instance.authStateChanges(),
-    builder: (context, snapshot) {
-      final user = snapshot.data;
-      final isLoggedIn = user != null;
+  Future<void> _sendEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'pratikkumarpradhan2006@gmail.com',
+      queryParameters: {
+        'subject': 'Message from Portfolio App',
+        'body': 'Hello Pratik,\n\n',
+      },
+    );
 
-      return Center(
-        child: Container(
-          width: 600,
-          margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xCC0B132B),
-                Color(0x99112233),
-                Color(0x66121A2E),
+    try {
+      if (await canLaunchUrl(emailUri)) {
+        await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No email app found on this device')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error opening email: $e')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        final user = snapshot.data;
+        final isLoggedIn = user != null;
+
+        return Center(
+          child: Container(
+            width: 600,
+            margin: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xCC0B132B),
+                  Color(0x99112233),
+                  Color(0x66121A2E),
+                ],
+              ),
+              border: Border.all(color: Colors.white54, width: 1.2),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.teal.shade900,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    'assets/images/gmail.png',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Get In Touch',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  isLoggedIn
+                      ? 'Logged in as: ${user?.email ?? "Unknown"}'
+                      : 'Please sign in to send a message',
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal.shade700,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 24,
+                    ),
+                  ),
+                  onPressed: () async {
+                    if (isLoggedIn) {
+                      await _sendEmail();
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                      );
+                    }
+                  },
+                  child: Text(
+                    isLoggedIn ? 'Send Message' : 'Sign In / Sign Up',
+                    style: const TextStyle(fontSize: 14, color: Colors.white),
+                  ),
+                ),
               ],
             ),
-            border: Border.all(color: Colors.white54, width: 1.2),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.teal.shade900,
-                  shape: BoxShape.circle,
-                ),
-                child: Image.asset(
-                  'assets/images/gmail.png',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.contain,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Get In Touch',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                isLoggedIn
-                    ? 'Logged in as: ${user?.email ?? "Unknown"}'
-                    : 'Please sign in to send a message',
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal.shade700,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 24,
-                  ),
-                ),
-                onPressed: () async {
-                  if (isLoggedIn) {
-                    await _sendEmail();
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginPage()),
-                    );
-                  }
-                },
-                child: Text(
-                  isLoggedIn ? 'Send Message' : 'Sign In / Sign Up',
-                  style: const TextStyle(fontSize: 14, color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 }
 
 class _CircleBox extends StatefulWidget {
@@ -462,43 +467,43 @@ class _CircleBox extends StatefulWidget {
 class _CircleBoxState extends State<_CircleBox> {
   bool _hovered = false;
 
- Widget _getSocialIcon() {
-  if (widget.isLinkedIn) {
-    return ClipOval(
-      child: Image.asset(
-        'assets/images/linkedin1.png',
-        width: 60,
-        height: 60,
-        fit: BoxFit.cover,
-      ),
-    );
-  } else if (widget.isInstagram) {
-    return ClipOval(
-      child: Image.asset(
-        'assets/images/instagram1.png',
-        width: 60,
-        height: 60,
-        fit: BoxFit.cover,
-      ),
-    );
-  } else if (widget.isTwitter) {
-    return ClipOval(
-      child: Image.asset(
-        'assets/images/twitter.png',
-        width: 60,
-        height: 60,
-        fit: BoxFit.cover,
-      ),
-    );
-  } else if (widget.isEmail) {
-    return const Icon(
-      FontAwesomeIcons.envelope,
-      color: Colors.teal,
-      size: 60,
-    );
+  Widget _getSocialIcon() {
+    if (widget.isLinkedIn) {
+      return ClipOval(
+        child: Image.asset(
+          'assets/images/linkedin1.png',
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else if (widget.isInstagram) {
+      return ClipOval(
+        child: Image.asset(
+          'assets/images/instagram1.png',
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else if (widget.isTwitter) {
+      return ClipOval(
+        child: Image.asset(
+          'assets/images/twitter.png',
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else if (widget.isEmail) {
+      return const Icon(
+        FontAwesomeIcons.envelope,
+        color: Colors.teal,
+        size: 60,
+      );
+    }
+    return const SizedBox.shrink();
   }
-  return const SizedBox.shrink();
-}
 
   @override
   Widget build(BuildContext context) {

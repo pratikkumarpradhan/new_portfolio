@@ -1,15 +1,12 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolio/blogs/blog_screen.dart';
 import 'package:portfolio/connect_screen.dart';
 import 'package:portfolio/experience_screen.dart';
 import 'package:portfolio/github/github_screen.dart';
 import 'package:portfolio/leetcode/leetcode_screen.dart';
-import 'package:portfolio/login/login_screen.dart';
-import 'package:portfolio/login/register_screen.dart';
 import 'package:portfolio/projects/project_screen.dart';
 import 'package:portfolio/skills/skills.dart';
 
@@ -344,7 +341,12 @@ class _AddButtonWidgetState extends State<_AddButtonWidget>
 
 // Main HomeScreen widget
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  /// Used by web deep-linking (`/projects`, `/about`, ...).
+  ///
+  /// Must match keys in `screenMap` / Firestore `navigationButtons.screenType`.
+  final String initialScreenType;
+
+  const HomeScreen({super.key, this.initialScreenType = 'home'});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -361,6 +363,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _showLoginMessage = false;
   String? _userEmail;
   Timer? _messageTimer;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  late String _requestedScreenType;
 
   final Map<String, Widget> screenMap = {
     'home': const HomePage(),
@@ -376,9 +380,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _requestedScreenType = _normalizeScreenType(widget.initialScreenType);
     _pageController = PageController();
     _listenToNavigationButtons();
     _listenToAuthState();
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialScreenType != widget.initialScreenType) {
+      _requestedScreenType = _normalizeScreenType(widget.initialScreenType);
+      _syncToRequestedScreen(animate: true);
+    }
   }
 
   @override
@@ -469,6 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       .toList();
               _loading = false;
             });
+            _syncToRequestedScreen(animate: false);
             debugPrint(
               '📋 Loaded ${navigationButtons.length} navigation buttons',
             );
@@ -478,6 +493,61 @@ class _HomeScreenState extends State<HomeScreen> {
             setState(() => _loading = false);
           },
         );
+  }
+
+  String _normalizeScreenType(String screenType) {
+    if (screenType == 'contact') return 'about';
+    if (!screenMap.containsKey(screenType)) return 'home';
+    return screenType;
+  }
+
+  int _indexForScreenType(String screenType) {
+    final idx = navigationButtons.indexWhere((b) => b.screenType == screenType);
+    return idx >= 0 ? idx : 0;
+  }
+
+  String _pathForScreenType(String screenType) {
+    switch (screenType) {
+      case 'home':
+        return '/home';
+      case 'projects':
+        return '/projects';
+      case 'skills':
+        return '/skills';
+      case 'experience':
+        return '/experience';
+      case 'github':
+        return '/github';
+      case 'leetcode':
+        return '/leetcode';
+      case 'about':
+        return '/about';
+      case 'blog':
+        return '/blog';
+      default:
+        return '/home';
+    }
+  }
+
+  void _syncToRequestedScreen({required bool animate}) {
+    if (navigationButtons.isEmpty) return;
+    final targetIndex = _indexForScreenType(_requestedScreenType);
+    if (targetIndex == selectedIndex) return;
+
+    setState(() => selectedIndex = targetIndex);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (!_pageController.hasClients) return;
+      if (animate) {
+        _pageController.animateToPage(
+          targetIndex,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        _pageController.jumpToPage(targetIndex);
+      }
+    });
   }
 
   Future<void> _updateButtonOrder(
@@ -945,26 +1015,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void onNavTap(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
+    if (index < 0 || index >= navigationButtons.length) return;
+    final screenType = _normalizeScreenType(
+      navigationButtons[index].screenType,
     );
-    Navigator.of(context).pop();
+    context.go(_pathForScreenType(screenType));
+    _scaffoldKey.currentState?.closeEndDrawer();
   }
 
   void changePageAnimated(int index) {
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
+    if (index < 0 || index >= navigationButtons.length) return;
+    final screenType = _normalizeScreenType(
+      navigationButtons[index].screenType,
     );
-    setState(() {
-      selectedIndex = index;
-    });
+    context.go(_pathForScreenType(screenType));
   }
 
   var _isHovered = false;
@@ -976,6 +1040,7 @@ class _HomeScreenState extends State<HomeScreen> {
         MediaQuery.of(context).orientation == Orientation.landscape;
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.transparent,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(64),
@@ -1004,7 +1069,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     cursor: SystemMouseCursors.click,
                     child: GestureDetector(
                       onTap: () {
-                        changePageAnimated(0);
+                        context.go('/home');
                       },
                       child: AnimatedScale(
                         scale: _isHovered ? 1.1 : 1.0,
@@ -1126,12 +1191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   onTap: () async {
                                     await FirebaseAuth.instance.signOut();
                                     if (context.mounted) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => const LoginPage(),
-                                        ),
-                                      );
+                                      context.go('/login');
                                     }
                                   },
                                   isAdmin: false,
@@ -1150,12 +1210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   title: "Register",
                                   isSelected: false,
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => const RegisterPage(),
-                                      ),
-                                    );
+                                    context.go('/register');
                                   },
                                   isAdmin: false,
                                   fontSize: isDesktop ? 16 : 14,
@@ -1485,13 +1540,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               .instance
                                                               .signOut();
                                                           if (context.mounted) {
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder:
-                                                                    (_) =>
-                                                                        const LoginPage(),
-                                                              ),
+                                                            context.go(
+                                                              '/login',
                                                             );
                                                           }
                                                         }
@@ -1546,14 +1596,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     ),
                                                 child: ListTile(
                                                   onTap: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder:
-                                                            (_) =>
-                                                                const RegisterPage(),
-                                                      ),
-                                                    );
+                                                    context.go('/register');
                                                   },
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
@@ -1655,6 +1698,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   selectedIndex = index;
                 });
+
+                if (index < 0 || index >= navigationButtons.length) return;
+                final screenType = _normalizeScreenType(
+                  navigationButtons[index].screenType,
+                );
+                if (screenType != _requestedScreenType) {
+                  context.go(_pathForScreenType(screenType));
+                }
               },
               children: screens.map((screen) => Center(child: screen)).toList(),
             ),
@@ -1937,7 +1988,8 @@ class _HomePageState extends State<HomePage>
                   child: GestureDetector(
                     onTap: () async {
                       // const url = 'https://qrr.to/bf04e34f';
-                      const url = 'https://drive.google.com/file/d/1veGLSM5Z2nX0DRHuXFI6DQLNfxDNoLYo/view?';
+                      const url =
+                          'https://drive.google.com/file/d/1veGLSM5Z2nX0DRHuXFI6DQLNfxDNoLYo/view?';
                       final uri = Uri.parse(url);
 
                       if (await canLaunchUrl(uri)) {

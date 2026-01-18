@@ -61,7 +61,7 @@
 //         debugPrint('🔄 Skipping update - we are the ones making the change');
 //         return;
 //       }
-      
+
 //       if (snapshot.exists && snapshot.data() != null) {
 //         final data = snapshot.data()!;
 //         setState(() {
@@ -82,7 +82,7 @@
 //       _isUpdatingOrder = true;
 //       await FirebaseFirestore.instance.collection('settings').doc('categoryOrder').set(categoryOrder);
 //       debugPrint('💾 Saved category order to Firestore: $categoryOrder');
-      
+
 //       // Reset flag after a short delay to allow the listener to process
 //       Future.delayed(const Duration(milliseconds: 100), () {
 //         _isUpdatingOrder = false;
@@ -103,7 +103,7 @@
 //   Future<void> _updateCategoryOrder(String category1, String category2) async {
 //     debugPrint('🔄 Updating category order: $category1 ↔ $category2');
 //     debugPrint('📋 Before: $categoryOrder');
-    
+
 //     // Show a brief snackbar to indicate the change is being saved
 //     ScaffoldMessenger.of(context).showSnackBar(
 //       SnackBar(
@@ -112,7 +112,7 @@
 //         backgroundColor: Colors.blue,
 //       ),
 //     );
-    
+
 //     setState(() {
 //       final temp = categoryOrder[category1]!;
 //       categoryOrder[category1] = categoryOrder[category2]!;
@@ -149,7 +149,7 @@
 //       );
 //     }
 //     final isDesktop = MediaQuery.of(context).size.width >= 600;
-    
+
 //     if (isDesktop) {
 //       // Desktop layout (unchanged from original)
 //       return Scaffold(
@@ -263,13 +263,13 @@
 //                               // Group skills by category
 //                               final skills = snapshot.data!.docs.map((doc) => SkillItem.fromFirestore(doc)).toList();
 //                               skills.sort((a, b) => a.order.compareTo(b.order));
-                              
+
 //                               // Debug: Print loaded skills
 //                               debugPrint('📊 Loaded ${skills.length} skills from Firebase:');
 //                               for (final skill in skills) {
 //                                 debugPrint('  - ${skill.name} (${skill.category}): ${skill.iconUrl ?? 'No icon'}');
 //                               }
-                              
+
 //                               final Map<String, List<SkillItem>> grouped = {};
 //                               for (final skill in skills) {
 //                                 grouped.putIfAbsent(skill.category, () => []).add(skill);
@@ -500,13 +500,13 @@
 //                                     // Group skills by category
 //                                     final skills = snapshot.data!.docs.map((doc) => SkillItem.fromFirestore(doc)).toList();
 //                                     skills.sort((a, b) => a.order.compareTo(b.order));
-                                    
+
 //                                     // Debug: Print loaded skills
 //                                     debugPrint('📊 Loaded ${skills.length} skills from Firebase:');
 //                                     for (final skill in skills) {
 //                                       debugPrint('  - ${skill.name} (${skill.category}): ${skill.iconUrl ?? 'No icon'}');
 //                                     }
-                                    
+
 //                                     final Map<String, List<SkillItem>> grouped = {};
 //                                     for (final skill in skills) {
 //                                       grouped.putIfAbsent(skill.category, () => []).add(skill);
@@ -636,7 +636,7 @@
 //     String name = skill.name;
 //     String iconUrl = skill.iconUrl ?? '';
 //     final categories = ['Languages', 'Framework', 'Databases', 'Tools'];
-    
+
 //     showDialog(
 //       context: context,
 //       builder: (context) {
@@ -871,7 +871,7 @@
 //     final _formKey = GlobalKey<FormState>();
 //     String newCategoryName = category;
 //     final categories = ['Languages', 'Framework', 'Databases', 'Tools'];
-    
+
 //     showDialog(
 //       context: context,
 //       builder: (context) {
@@ -921,13 +921,13 @@
 //                         .collection('skills')
 //                         .where('category', isEqualTo: category)
 //                         .get();
-                    
+
 //                     final batch = FirebaseFirestore.instance.batch();
 //                     for (final doc in query.docs) {
 //                       batch.update(doc.reference, {'category': newCategoryName});
 //                     }
 //                     await batch.commit();
-                    
+
 //                     // Update category order if category name changed
 //                     if (category != newCategoryName) {
 //                       setState(() {
@@ -936,7 +936,7 @@
 //                       });
 //                       await _saveCategoryOrder();
 //                     }
-                    
+
 //                     Navigator.pop(context);
 //                     ScaffoldMessenger.of(context).showSnackBar(
 //                       SnackBar(
@@ -995,19 +995,19 @@
 //                       .collection('skills')
 //                       .where('category', isEqualTo: category)
 //                       .get();
-                  
+
 //                   final batch = FirebaseFirestore.instance.batch();
 //                   for (final doc in query.docs) {
 //                     batch.delete(doc.reference);
 //                   }
 //                   await batch.commit();
-                  
+
 //                   // Remove category from order
 //                   setState(() {
 //                     categoryOrder.remove(category);
 //                   });
 //                   await _saveCategoryOrder();
-                  
+
 //                   Navigator.pop(context);
 //                   ScaffoldMessenger.of(context).showSnackBar(
 //                     SnackBar(
@@ -1044,10 +1044,10 @@
 //   final void Function(String category) onDeleteCategory;
 
 //   const SkillCategory({
-//     super.key, 
-//     required this.title, 
-//     required this.skills, 
-//     required this.isAdmin, 
+//     super.key,
+//     required this.title,
+//     required this.skills,
+//     required this.isAdmin,
 //     required this.onReorder,
 //     required this.onEditSkill,
 //     required this.onDeleteSkill,
@@ -1532,7 +1532,7 @@
 //       ),
 //     );
 //   }
-  
+
 //   Widget _buildSkillIcon(SkillItem skill, bool isDesktop) {
 //     if (skill.iconUrl != null && skill.iconUrl!.isNotEmpty) {
 //       return SvgPicture.network(
@@ -1673,14 +1673,12 @@
 //   }
 // }
 
-
-
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:portfolio/home_screen.dart';
 import 'add_skill.dart';
 import 'dart:async';
 
@@ -1714,16 +1712,19 @@ class _SkillsScreenState extends State<SkillsScreen> {
   }
 
   void _listenToAuthState() {
-    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
-      debugPrint('🔍 SkillsScreen auth state changed: ${user?.email}');
-      _checkAdmin(user);
-    }, onError: (error) {
-      debugPrint('❌ SkillsScreen auth state error: $error');
-      setState(() {
-        _isAdmin = false;
-        _loading = false;
-      });
-    });
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen(
+      (user) {
+        debugPrint('🔍 SkillsScreen auth state changed: ${user?.email}');
+        _checkAdmin(user);
+      },
+      onError: (error) {
+        debugPrint('❌ SkillsScreen auth state error: $error');
+        setState(() {
+          _isAdmin = false;
+          _loading = false;
+        });
+      },
+    );
   }
 
   Future<void> _checkAdmin(User? user) async {
@@ -1735,7 +1736,11 @@ class _SkillsScreenState extends State<SkillsScreen> {
       return;
     }
     try {
-      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
       setState(() {
         _isAdmin = doc.data()?['role'] == 'admin';
         _loading = false;
@@ -1754,32 +1759,42 @@ class _SkillsScreenState extends State<SkillsScreen> {
         .collection('settings')
         .doc('categoryOrder')
         .snapshots()
-        .listen((snapshot) {
-      if (_isUpdatingOrder) {
-        debugPrint('🔄 Skipping update - we are the ones making the change');
-        return;
-      }
-      
-      if (snapshot.exists && snapshot.data() != null) {
-        final data = snapshot.data()!;
-        setState(() {
-          categoryOrder = Map<String, int>.from(data);
-        });
-        debugPrint('📋 Real-time category order update: $categoryOrder');
-      } else {
-        debugPrint('📋 No category order found in Firestore, will initialize from skills');
-      }
-    }, onError: (error) {
-      debugPrint('❌ Error listening to category order: $error');
-    });
+        .listen(
+          (snapshot) {
+            if (_isUpdatingOrder) {
+              debugPrint(
+                '🔄 Skipping update - we are the ones making the change',
+              );
+              return;
+            }
+
+            if (snapshot.exists && snapshot.data() != null) {
+              final data = snapshot.data()!;
+              setState(() {
+                categoryOrder = Map<String, int>.from(data);
+              });
+              debugPrint('📋 Real-time category order update: $categoryOrder');
+            } else {
+              debugPrint(
+                '📋 No category order found in Firestore, will initialize from skills',
+              );
+            }
+          },
+          onError: (error) {
+            debugPrint('❌ Error listening to category order: $error');
+          },
+        );
   }
 
   Future<void> _saveCategoryOrder() async {
     try {
       _isUpdatingOrder = true;
-      await FirebaseFirestore.instance.collection('settings').doc('categoryOrder').set(categoryOrder);
+      await FirebaseFirestore.instance
+          .collection('settings')
+          .doc('categoryOrder')
+          .set(categoryOrder);
       debugPrint('💾 Saved category order to Firestore: $categoryOrder');
-      
+
       Future.delayed(const Duration(milliseconds: 100), () {
         _isUpdatingOrder = false;
       });
@@ -1798,7 +1813,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
   Future<void> _updateCategoryOrder(String category1, String category2) async {
     debugPrint('🔄 Updating category order: $category1 ↔ $category2');
     debugPrint('📋 Before: $categoryOrder');
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Updating category order...'),
@@ -1806,7 +1821,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
         backgroundColor: Colors.blue,
       ),
     );
-    
+
     setState(() {
       final temp = categoryOrder[category1]!;
       categoryOrder[category1] = categoryOrder[category2]!;
@@ -1817,7 +1832,8 @@ class _SkillsScreenState extends State<SkillsScreen> {
   }
 
   void _createFirebaseIndex() {
-    const indexUrl = 'https://console.firebase.google.com/v1/r/project/portfolio-7474e/firestore/indexes?create_composite=Ck5wcm9qZWN0cy9wb3J0Zm9saW8tNzQ3NGUvZGF0YWJhc2VzLyhkZWZhdWx0KS9jb2xsZWN0aW9uR3JvdXBzL3NraWxscy9pbmRleGVzL18QARoMCghjYXRlZ29yeRABGgkKBW9yZGVyEAIaDAoIX19uYW1lX18QAg';
+    const indexUrl =
+        'https://console.firebase.google.com/v1/r/project/portfolio-7474e/firestore/indexes?create_composite=Ck5wcm9qZWN0cy9wb3J0Zm9saW8tNzQ3NGUvZGF0YWJhc2VzLyhkZWZhdWx0KS9jb2xsZWN0aW9uR3JvdXBzL3NraWxscy9pbmRleGVzL18QARoMCghjYXRlZ29yeRABGgkKBW9yZGVyEAIaDAoIX19uYW1lX18QAg';
     debugPrint('🔗 Firebase Index URL: $indexUrl');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1835,12 +1851,10 @@ class _SkillsScreenState extends State<SkillsScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final isDesktop = MediaQuery.of(context).size.width >= 600;
-    
+
     if (isDesktop) {
       // Desktop layout with scrollable content
       return Scaffold(
@@ -1852,10 +1866,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
           flexibleSpace: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Color(0xFF0B1020),
-                  Color(0xFF101828),
-                ],
+                colors: [Color(0xFF0B1020), Color(0xFF101828)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -1867,10 +1878,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HomeScreen()),
-                  );
+                  context.go('/home');
                 },
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 label: const Text(
@@ -1883,7 +1891,10 @@ class _SkillsScreenState extends State<SkillsScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   backgroundColor: Colors.transparent,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
               ),
             ),
@@ -1906,7 +1917,10 @@ class _SkillsScreenState extends State<SkillsScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
                       child: Text(
                         "Skills",
                         style: GoogleFonts.comfortaa(
@@ -1920,10 +1934,15 @@ class _SkillsScreenState extends State<SkillsScreen> {
                     ),
                     Container(
                       width: containerWidth,
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 0,
+                      ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: Colors.white.withOpacity(0.18)),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.18),
+                        ),
                         gradient: const LinearGradient(
                           colors: [
                             Color(0xFF090C1A),
@@ -1940,25 +1959,48 @@ class _SkillsScreenState extends State<SkillsScreen> {
                         children: [
                           const SizedBox(height: 12),
                           StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance.collection('skills').snapshots(),
+                            stream:
+                                FirebaseFirestore.instance
+                                    .collection('skills')
+                                    .snapshots(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(child: CircularProgressIndicator());
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
                               }
-                              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                return const Center(child: Text('No skills found', style: TextStyle(color: Colors.white70)));
+                              if (!snapshot.hasData ||
+                                  snapshot.data!.docs.isEmpty) {
+                                return const Center(
+                                  child: Text(
+                                    'No skills found',
+                                    style: TextStyle(color: Colors.white70),
+                                  ),
+                                );
                               }
-                              final skills = snapshot.data!.docs.map((doc) => SkillItem.fromFirestore(doc)).toList();
+                              final skills =
+                                  snapshot.data!.docs
+                                      .map(
+                                        (doc) => SkillItem.fromFirestore(doc),
+                                      )
+                                      .toList();
                               skills.sort((a, b) => a.order.compareTo(b.order));
-                              
-                              debugPrint('📊 Loaded ${skills.length} skills from Firebase:');
+
+                              debugPrint(
+                                '📊 Loaded ${skills.length} skills from Firebase:',
+                              );
                               for (final skill in skills) {
-                                debugPrint('  - ${skill.name} (${skill.category}): ${skill.iconUrl ?? 'No icon'}');
+                                debugPrint(
+                                  '  - ${skill.name} (${skill.category}): ${skill.iconUrl ?? 'No icon'}',
+                                );
                               }
-                              
+
                               final Map<String, List<SkillItem>> grouped = {};
                               for (final skill in skills) {
-                                grouped.putIfAbsent(skill.category, () => []).add(skill);
+                                grouped
+                                    .putIfAbsent(skill.category, () => [])
+                                    .add(skill);
                               }
                               if (categoryOrder.isEmpty) {
                                 int idx = 0;
@@ -1970,7 +2012,13 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                 bool hasNewCategories = false;
                                 for (final cat in grouped.keys) {
                                   if (!categoryOrder.containsKey(cat)) {
-                                    categoryOrder[cat] = categoryOrder.values.isEmpty ? 0 : categoryOrder.values.reduce((a, b) => a > b ? a : b) + 1;
+                                    categoryOrder[cat] =
+                                        categoryOrder.values.isEmpty
+                                            ? 0
+                                            : categoryOrder.values.reduce(
+                                                  (a, b) => a > b ? a : b,
+                                                ) +
+                                                1;
                                     hasNewCategories = true;
                                   }
                                 }
@@ -1978,8 +2026,12 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                   _saveCategoryOrder();
                                 }
                               }
-                              final sortedCategories = grouped.keys.toList()
-                                ..sort((a, b) => (categoryOrder[a] ?? 0).compareTo(categoryOrder[b] ?? 0));
+                              final sortedCategories =
+                                  grouped.keys.toList()..sort(
+                                    (a, b) => (categoryOrder[a] ?? 0).compareTo(
+                                      categoryOrder[b] ?? 0,
+                                    ),
+                                  );
                               const crossAxisCount = 2;
                               const mainAxisSpacing = 8.0;
                               const crossAxisSpacing = 24.0;
@@ -1992,7 +2044,11 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 children: [
-                                  for (int i = 0; i < sortedCategories.length; i++)
+                                  for (
+                                    int i = 0;
+                                    i < sortedCategories.length;
+                                    i++
+                                  )
                                     Stack(
                                       clipBehavior: Clip.none,
                                       children: [
@@ -2000,24 +2056,71 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                           title: sortedCategories[i],
                                           skills: grouped[sortedCategories[i]]!,
                                           isAdmin: _isAdmin ?? false,
-                                          onReorder: (oldIndex, newIndex, category) async {
-                                            final categorySkills = skills.where((s) => s.category == category).toList();
-                                            if (newIndex < 0 || newIndex >= categorySkills.length) return;
-                                            final movedSkill = categorySkills[oldIndex];
+                                          onReorder: (
+                                            oldIndex,
+                                            newIndex,
+                                            category,
+                                          ) async {
+                                            final categorySkills =
+                                                skills
+                                                    .where(
+                                                      (s) =>
+                                                          s.category ==
+                                                          category,
+                                                    )
+                                                    .toList();
+                                            if (newIndex < 0 ||
+                                                newIndex >=
+                                                    categorySkills.length)
+                                              return;
+                                            final movedSkill =
+                                                categorySkills[oldIndex];
                                             categorySkills.removeAt(oldIndex);
-                                            categorySkills.insert(newIndex, movedSkill);
-                                            for (int i = 0; i < categorySkills.length; i++) {
-                                              await FirebaseFirestore.instance.collection('skills').doc(categorySkills[i].id).update({'order': i});
+                                            categorySkills.insert(
+                                              newIndex,
+                                              movedSkill,
+                                            );
+                                            for (
+                                              int i = 0;
+                                              i < categorySkills.length;
+                                              i++
+                                            ) {
+                                              await FirebaseFirestore.instance
+                                                  .collection('skills')
+                                                  .doc(categorySkills[i].id)
+                                                  .update({'order': i});
                                             }
                                           },
-                                          onEditSkill: (skill) => _showEditSkillDialog(context, skill),
-                                          onDeleteSkill: (skill) => _showDeleteSkillDialog(context, skill),
-                                          onEditCategory: (category) => _showEditCategoryDialog(context, category),
-                                          onDeleteCategory: (category) => _showDeleteCategoryDialog(context, category),
+                                          onEditSkill:
+                                              (skill) => _showEditSkillDialog(
+                                                context,
+                                                skill,
+                                              ),
+                                          onDeleteSkill:
+                                              (skill) => _showDeleteSkillDialog(
+                                                context,
+                                                skill,
+                                              ),
+                                          onEditCategory:
+                                              (category) =>
+                                                  _showEditCategoryDialog(
+                                                    context,
+                                                    category,
+                                                  ),
+                                          onDeleteCategory:
+                                              (category) =>
+                                                  _showDeleteCategoryDialog(
+                                                    context,
+                                                    category,
+                                                  ),
                                           onTap: () {
-                                            ScaffoldMessenger.of(context).showSnackBar(
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
                                               SnackBar(
-                                                content: Text('Tapped category: ${sortedCategories[i]}'),
+                                                content: Text(
+                                                  'Tapped category: ${sortedCategories[i]}',
+                                                ),
                                                 backgroundColor: Colors.blue,
                                               ),
                                             );
@@ -2031,22 +2134,55 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Padding(
-                                                  padding: const EdgeInsets.only(right: 16),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                        right: 16,
+                                                      ),
                                                   child: Column(
-                                                    mainAxisSize: MainAxisSize.min,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
                                                     children: [
                                                       IconButton(
-                                                        icon: const Icon(Icons.arrow_upward, size: 16, color: Colors.white54),
-                                                        padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(),
-                                                        onPressed: i > 0 ? () => _updateCategoryOrder(sortedCategories[i], sortedCategories[i-1]) : null,
+                                                        icon: const Icon(
+                                                          Icons.arrow_upward,
+                                                          size: 16,
+                                                          color: Colors.white54,
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        constraints:
+                                                            const BoxConstraints(),
+                                                        onPressed:
+                                                            i > 0
+                                                                ? () => _updateCategoryOrder(
+                                                                  sortedCategories[i],
+                                                                  sortedCategories[i -
+                                                                      1],
+                                                                )
+                                                                : null,
                                                         tooltip: 'Move up',
                                                       ),
                                                       IconButton(
-                                                        icon: const Icon(Icons.arrow_downward, size: 16, color: Colors.white54),
-                                                        padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(),
-                                                        onPressed: i < sortedCategories.length - 1 ? () => _updateCategoryOrder(sortedCategories[i], sortedCategories[i+1]) : null,
+                                                        icon: const Icon(
+                                                          Icons.arrow_downward,
+                                                          size: 16,
+                                                          color: Colors.white54,
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        constraints:
+                                                            const BoxConstraints(),
+                                                        onPressed:
+                                                            i <
+                                                                    sortedCategories
+                                                                            .length -
+                                                                        1
+                                                                ? () => _updateCategoryOrder(
+                                                                  sortedCategories[i],
+                                                                  sortedCategories[i +
+                                                                      1],
+                                                                )
+                                                                : null,
                                                         tooltip: 'Move down',
                                                       ),
                                                     ],
@@ -2085,10 +2221,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
               flexibleSpace: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      Color(0xFF0B1020),
-                      Color(0xFF101828),
-                    ],
+                    colors: [Color(0xFF0B1020), Color(0xFF101828)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -2102,15 +2235,18 @@ class _SkillsScreenState extends State<SkillsScreen> {
                           width: 130,
                           child: OutlinedButton.icon(
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (_) => const HomeScreen()),
-                              );
+                              context.go('/home');
                             },
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            ),
                             label: const Text(
                               "Back",
-                              style: TextStyle(color: Colors.white, fontSize: 14),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
                             ),
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Colors.white),
@@ -2118,7 +2254,10 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               backgroundColor: Colors.transparent,
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 8,
+                              ),
                             ),
                           ),
                         ),
@@ -2145,7 +2284,10 @@ class _SkillsScreenState extends State<SkillsScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
                           child: Text(
                             "Skills",
                             style: GoogleFonts.comfortaa(
@@ -2159,10 +2301,15 @@ class _SkillsScreenState extends State<SkillsScreen> {
                         ),
                         Container(
                           width: containerWidth,
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 0),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 0,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
-                            border: Border.all(color: Colors.white.withOpacity(0.18)),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.18),
+                            ),
                             gradient: const LinearGradient(
                               colors: [
                                 Color(0xFF090C1A),
@@ -2179,25 +2326,52 @@ class _SkillsScreenState extends State<SkillsScreen> {
                             children: [
                               const SizedBox(height: 12),
                               StreamBuilder<QuerySnapshot>(
-                                stream: FirebaseFirestore.instance.collection('skills').snapshots(),
+                                stream:
+                                    FirebaseFirestore.instance
+                                        .collection('skills')
+                                        .snapshots(),
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return const Center(child: CircularProgressIndicator());
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
                                   }
-                                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                    return const Center(child: Text('No skills found', style: TextStyle(color: Colors.white70)));
+                                  if (!snapshot.hasData ||
+                                      snapshot.data!.docs.isEmpty) {
+                                    return const Center(
+                                      child: Text(
+                                        'No skills found',
+                                        style: TextStyle(color: Colors.white70),
+                                      ),
+                                    );
                                   }
-                                  final skills = snapshot.data!.docs.map((doc) => SkillItem.fromFirestore(doc)).toList();
-                                  skills.sort((a, b) => a.order.compareTo(b.order));
-                                  
-                                  debugPrint('📊 Loaded ${skills.length} skills from Firebase:');
+                                  final skills =
+                                      snapshot.data!.docs
+                                          .map(
+                                            (doc) =>
+                                                SkillItem.fromFirestore(doc),
+                                          )
+                                          .toList();
+                                  skills.sort(
+                                    (a, b) => a.order.compareTo(b.order),
+                                  );
+
+                                  debugPrint(
+                                    '📊 Loaded ${skills.length} skills from Firebase:',
+                                  );
                                   for (final skill in skills) {
-                                    debugPrint('  - ${skill.name} (${skill.category}): ${skill.iconUrl ?? 'No icon'}');
+                                    debugPrint(
+                                      '  - ${skill.name} (${skill.category}): ${skill.iconUrl ?? 'No icon'}',
+                                    );
                                   }
-                                  
-                                  final Map<String, List<SkillItem>> grouped = {};
+
+                                  final Map<String, List<SkillItem>> grouped =
+                                      {};
                                   for (final skill in skills) {
-                                    grouped.putIfAbsent(skill.category, () => []).add(skill);
+                                    grouped
+                                        .putIfAbsent(skill.category, () => [])
+                                        .add(skill);
                                   }
                                   if (categoryOrder.isEmpty) {
                                     int idx = 0;
@@ -2209,7 +2383,13 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                     bool hasNewCategories = false;
                                     for (final cat in grouped.keys) {
                                       if (!categoryOrder.containsKey(cat)) {
-                                        categoryOrder[cat] = categoryOrder.values.isEmpty ? 0 : categoryOrder.values.reduce((a, b) => a > b ? a : b) + 1;
+                                        categoryOrder[cat] =
+                                            categoryOrder.values.isEmpty
+                                                ? 0
+                                                : categoryOrder.values.reduce(
+                                                      (a, b) => a > b ? a : b,
+                                                    ) +
+                                                    1;
                                         hasNewCategories = true;
                                       }
                                     }
@@ -2217,8 +2397,11 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                       _saveCategoryOrder();
                                     }
                                   }
-                                  final sortedCategories = grouped.keys.toList()
-                                    ..sort((a, b) => (categoryOrder[a] ?? 0).compareTo(categoryOrder[b] ?? 0));
+                                  final sortedCategories =
+                                      grouped.keys.toList()..sort(
+                                        (a, b) => (categoryOrder[a] ?? 0)
+                                            .compareTo(categoryOrder[b] ?? 0),
+                                      );
                                   const crossAxisCount = 1;
                                   const mainAxisSpacing = 2.0;
                                   const crossAxisSpacing = 4.0;
@@ -2228,36 +2411,95 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                     crossAxisSpacing: crossAxisSpacing,
                                     mainAxisSpacing: mainAxisSpacing,
                                     childAspectRatio: childAspectRatio,
-                                    physics: const NeverScrollableScrollPhysics(),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     children: [
-                                      for (int i = 0; i < sortedCategories.length; i++)
+                                      for (
+                                        int i = 0;
+                                        i < sortedCategories.length;
+                                        i++
+                                      )
                                         Stack(
                                           clipBehavior: Clip.none,
                                           children: [
                                             SkillCategory(
                                               title: sortedCategories[i],
-                                              skills: grouped[sortedCategories[i]]!,
+                                              skills:
+                                                  grouped[sortedCategories[i]]!,
                                               isAdmin: _isAdmin ?? false,
-                                              onReorder: (oldIndex, newIndex, category) async {
-                                                final categorySkills = skills.where((s) => s.category == category).toList();
-                                                if (newIndex < 0 || newIndex >= categorySkills.length) return;
-                                                final movedSkill = categorySkills[oldIndex];
-                                                categorySkills.removeAt(oldIndex);
-                                                categorySkills.insert(newIndex, movedSkill);
-                                                for (int i = 0; i < categorySkills.length; i++) {
-                                                  await FirebaseFirestore.instance.collection('skills').doc(categorySkills[i].id).update({'order': i});
+                                              onReorder: (
+                                                oldIndex,
+                                                newIndex,
+                                                category,
+                                              ) async {
+                                                final categorySkills =
+                                                    skills
+                                                        .where(
+                                                          (s) =>
+                                                              s.category ==
+                                                              category,
+                                                        )
+                                                        .toList();
+                                                if (newIndex < 0 ||
+                                                    newIndex >=
+                                                        categorySkills.length)
+                                                  return;
+                                                final movedSkill =
+                                                    categorySkills[oldIndex];
+                                                categorySkills.removeAt(
+                                                  oldIndex,
+                                                );
+                                                categorySkills.insert(
+                                                  newIndex,
+                                                  movedSkill,
+                                                );
+                                                for (
+                                                  int i = 0;
+                                                  i < categorySkills.length;
+                                                  i++
+                                                ) {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('skills')
+                                                      .doc(categorySkills[i].id)
+                                                      .update({'order': i});
                                                 }
                                               },
-                                              onEditSkill: (skill) => _showEditSkillDialog(context, skill),
-                                              onDeleteSkill: (skill) => _showDeleteSkillDialog(context, skill),
-                                              onEditCategory: (category) => _showEditCategoryDialog(context, category),
-                                              onDeleteCategory: (category) => _showDeleteCategoryDialog(context, category),
+                                              onEditSkill:
+                                                  (skill) =>
+                                                      _showEditSkillDialog(
+                                                        context,
+                                                        skill,
+                                                      ),
+                                              onDeleteSkill:
+                                                  (skill) =>
+                                                      _showDeleteSkillDialog(
+                                                        context,
+                                                        skill,
+                                                      ),
+                                              onEditCategory:
+                                                  (category) =>
+                                                      _showEditCategoryDialog(
+                                                        context,
+                                                        category,
+                                                      ),
+                                              onDeleteCategory:
+                                                  (category) =>
+                                                      _showDeleteCategoryDialog(
+                                                        context,
+                                                        category,
+                                                      ),
                                               onTap: () {
-                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
                                                   SnackBar(
-                                                    content: Text('Tapped category: ${sortedCategories[i]}'),
-                                                    backgroundColor: Colors.blue,
+                                                    content: Text(
+                                                      'Tapped category: ${sortedCategories[i]}',
+                                                    ),
+                                                    backgroundColor:
+                                                        Colors.blue,
                                                   ),
                                                 );
                                               },
@@ -2267,26 +2509,66 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                                 top: 8,
                                                 right: 8,
                                                 child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: [
                                                     Padding(
-                                                      padding: const EdgeInsets.only(right: 16),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                            right: 16,
+                                                          ),
                                                       child: Column(
-                                                        mainAxisSize: MainAxisSize.min,
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
                                                         children: [
                                                           IconButton(
-                                                            icon: const Icon(Icons.arrow_upward, size: 16, color: Colors.white54),
-                                                            padding: EdgeInsets.zero,
-                                                            constraints: const BoxConstraints(),
-                                                            onPressed: i > 0 ? () => _updateCategoryOrder(sortedCategories[i], sortedCategories[i-1]) : null,
+                                                            icon: const Icon(
+                                                              Icons
+                                                                  .arrow_upward,
+                                                              size: 16,
+                                                              color:
+                                                                  Colors
+                                                                      .white54,
+                                                            ),
+                                                            padding:
+                                                                EdgeInsets.zero,
+                                                            constraints:
+                                                                const BoxConstraints(),
+                                                            onPressed:
+                                                                i > 0
+                                                                    ? () => _updateCategoryOrder(
+                                                                      sortedCategories[i],
+                                                                      sortedCategories[i -
+                                                                          1],
+                                                                    )
+                                                                    : null,
                                                             tooltip: 'Move up',
                                                           ),
                                                           IconButton(
-                                                            icon: const Icon(Icons.arrow_downward, size: 16, color: Colors.white54),
-                                                            padding: EdgeInsets.zero,
-                                                            constraints: const BoxConstraints(),
-                                                            onPressed: i < sortedCategories.length - 1 ? () => _updateCategoryOrder(sortedCategories[i], sortedCategories[i+1]) : null,
-                                                            tooltip: 'Move down',
+                                                            icon: const Icon(
+                                                              Icons
+                                                                  .arrow_downward,
+                                                              size: 16,
+                                                              color:
+                                                                  Colors
+                                                                      .white54,
+                                                            ),
+                                                            padding:
+                                                                EdgeInsets.zero,
+                                                            constraints:
+                                                                const BoxConstraints(),
+                                                            onPressed:
+                                                                i <
+                                                                        sortedCategories.length -
+                                                                            1
+                                                                    ? () => _updateCategoryOrder(
+                                                                      sortedCategories[i],
+                                                                      sortedCategories[i +
+                                                                          1],
+                                                                    )
+                                                                    : null,
+                                                            tooltip:
+                                                                'Move down',
                                                           ),
                                                         ],
                                                       ),
@@ -2317,10 +2599,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
   }
 
   void _showAddSkillDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => const AddSkillDialog(),
-    );
+    showDialog(context: context, builder: (context) => const AddSkillDialog());
   }
 
   void _showEditSkillDialog(BuildContext context, SkillItem skill) {
@@ -2329,17 +2608,22 @@ class _SkillsScreenState extends State<SkillsScreen> {
     String name = skill.name;
     String iconUrl = skill.iconUrl ?? '';
     final categories = ['Languages', 'Framework', 'Databases', 'Tools'];
-    
+
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               backgroundColor: const Color(0xff23243a),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 24,
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -2348,9 +2632,20 @@ class _SkillsScreenState extends State<SkillsScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.edit, color: Colors.cyanAccent, size: 28),
+                          const Icon(
+                            Icons.edit,
+                            color: Colors.cyanAccent,
+                            size: 28,
+                          ),
                           const SizedBox(width: 10),
-                          Text('Edit Skill', style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+                          Text(
+                            'Edit Skill',
+                            style: GoogleFonts.poppins(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                           const Spacer(),
                           if (iconUrl.isNotEmpty)
                             Container(
@@ -2363,11 +2658,12 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                 iconUrl,
                                 width: 28,
                                 height: 28,
-                                placeholderBuilder: (context) => const Icon(
-                                  Icons.extension,
-                                  color: Colors.cyanAccent,
-                                  size: 28,
-                                ),
+                                placeholderBuilder:
+                                    (context) => const Icon(
+                                      Icons.extension,
+                                      color: Colors.cyanAccent,
+                                      size: 28,
+                                    ),
                               ),
                             ),
                         ],
@@ -2375,20 +2671,36 @@ class _SkillsScreenState extends State<SkillsScreen> {
                       const SizedBox(height: 18),
                       DropdownButtonFormField<String>(
                         value: category,
-                        items: categories.map((cat) => DropdownMenuItem(
-                          value: cat,
-                          child: Text(cat, style: const TextStyle(color: Colors.white)),
-                        )).toList(),
+                        items:
+                            categories
+                                .map(
+                                  (cat) => DropdownMenuItem(
+                                    value: cat,
+                                    child: Text(
+                                      cat,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                         onChanged: (val) => category = val ?? '',
                         decoration: InputDecoration(
                           labelText: 'Category',
                           labelStyle: const TextStyle(color: Colors.cyanAccent),
                           filled: true,
                           fillColor: Colors.white.withOpacity(0.05),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         dropdownColor: const Color(0xff23243a),
-                        validator: (val) => val == null || val.isEmpty ? 'Select category' : null,
+                        validator:
+                            (val) =>
+                                val == null || val.isEmpty
+                                    ? 'Select category'
+                                    : null,
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -2398,11 +2710,17 @@ class _SkillsScreenState extends State<SkillsScreen> {
                           labelStyle: const TextStyle(color: Colors.cyanAccent),
                           filled: true,
                           fillColor: Colors.white.withOpacity(0.05),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         style: const TextStyle(color: Colors.white),
                         onChanged: (val) => name = val,
-                        validator: (val) => val == null || val.isEmpty ? 'Enter skill name' : null,
+                        validator:
+                            (val) =>
+                                val == null || val.isEmpty
+                                    ? 'Enter skill name'
+                                    : null,
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -2410,26 +2728,45 @@ class _SkillsScreenState extends State<SkillsScreen> {
                         decoration: InputDecoration(
                           labelText: 'SVG Icon URL (Cloudinary)',
                           labelStyle: const TextStyle(color: Colors.cyanAccent),
-                          hintText: 'https://res.cloudinary.com/.../skills/icon.svg',
-                          hintStyle: const TextStyle(color: Colors.white54, fontSize: 12),
+                          hintText:
+                              'https://res.cloudinary.com/.../skills/icon.svg',
+                          hintStyle: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 12,
+                          ),
                           filled: true,
                           fillColor: Colors.white.withOpacity(0.05),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          suffixIcon: iconUrl.isNotEmpty
-                              ? IconButton(
-                                  onPressed: () => setDialogState(() => iconUrl = ''),
-                                  icon: const Icon(Icons.clear, color: Colors.red),
-                                  tooltip: 'Clear URL',
-                                )
-                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          suffixIcon:
+                              iconUrl.isNotEmpty
+                                  ? IconButton(
+                                    onPressed:
+                                        () =>
+                                            setDialogState(() => iconUrl = ''),
+                                    icon: const Icon(
+                                      Icons.clear,
+                                      color: Colors.red,
+                                    ),
+                                    tooltip: 'Clear URL',
+                                  )
+                                  : null,
                         ),
                         style: const TextStyle(color: Colors.white),
                         onChanged: (val) => setDialogState(() => iconUrl = val),
-                        validator: (val) => val == null || val.isEmpty ? 'Enter SVG URL' : null,
+                        validator:
+                            (val) =>
+                                val == null || val.isEmpty
+                                    ? 'Enter SVG URL'
+                                    : null,
                       ),
                       if (iconUrl.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        Text('Icon Preview:', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        Text(
+                          'Icon Preview:',
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                        ),
                         const SizedBox(height: 4),
                         Container(
                           padding: const EdgeInsets.all(8),
@@ -2441,11 +2778,12 @@ class _SkillsScreenState extends State<SkillsScreen> {
                             iconUrl,
                             width: 32,
                             height: 32,
-                            placeholderBuilder: (context) => const Icon(
-                              Icons.extension,
-                              color: Colors.cyanAccent,
-                              size: 32,
-                            ),
+                            placeholderBuilder:
+                                (context) => const Icon(
+                                  Icons.extension,
+                                  color: Colors.cyanAccent,
+                                  size: 32,
+                                ),
                           ),
                         ),
                       ],
@@ -2457,42 +2795,60 @@ class _SkillsScreenState extends State<SkillsScreen> {
                         children: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(color: Colors.white70),
+                            ),
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.cyanAccent,
                               foregroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
                             ),
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
                                 try {
-                                  await FirebaseFirestore.instance.collection('skills').doc(skill.id).update({
-                                    'category': category,
-                                    'name': name,
-                                    'iconUrl': iconUrl,
-                                  });
+                                  await FirebaseFirestore.instance
+                                      .collection('skills')
+                                      .doc(skill.id)
+                                      .update({
+                                        'category': category,
+                                        'name': name,
+                                        'iconUrl': iconUrl,
+                                      });
                                   Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Skill "$name" updated successfully!'),
+                                      content: Text(
+                                        'Skill "$name" updated successfully!',
+                                      ),
                                       backgroundColor: Colors.green,
                                     ),
                                   );
                                 } catch (e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Failed to update skill: $e'),
+                                      content: Text(
+                                        'Failed to update skill: $e',
+                                      ),
                                       backgroundColor: Colors.red,
                                     ),
                                   );
                                 }
                               }
                             },
-                            child: const Text('Update', style: TextStyle(fontWeight: FontWeight.bold)),
+                            child: const Text(
+                              'Update',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ],
                       ),
@@ -2513,10 +2869,16 @@ class _SkillsScreenState extends State<SkillsScreen> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xff23243a),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
             'Delete Skill',
-            style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           content: Text(
             'Are you sure you want to delete "${skill.name}"? This action cannot be undone.',
@@ -2525,21 +2887,31 @@ class _SkillsScreenState extends State<SkillsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               onPressed: () async {
                 try {
-                  await FirebaseFirestore.instance.collection('skills').doc(skill.id).delete();
+                  await FirebaseFirestore.instance
+                      .collection('skills')
+                      .doc(skill.id)
+                      .delete();
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Skill "${skill.name}" deleted successfully!'),
+                      content: Text(
+                        'Skill "${skill.name}" deleted successfully!',
+                      ),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -2564,74 +2936,103 @@ class _SkillsScreenState extends State<SkillsScreen> {
     final _formKey = GlobalKey<FormState>();
     String newCategoryName = category;
     final categories = ['Languages', 'Framework', 'Databases', 'Tools'];
-    
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xff23243a),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
             'Edit Category',
-            style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           content: Form(
             key: _formKey,
             child: DropdownButtonFormField<String>(
               value: newCategoryName,
-              items: categories.map((cat) => DropdownMenuItem(
-                value: cat,
-                child: Text(cat, style: const TextStyle(color: Colors.white)),
-              )).toList(),
+              items:
+                  categories
+                      .map(
+                        (cat) => DropdownMenuItem(
+                          value: cat,
+                          child: Text(
+                            cat,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      )
+                      .toList(),
               onChanged: (val) => newCategoryName = val ?? '',
               decoration: InputDecoration(
                 labelText: 'Category Name',
                 labelStyle: const TextStyle(color: Colors.cyanAccent),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.05),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               dropdownColor: const Color(0xff23243a),
-              validator: (val) => val == null || val.isEmpty ? 'Select category' : null,
+              validator:
+                  (val) =>
+                      val == null || val.isEmpty ? 'Select category' : null,
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyanAccent,
                 foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   try {
-                    final query = await FirebaseFirestore.instance
-                        .collection('skills')
-                        .where('category', isEqualTo: category)
-                        .get();
-                    
+                    final query =
+                        await FirebaseFirestore.instance
+                            .collection('skills')
+                            .where('category', isEqualTo: category)
+                            .get();
+
                     final batch = FirebaseFirestore.instance.batch();
                     for (final doc in query.docs) {
-                      batch.update(doc.reference, {'category': newCategoryName});
+                      batch.update(doc.reference, {
+                        'category': newCategoryName,
+                      });
                     }
                     await batch.commit();
-                    
+
                     if (category != newCategoryName) {
                       setState(() {
-                        categoryOrder[newCategoryName] = categoryOrder[category] ?? 0;
+                        categoryOrder[newCategoryName] =
+                            categoryOrder[category] ?? 0;
                         categoryOrder.remove(category);
                       });
                       await _saveCategoryOrder();
                     }
-                    
+
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Category updated to "$newCategoryName"!'),
+                        content: Text(
+                          'Category updated to "$newCategoryName"!',
+                        ),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -2645,7 +3046,10 @@ class _SkillsScreenState extends State<SkillsScreen> {
                   }
                 }
               },
-              child: const Text('Update', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text(
+                'Update',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         );
@@ -2659,10 +3063,16 @@ class _SkillsScreenState extends State<SkillsScreen> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xff23243a),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
             'Delete Category',
-            style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           content: Text(
             'Are you sure you want to delete the "$category" category and all its skills? This action cannot be undone.',
@@ -2671,36 +3081,44 @@ class _SkillsScreenState extends State<SkillsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               onPressed: () async {
                 try {
-                  final query = await FirebaseFirestore.instance
-                      .collection('skills')
-                      .where('category', isEqualTo: category)
-                      .get();
-                  
+                  final query =
+                      await FirebaseFirestore.instance
+                          .collection('skills')
+                          .where('category', isEqualTo: category)
+                          .get();
+
                   final batch = FirebaseFirestore.instance.batch();
                   for (final doc in query.docs) {
                     batch.delete(doc.reference);
                   }
                   await batch.commit();
-                  
+
                   setState(() {
                     categoryOrder.remove(category);
                   });
                   await _saveCategoryOrder();
-                  
+
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Category "$category" and all its skills deleted!'),
+                      content: Text(
+                        'Category "$category" and all its skills deleted!',
+                      ),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -2757,21 +3175,23 @@ class _SkillCategoryState extends State<SkillCategory> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.of(context).size.width >= 600;
-    final borderColor = (_isHovered || _isPressed) ? Colors.white : Colors.white.withOpacity(0.18);
+    final borderColor =
+        (_isHovered || _isPressed)
+            ? Colors.white
+            : Colors.white.withOpacity(0.18);
     final borderWidth = (_isHovered || _isPressed) ? 2.8 : 2.5;
     final boxDecorationDesktop = BoxDecoration(
       borderRadius: BorderRadius.circular(24),
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          Color(0xCC0B132B),
-          Color(0x99112233),
-          Color(0x66121A2E),
-        ],
+        colors: [Color(0xCC0B132B), Color(0x99112233), Color(0x66121A2E)],
       ),
       border: Border.all(
-        color: (_isHovered || _isPressed) ? Colors.white : Colors.cyanAccent.withOpacity(0.14),
+        color:
+            (_isHovered || _isPressed)
+                ? Colors.white
+                : Colors.cyanAccent.withOpacity(0.14),
         width: (_isHovered || _isPressed) ? 2.2 : 1.4,
       ),
       boxShadow: [
@@ -2793,14 +3213,13 @@ class _SkillCategoryState extends State<SkillCategory> {
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          Color(0xCC0B132B),
-          Color(0x99112233),
-          Color(0x66121A2E),
-        ],
+        colors: [Color(0xCC0B132B), Color(0x99112233), Color(0x66121A2E)],
       ),
       border: Border.all(
-        color: (_isHovered || _isPressed) ? Colors.white : Colors.cyanAccent.withOpacity(0.14),
+        color:
+            (_isHovered || _isPressed)
+                ? Colors.white
+                : Colors.cyanAccent.withOpacity(0.14),
         width: (_isHovered || _isPressed) ? 2.2 : 1.4,
       ),
       boxShadow: [
@@ -2830,12 +3249,14 @@ class _SkillCategoryState extends State<SkillCategory> {
           decoration: isDesktop ? boxDecorationDesktop : boxDecorationMobile,
           width: width,
           height: isDesktop ? 300 : height,
-          padding: isDesktop ? const EdgeInsets.all(32) : const EdgeInsets.all(16),
+          padding:
+              isDesktop ? const EdgeInsets.all(32) : const EdgeInsets.all(16),
           clipBehavior: isDesktop ? Clip.none : Clip.hardEdge,
           child: child,
         ),
       );
     }
+
     if (isDesktop) {
       return Stack(
         clipBehavior: Clip.none,
@@ -2846,7 +3267,11 @@ class _SkillCategoryState extends State<SkillCategory> {
               children: [
                 Row(
                   children: [
-                    _buildCategoryIcon(widget.skills.first.iconUrl, 32, category: widget.title),
+                    _buildCategoryIcon(
+                      widget.skills.first.iconUrl,
+                      32,
+                      category: widget.title,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -2864,83 +3289,124 @@ class _SkillCategoryState extends State<SkillCategory> {
                 Wrap(
                   spacing: 16,
                   runSpacing: 16,
-                  children: widget.skills.asMap().entries.map((entry) {
-                    final i = entry.key;
-                    final skill = entry.value;
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                  children:
+                      widget.skills.asMap().entries.map((entry) {
+                        final i = entry.key;
+                        final skill = entry.value;
+                        return Stack(
+                          clipBehavior: Clip.none,
                           children: [
-                            _SkillChip(
-                              skill: skill,
-                              isDesktop: true,
-                              isAdmin: widget.isAdmin,
-                              onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Tapped skill: ${skill.name}'),
-                                    backgroundColor: Colors.blue,
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                _SkillChip(
+                                  skill: skill,
+                                  isDesktop: true,
+                                  isAdmin: widget.isAdmin,
+                                  onTap: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Tapped skill: ${skill.name}',
+                                        ),
+                                        backgroundColor: Colors.blue,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                if (widget.isAdmin) ...[
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 16),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.arrow_upward,
+                                            size: 16,
+                                            color: Colors.white54,
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
+                                          onPressed:
+                                              i > 0
+                                                  ? () => widget.onReorder(
+                                                    i,
+                                                    i - 1,
+                                                    widget.title,
+                                                  )
+                                                  : null,
+                                          tooltip: 'Move up',
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.arrow_downward,
+                                            size: 16,
+                                            color: Colors.white54,
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
+                                          onPressed:
+                                              i < widget.skills.length - 1
+                                                  ? () => widget.onReorder(
+                                                    i,
+                                                    i + 1,
+                                                    widget.title,
+                                                  )
+                                                  : null,
+                                          tooltip: 'Move down',
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                );
-                              },
+                                ],
+                              ],
                             ),
-                            if (widget.isAdmin) ...[
-                              Padding(
-                                padding: const EdgeInsets.only(right: 16),
-                                child: Column(
+                            if (widget.isAdmin)
+                              Positioned(
+                                top: -8,
+                                right: -8,
+                                child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     IconButton(
-                                      icon: const Icon(Icons.arrow_upward, size: 16, color: Colors.white54),
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
-                                      onPressed: i > 0 ? () => widget.onReorder(i, i - 1, widget.title) : null,
-                                      tooltip: 'Move up',
+                                      icon: const Icon(
+                                        Icons.edit,
+                                        color: Colors.cyanAccent,
+                                        size: 16,
+                                      ),
+                                      onPressed:
+                                          () => widget.onEditSkill(skill),
+                                      tooltip: 'Edit',
+                                      padding: const EdgeInsets.all(4),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 24,
+                                        minHeight: 24,
+                                      ),
                                     ),
+                                    const SizedBox(width: 0),
                                     IconButton(
-                                      icon: const Icon(Icons.arrow_downward, size: 16, color: Colors.white54),
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
-                                      onPressed: i < widget.skills.length - 1 ? () => widget.onReorder(i, i + 1, widget.title) : null,
-                                      tooltip: 'Move down',
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: Colors.redAccent,
+                                        size: 16,
+                                      ),
+                                      onPressed:
+                                          () => widget.onDeleteSkill(skill),
+                                      tooltip: 'Delete',
+                                      padding: const EdgeInsets.all(4),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 24,
+                                        minHeight: 24,
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ],
                           ],
-                        ),
-                        if (widget.isAdmin)
-                          Positioned(
-                            top: -8,
-                            right: -8,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.cyanAccent, size: 16),
-                                  onPressed: () => widget.onEditSkill(skill),
-                                  tooltip: 'Edit',
-                                  padding: const EdgeInsets.all(4),
-                                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
-                                ),
-                                const SizedBox(width: 0),
-                                IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.redAccent, size: 16),
-                                  onPressed: () => widget.onDeleteSkill(skill),
-                                  tooltip: 'Delete',
-                                  padding: const EdgeInsets.all(4),
-                                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
                 ),
               ],
             ),
@@ -2954,19 +3420,33 @@ class _SkillCategoryState extends State<SkillCategory> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.cyanAccent, size: 20),
+                    icon: const Icon(
+                      Icons.edit,
+                      color: Colors.cyanAccent,
+                      size: 20,
+                    ),
                     onPressed: () => widget.onEditCategory(widget.title),
                     tooltip: 'Edit Category',
                     padding: const EdgeInsets.all(6),
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
                   ),
                   const SizedBox(width: 2),
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.redAccent, size: 20),
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.redAccent,
+                      size: 20,
+                    ),
                     onPressed: () => widget.onDeleteCategory(widget.title),
                     tooltip: 'Delete Category',
                     padding: const EdgeInsets.all(6),
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
                   ),
                 ],
               ),
@@ -2983,7 +3463,11 @@ class _SkillCategoryState extends State<SkillCategory> {
             children: [
               Row(
                 children: [
-                  _buildCategoryIcon(widget.skills.first.iconUrl, 24, category: widget.title),
+                  _buildCategoryIcon(
+                    widget.skills.first.iconUrl,
+                    24,
+                    category: widget.title,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -3021,7 +3505,9 @@ class _SkillCategoryState extends State<SkillCategory> {
                                   onTap: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Tapped skill: ${widget.skills[i].name}'),
+                                        content: Text(
+                                          'Tapped skill: ${widget.skills[i].name}',
+                                        ),
                                         backgroundColor: Colors.blue,
                                       ),
                                     );
@@ -3034,17 +3520,39 @@ class _SkillCategoryState extends State<SkillCategory> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         IconButton(
-                                          icon: const Icon(Icons.arrow_upward, size: 16, color: Colors.white54),
+                                          icon: const Icon(
+                                            Icons.arrow_upward,
+                                            size: 16,
+                                            color: Colors.white54,
+                                          ),
                                           padding: EdgeInsets.zero,
                                           constraints: BoxConstraints(),
-                                          onPressed: i > 0 ? () => widget.onReorder(i, i - 1, widget.title) : null,
+                                          onPressed:
+                                              i > 0
+                                                  ? () => widget.onReorder(
+                                                    i,
+                                                    i - 1,
+                                                    widget.title,
+                                                  )
+                                                  : null,
                                           tooltip: 'Move up',
                                         ),
                                         IconButton(
-                                          icon: const Icon(Icons.arrow_downward, size: 16, color: Colors.white54),
+                                          icon: const Icon(
+                                            Icons.arrow_downward,
+                                            size: 16,
+                                            color: Colors.white54,
+                                          ),
                                           padding: EdgeInsets.zero,
                                           constraints: BoxConstraints(),
-                                          onPressed: i < widget.skills.length - 1 ? () => widget.onReorder(i, i + 1, widget.title) : null,
+                                          onPressed:
+                                              i < widget.skills.length - 1
+                                                  ? () => widget.onReorder(
+                                                    i,
+                                                    i + 1,
+                                                    widget.title,
+                                                  )
+                                                  : null,
                                           tooltip: 'Move down',
                                         ),
                                       ],
@@ -3061,19 +3569,39 @@ class _SkillCategoryState extends State<SkillCategory> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     IconButton(
-                                      icon: const Icon(Icons.edit, color: Colors.cyanAccent, size: 14),
-                                      onPressed: () => widget.onEditSkill(widget.skills[i]),
+                                      icon: const Icon(
+                                        Icons.edit,
+                                        color: Colors.cyanAccent,
+                                        size: 14,
+                                      ),
+                                      onPressed:
+                                          () => widget.onEditSkill(
+                                            widget.skills[i],
+                                          ),
                                       tooltip: 'Edit',
                                       padding: const EdgeInsets.all(3),
-                                      constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 20,
+                                        minHeight: 20,
+                                      ),
                                     ),
                                     const SizedBox(width: 0),
                                     IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.redAccent, size: 14),
-                                      onPressed: () => widget.onDeleteSkill(widget.skills[i]),
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: Colors.redAccent,
+                                        size: 14,
+                                      ),
+                                      onPressed:
+                                          () => widget.onDeleteSkill(
+                                            widget.skills[i],
+                                          ),
                                       tooltip: 'Delete',
                                       padding: const EdgeInsets.all(3),
-                                      constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 20,
+                                        minHeight: 20,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -3097,19 +3625,33 @@ class _SkillCategoryState extends State<SkillCategory> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.cyanAccent, size: 16),
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.cyanAccent,
+                    size: 16,
+                  ),
                   onPressed: () => widget.onEditCategory(widget.title),
                   tooltip: 'Edit Category',
                   padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  constraints: const BoxConstraints(
+                    minWidth: 24,
+                    minHeight: 24,
+                  ),
                 ),
                 const SizedBox(width: 0),
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.redAccent, size: 16),
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Colors.redAccent,
+                    size: 16,
+                  ),
                   onPressed: () => widget.onDeleteCategory(widget.title),
                   tooltip: 'Delete Category',
                   padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  constraints: const BoxConstraints(
+                    minWidth: 24,
+                    minHeight: 24,
+                  ),
                 ),
               ],
             ),
@@ -3120,28 +3662,26 @@ class _SkillCategoryState extends State<SkillCategory> {
 
   Widget _buildCategoryIcon(String? iconUrl, double size, {String? category}) {
     final categorySvgs = <String, String>{
-      'Languages': 'https://res.cloudinary.com/dyp8u0ka1/image/upload/v1751118819/ud5yvl7gbkj6oul7esqt.svg',
-      'Framework': 'https://res.cloudinary.com/dyp8u0ka1/image/upload/v1751117868/feinbsv6jyde9jccyrkg.svg',
-      'Databases': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg',
-      'Tools': 'https://res.cloudinary.com/dyp8u0ka1/image/upload/v1751118421/x6b4ojkysonz0ro4hxle.svg',
+      'Languages':
+          'https://res.cloudinary.com/dyp8u0ka1/image/upload/v1751118819/ud5yvl7gbkj6oul7esqt.svg',
+      'Framework':
+          'https://res.cloudinary.com/dyp8u0ka1/image/upload/v1751117868/feinbsv6jyde9jccyrkg.svg',
+      'Databases':
+          'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg',
+      'Tools':
+          'https://res.cloudinary.com/dyp8u0ka1/image/upload/v1751118421/x6b4ojkysonz0ro4hxle.svg',
     };
     if (category != null && categorySvgs.containsKey(category)) {
       return SvgPicture.network(
         categorySvgs[category]!,
         width: size,
         height: size,
-        placeholderBuilder: (context) => Icon(
-          Icons.extension,
-          size: size,
-          color: Colors.cyanAccent,
-        ),
+        placeholderBuilder:
+            (context) =>
+                Icon(Icons.extension, size: size, color: Colors.cyanAccent),
         errorBuilder: (context, error, stackTrace) {
           debugPrint('❌ Category SVG loading error: $error');
-          return Icon(
-            Icons.extension,
-            size: size,
-            color: Colors.cyanAccent,
-          );
+          return Icon(Icons.extension, size: size, color: Colors.cyanAccent);
         },
       );
     }
@@ -3150,26 +3690,16 @@ class _SkillCategoryState extends State<SkillCategory> {
         iconUrl,
         width: size,
         height: size,
-        placeholderBuilder: (context) => Icon(
-          Icons.extension,
-          size: size,
-          color: Colors.cyanAccent,
-        ),
+        placeholderBuilder:
+            (context) =>
+                Icon(Icons.extension, size: size, color: Colors.cyanAccent),
         errorBuilder: (context, error, stackTrace) {
           debugPrint('❌ Category SVG loading error: $error');
-          return Icon(
-            Icons.extension,
-            size: size,
-            color: Colors.cyanAccent,
-          );
+          return Icon(Icons.extension, size: size, color: Colors.cyanAccent);
         },
       );
     }
-    return Icon(
-      Icons.extension,
-      size: size,
-      color: Colors.cyanAccent,
-    );
+    return Icon(Icons.extension, size: size, color: Colors.cyanAccent);
   }
 }
 
@@ -3216,7 +3746,10 @@ class _SkillChipState extends State<_SkillChip> {
             color: Colors.white.withOpacity(widget.isDesktop ? 0.08 : 0.05),
             borderRadius: BorderRadius.circular(widget.isDesktop ? 18 : 12),
             border: Border.all(
-              color: (_isHovered || _isPressed) ? Colors.white : Colors.white.withOpacity(0.18),
+              color:
+                  (_isHovered || _isPressed)
+                      ? Colors.white
+                      : Colors.white.withOpacity(0.18),
               width: (_isHovered || _isPressed) ? 1.5 : 1.2,
             ),
           ),
@@ -3238,18 +3771,19 @@ class _SkillChipState extends State<_SkillChip> {
       ),
     );
   }
-  
+
   Widget _buildSkillIcon(SkillItem skill, bool isDesktop) {
     if (skill.iconUrl != null && skill.iconUrl!.isNotEmpty) {
       return SvgPicture.network(
         skill.iconUrl!,
         width: isDesktop ? 22 : 16,
         height: isDesktop ? 22 : 16,
-        placeholderBuilder: (context) => Icon(
-          Icons.extension,
-          size: isDesktop ? 22 : 16,
-          color: Colors.cyanAccent,
-        ),
+        placeholderBuilder:
+            (context) => Icon(
+              Icons.extension,
+              size: isDesktop ? 22 : 16,
+              color: Colors.cyanAccent,
+            ),
         errorBuilder: (context, error, stackTrace) {
           debugPrint('❌ SVG loading error for ${skill.name}: $error');
           return Icon(
@@ -3275,7 +3809,13 @@ class SkillItem {
   final int order;
   final String id;
 
-  SkillItem({required this.name, this.iconUrl, required this.category, required this.order, required this.id});
+  SkillItem({
+    required this.name,
+    this.iconUrl,
+    required this.category,
+    required this.order,
+    required this.id,
+  });
 
   factory SkillItem.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
