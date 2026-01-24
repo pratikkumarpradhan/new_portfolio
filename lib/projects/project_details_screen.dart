@@ -6,7 +6,6 @@ import 'package:portfolio/projects/project_screen.dart';
 import 'package:portfolio/services/firebase.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
- 
 
 class ProjectDetailScreen extends StatefulWidget {
   final PortfolioProject project;
@@ -21,7 +20,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   int _currentIndex = 0;
   Timer? _autoScrollTimer;
   // Removed YoutubePlayerController
-  
+
   bool _isPlayButtonHovered = false;
 
   @override
@@ -62,7 +61,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       // Fallback to web if app launch fails
       if (!await launchUrl(uri, mode: LaunchMode.platformDefault)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not launch $url', style: TextStyle(color: Colors.white))),
+          SnackBar(
+            content: Text(
+              'Could not launch $url',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
         );
       }
     }
@@ -89,21 +93,20 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF090C1A),
-              Color(0xFF0F172A),
-              Color(0xFF1E293B),
-            ],
+            colors: [Color(0xFF090C1A), Color(0xFF0F172A), Color(0xFF1E293B)],
             stops: [0.0, 0.55, 1.0],
           ),
         ),
         child: SingleChildScrollView(
-          child: Center( // Center the content column horizontally
+          child: Center(
+            // Center the content column horizontally
             child: Card(
-margin: EdgeInsets.symmetric(
-  horizontal: MediaQuery.of(context).size.width < 600 ? 8.0 : 32.0,
-  vertical: 16.0,
-),              elevation: 8.0,
+              margin: EdgeInsets.symmetric(
+                horizontal:
+                    MediaQuery.of(context).size.width < 600 ? 8.0 : 32.0,
+                vertical: 16.0,
+              ),
+              elevation: 8.0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
               ),
@@ -125,7 +128,10 @@ margin: EdgeInsets.symmetric(
                         ],
                       ),
                       borderRadius: BorderRadius.circular(24.0),
-                      border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.2),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.18),
+                        width: 1.2,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.28),
@@ -139,7 +145,10 @@ margin: EdgeInsets.symmetric(
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 32.0,
+                    ),
                     child: Stack(
                       children: [
                         // Fixed back button in the inner box top left
@@ -150,7 +159,10 @@ margin: EdgeInsets.symmetric(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            ),
                             label: const Text(
                               "Back",
                               style: TextStyle(color: Colors.white),
@@ -161,13 +173,18 @@ margin: EdgeInsets.symmetric(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               backgroundColor: Colors.transparent,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
                             ),
                           ),
                         ),
                         // Main content
                         Padding(
-                          padding: const EdgeInsets.only(top: 56.0), // Add space for the button
+                          padding: const EdgeInsets.only(
+                            top: 56.0,
+                          ), // Add space for the button
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
@@ -182,117 +199,137 @@ margin: EdgeInsets.symmetric(
                                           PageView.builder(
                                             controller: _pageController,
                                             itemCount: project.images.length,
-                                            physics: const BouncingScrollPhysics(),
+                                            physics:
+                                                const BouncingScrollPhysics(),
                                             onPageChanged: (index) {
-                                              setState(() => _currentIndex = index);
+                                              setState(
+                                                () => _currentIndex = index,
+                                              );
                                             },
                                             itemBuilder: (context, index) {
                                               return Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 16.0,
+                                                    ),
                                                 child: ClipRect(
                                                   child: Align(
                                                     alignment: Alignment.center,
                                                     heightFactor: 1.0,
-                                                    child: PhoneMockupNetwork(imageUrl: project.images[index]),
+                                                    child: PhoneMockupNetwork(
+                                                      imageUrl:
+                                                          project.images[index],
+                                                    ),
                                                   ),
                                                 ),
                                               );
                                             },
                                           ),
 
-                                  // Arrows (square shape for all screens)
-Positioned(
-  left: 12,
-  top: 0,
-  bottom: 0,
-  child: Center(
-    child: Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: () => _goToPage(_currentIndex - 1),
-        child: const SizedBox(
-          width: 42,
-          height: 42,
-          child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
-        ),
-      ),
-    ),
-  ),
-),
-// // Square Arrow Buttons (adjusted for mobile)
-// Positioned(
-//   left: MediaQuery.of(context).size.width < 600 ? 2 : 12,
-//   top: 0,
-//   bottom: 0,
-//   child: Center(
-//     child: Container(
-//       decoration: BoxDecoration(
-//         color: Colors.white.withOpacity(0.15),
-//         borderRadius: BorderRadius.circular(8),
-//         border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
-//         boxShadow: [
-//           BoxShadow(
-//             color: Colors.black.withOpacity(0.3),
-//             blurRadius: 8,
-//             offset: const Offset(0, 3),
-//           ),
-//         ],
-//       ),
-//       child: InkWell(
-//         borderRadius: BorderRadius.circular(8),
-//         onTap: () => _goToPage(_currentIndex - 1),
-//         child: const SizedBox(
-//           width: 42,
-//           height: 42,
-//           child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
-//         ),
-//       ),
-//     ),
-//   ),
-// ),
+                                          // Arrows (square shape for all screens)
+                                          Positioned(
+                                            left: 12,
+                                            top: 0,
+                                            bottom: 0,
+                                            child: Center(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white
+                                                      .withOpacity(0.15),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  border: Border.all(
+                                                    color: Colors.white
+                                                        .withOpacity(0.25),
+                                                    width: 1,
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withOpacity(0.3),
+                                                      blurRadius: 8,
+                                                      offset: const Offset(
+                                                        0,
+                                                        3,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: InkWell(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  onTap:
+                                                      () => _goToPage(
+                                                        _currentIndex - 1,
+                                                      ),
+                                                  child: const SizedBox(
+                                                    width: 42,
+                                                    height: 42,
+                                                    child: Icon(
+                                                      Icons.arrow_back_ios_new,
+                                                      color: Colors.white,
+                                                      size: 22,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
 
-Positioned(
-  right: MediaQuery.of(context).size.width < 600 ? 2 : 12,
-  top: 0,
-  bottom: 0,
-  child: Center(
-    child: Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: () => _goToPage(_currentIndex + 1),
-        child: const SizedBox(
-          width: 42,
-          height: 42,
-          child: Icon(Icons.arrow_forward_ios, color: Colors.white, size: 22),
-        ),
-      ),
-    ),
-  ),
-),
+                                          Positioned(
+                                            right:
+                                                MediaQuery.of(
+                                                          context,
+                                                        ).size.width <
+                                                        600
+                                                    ? 2
+                                                    : 12,
+                                            top: 0,
+                                            bottom: 0,
+                                            child: Center(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white
+                                                      .withOpacity(0.15),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  border: Border.all(
+                                                    color: Colors.white
+                                                        .withOpacity(0.25),
+                                                    width: 1,
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withOpacity(0.3),
+                                                      blurRadius: 8,
+                                                      offset: const Offset(
+                                                        0,
+                                                        3,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: InkWell(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  onTap:
+                                                      () => _goToPage(
+                                                        _currentIndex + 1,
+                                                      ),
+                                                  child: const SizedBox(
+                                                    width: 42,
+                                                    height: 42,
+                                                    child: Icon(
+                                                      Icons.arrow_forward_ios,
+                                                      color: Colors.white,
+                                                      size: 22,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -300,17 +337,27 @@ Positioned(
 
                                     // Indicator Dots
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: List.generate(
                                         project.images.length,
                                         (index) => AnimatedContainer(
-                                          duration: const Duration(milliseconds: 300),
-                                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                                          width: _currentIndex == index ? 12 : 8,
-                                          height: _currentIndex == index ? 12 : 8,
+                                          duration: const Duration(
+                                            milliseconds: 300,
+                                          ),
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 4,
+                                          ),
+                                          width:
+                                              _currentIndex == index ? 12 : 8,
+                                          height:
+                                              _currentIndex == index ? 12 : 8,
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
-                                            color: _currentIndex == index ? Colors.white : Colors.white54,
+                                            color:
+                                                _currentIndex == index
+                                                    ? Colors.white
+                                                    : Colors.white54,
                                           ),
                                         ),
                                       ),
@@ -323,7 +370,9 @@ Positioned(
                               // Title and Overview in a centered container
                               Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.symmetric(horizontal: 32),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                ),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
@@ -336,7 +385,10 @@ Positioned(
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.2),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.18),
+                                      width: 1.2,
+                                    ),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black.withOpacity(0.22),
@@ -345,44 +397,61 @@ Positioned(
                                       ),
                                     ],
                                   ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 18,
+                                  ),
                                   child: Column(
                                     children: [
                                       Text(
                                         project.title,
-                                        style:  GoogleFonts.berkshireSwash(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                                        style: GoogleFonts.berkshireSwash(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                         textAlign: TextAlign.center,
                                       ),
                                       const SizedBox(height: 12),
                                       Text(
                                         project.overview,
-                                        style: GoogleFonts.merienda(fontSize: 16, height: 1.5, color: Colors.white),
+                                        style: GoogleFonts.merienda(
+                                          fontSize: 16,
+                                          height: 1.5,
+                                          color: Colors.white,
+                                        ),
                                         textAlign: TextAlign.center,
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
-                            // Tagline display
-if (project.tagline.trim().isNotEmpty) ...[
-  const SizedBox(height: 16),
-  Center(
-    child: Text(
-      project.tagline,
-      style: GoogleFonts.comfortaa(
-        fontSize: MediaQuery.of(context).size.width < 600 ? 14 : 18, // smaller on mobile
-        fontStyle: FontStyle.italic,
-        color: Colors.white,
-      ),
-      textAlign: TextAlign.center,
-    ),
-  ),
-],
+                              // Tagline display
+                              if (project.tagline.trim().isNotEmpty) ...[
+                                const SizedBox(height: 16),
+                                Center(
+                                  child: Text(
+                                    project.tagline,
+                                    style: GoogleFonts.comfortaa(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width <
+                                                  600
+                                              ? 14
+                                              : 18, // smaller on mobile
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.white,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
                               const SizedBox(height: 32),
 
                               // Description sections (left-aligned)
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -399,27 +468,44 @@ if (project.tagline.trim().isNotEmpty) ...[
                                           ],
                                         ),
                                         borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.0),
+                                        border: Border.all(
+                                          color: Colors.white.withOpacity(0.18),
+                                          width: 1.0,
+                                        ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(0.22),
+                                            color: Colors.black.withOpacity(
+                                              0.22,
+                                            ),
                                             blurRadius: 16,
                                             offset: const Offset(0, 8),
                                           ),
                                         ],
                                       ),
-                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 14,
+                                      ),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             project.description1Heading,
-                                            style:GoogleFonts.pangolin(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                                            style: GoogleFonts.pangolin(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
                                           ),
                                           const SizedBox(height: 8),
                                           Text(
                                             project.description1,
-                                            style:GoogleFonts.delius(fontSize: 16, height: 1.5, color: Colors.white),
+                                            style: GoogleFonts.delius(
+                                              fontSize: 16,
+                                              height: 1.5,
+                                              color: Colors.white,
+                                            ),
                                             maxLines: null,
                                             overflow: TextOverflow.visible,
                                           ),
@@ -441,28 +527,49 @@ if (project.tagline.trim().isNotEmpty) ...[
                                               Color(0x66121A2E),
                                             ],
                                           ),
-                                          borderRadius: BorderRadius.circular(14),
-                                          border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.0),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.white.withOpacity(
+                                              0.18,
+                                            ),
+                                            width: 1.0,
+                                          ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(0.22),
+                                              color: Colors.black.withOpacity(
+                                                0.22,
+                                              ),
                                               blurRadius: 16,
                                               offset: const Offset(0, 8),
                                             ),
                                           ],
                                         ),
-                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 14,
+                                        ),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               project.description2Heading,
-                                              style: GoogleFonts.pangolin(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                                              style: GoogleFonts.pangolin(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
                                             ),
                                             const SizedBox(height: 8),
                                             Text(
                                               project.description2,
-                                              style:GoogleFonts.delius(fontSize: 16, height: 1.5, color: Colors.white),
+                                              style: GoogleFonts.delius(
+                                                fontSize: 16,
+                                                height: 1.5,
+                                                color: Colors.white,
+                                              ),
                                               maxLines: null,
                                               overflow: TextOverflow.visible,
                                             ),
@@ -485,28 +592,49 @@ if (project.tagline.trim().isNotEmpty) ...[
                                               Color(0x66121A2E),
                                             ],
                                           ),
-                                          borderRadius: BorderRadius.circular(14),
-                                          border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.0),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.white.withOpacity(
+                                              0.18,
+                                            ),
+                                            width: 1.0,
+                                          ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(0.22),
+                                              color: Colors.black.withOpacity(
+                                                0.22,
+                                              ),
                                               blurRadius: 16,
                                               offset: const Offset(0, 8),
                                             ),
                                           ],
                                         ),
-                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 14,
+                                        ),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               project.description3Heading,
-                                              style: GoogleFonts.pangolin(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                                              style: GoogleFonts.pangolin(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
                                             ),
                                             const SizedBox(height: 8),
                                             Text(
                                               project.description3,
-                                              style: GoogleFonts.delius(fontSize: 16, height: 1.5, color: Colors.white),
+                                              style: GoogleFonts.delius(
+                                                fontSize: 16,
+                                                height: 1.5,
+                                                color: Colors.white,
+                                              ),
                                               maxLines: null,
                                               overflow: TextOverflow.visible,
                                             ),
@@ -529,28 +657,49 @@ if (project.tagline.trim().isNotEmpty) ...[
                                               Color(0x66121A2E),
                                             ],
                                           ),
-                                          borderRadius: BorderRadius.circular(14),
-                                          border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.0),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.white.withOpacity(
+                                              0.18,
+                                            ),
+                                            width: 1.0,
+                                          ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(0.22),
+                                              color: Colors.black.withOpacity(
+                                                0.22,
+                                              ),
                                               blurRadius: 16,
                                               offset: const Offset(0, 8),
                                             ),
                                           ],
                                         ),
-                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 14,
+                                        ),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               project.description4Heading,
-                                              style:GoogleFonts.pangolin(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                                              style: GoogleFonts.pangolin(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
                                             ),
                                             const SizedBox(height: 8),
                                             Text(
                                               project.description4,
-                                              style: GoogleFonts.delius(fontSize: 16, height: 1.5, color: Colors.white),
+                                              style: GoogleFonts.delius(
+                                                fontSize: 16,
+                                                height: 1.5,
+                                                color: Colors.white,
+                                              ),
                                               maxLines: null,
                                               overflow: TextOverflow.visible,
                                             ),
@@ -573,28 +722,49 @@ if (project.tagline.trim().isNotEmpty) ...[
                                               Color(0x66121A2E),
                                             ],
                                           ),
-                                          borderRadius: BorderRadius.circular(14),
-                                          border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.0),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.white.withOpacity(
+                                              0.18,
+                                            ),
+                                            width: 1.0,
+                                          ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(0.22),
+                                              color: Colors.black.withOpacity(
+                                                0.22,
+                                              ),
                                               blurRadius: 16,
                                               offset: const Offset(0, 8),
                                             ),
                                           ],
                                         ),
-                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 14,
+                                        ),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               project.description5Heading,
-                                              style: GoogleFonts.pangolin(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                                              style: GoogleFonts.pangolin(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
                                             ),
                                             const SizedBox(height: 8),
                                             Text(
                                               project.description5,
-                                              style: GoogleFonts.delius(fontSize: 16, height: 1.5, color: Colors.white),
+                                              style: GoogleFonts.delius(
+                                                fontSize: 16,
+                                                height: 1.5,
+                                                color: Colors.white,
+                                              ),
                                               maxLines: null,
                                               overflow: TextOverflow.visible,
                                             ),
@@ -606,93 +776,170 @@ if (project.tagline.trim().isNotEmpty) ...[
                                   ],
                                 ),
                               ),
-// Youtube Video Thumbnail (clickable)
-if (youtubeThumbnailUrl != null) ...[
-  Padding(
-    padding: EdgeInsets.symmetric(
-      horizontal: MediaQuery.of(context).size.width < 600 ? 8.0 : 16.0,
-    ),
-    child: Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xCC0B132B),
-            Color(0x99112233),
-            Color(0x66121A2E),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.22),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(8),
-      child: Center(
-        child: GestureDetector(
-          onTap: () => _launchYouTubeUrl(project.youtubeUrl),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Thumbnail with max size
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12.0),
-                child: Image.network(
-                  youtubeThumbnailUrl,
-                  fit: BoxFit.cover,
-                  width: MediaQuery.of(context).size.width < 600 ? 320 : 560,
-                  height: MediaQuery.of(context).size.width < 600 ? 180 : 315,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey[300],
-                    width: MediaQuery.of(context).size.width < 600 ? 320 : 560,
-                    height: MediaQuery.of(context).size.width < 600 ? 180 : 315,
-                    child: const Icon(Icons.broken_image, size: 50, color: Colors.white),
-                  ),
-                ),
-              ),
+                              // Youtube Video Thumbnail (clickable)
+                              if (youtubeThumbnailUrl != null) ...[
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal:
+                                        MediaQuery.of(context).size.width < 600
+                                            ? 8.0
+                                            : 16.0,
+                                  ),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Color(0xCC0B132B),
+                                          Color(0x99112233),
+                                          Color(0x66121A2E),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.18),
+                                        width: 1.0,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.22),
+                                          blurRadius: 16,
+                                          offset: const Offset(0, 8),
+                                        ),
+                                      ],
+                                    ),
+                                    padding: const EdgeInsets.all(8),
+                                    child: Center(
+                                      child: GestureDetector(
+                                        onTap:
+                                            () => _launchYouTubeUrl(
+                                              project.youtubeUrl,
+                                            ),
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // Thumbnail with max size
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12.0),
+                                              child: Image.network(
+                                                youtubeThumbnailUrl,
+                                                fit: BoxFit.cover,
+                                                width:
+                                                    MediaQuery.of(
+                                                              context,
+                                                            ).size.width <
+                                                            600
+                                                        ? 320
+                                                        : 560,
+                                                height:
+                                                    MediaQuery.of(
+                                                              context,
+                                                            ).size.width <
+                                                            600
+                                                        ? 180
+                                                        : 315,
+                                                errorBuilder:
+                                                    (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) => Container(
+                                                      color: Colors.grey[300],
+                                                      width:
+                                                          MediaQuery.of(
+                                                                    context,
+                                                                  ).size.width <
+                                                                  600
+                                                              ? 320
+                                                              : 560,
+                                                      height:
+                                                          MediaQuery.of(
+                                                                    context,
+                                                                  ).size.width <
+                                                                  600
+                                                              ? 180
+                                                              : 315,
+                                                      child: const Icon(
+                                                        Icons.broken_image,
+                                                        size: 50,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                              ),
+                                            ),
 
-              // ElevatedButton with PNG
-              MouseRegion(
-                onEnter: (_) => setState(() => _isPlayButtonHovered = true),
-                onExit: (_) => setState(() => _isPlayButtonHovered = false),
-                child: AnimatedScale(
-                  
-                  scale: _isPlayButtonHovered ? 1.15 : 1.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.black.withOpacity(0.35),
-                      elevation: 12,
-                      padding: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    onPressed: () => _launchYouTubeUrl(project.youtubeUrl),
-                    child: Image.asset(
-                      'assets/images/youtube.png', // PNG path
-                      width: MediaQuery.of(context).size.width < 600 ? 80 : 100,
-                      height: MediaQuery.of(context).size.width < 600 ? 80 : 100,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
-  ),
-  const SizedBox(height: 24),
-],
+                                            // ElevatedButton with PNG
+                                            MouseRegion(
+                                              onEnter:
+                                                  (_) => setState(
+                                                    () =>
+                                                        _isPlayButtonHovered =
+                                                            true,
+                                                  ),
+                                              onExit:
+                                                  (_) => setState(
+                                                    () =>
+                                                        _isPlayButtonHovered =
+                                                            false,
+                                                  ),
+                                              child: AnimatedScale(
+                                                scale:
+                                                    _isPlayButtonHovered
+                                                        ? 1.15
+                                                        : 1.0,
+                                                duration: const Duration(
+                                                  milliseconds: 200,
+                                                ),
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    shadowColor: Colors.black
+                                                        .withOpacity(0.35),
+                                                    elevation: 12,
+                                                    padding: EdgeInsets.zero,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  onPressed:
+                                                      () => _launchYouTubeUrl(
+                                                        project.youtubeUrl,
+                                                      ),
+                                                  child: Image.asset(
+                                                    'assets/images/youtube.png', // PNG path
+                                                    width:
+                                                        MediaQuery.of(
+                                                                  context,
+                                                                ).size.width <
+                                                                600
+                                                            ? 80
+                                                            : 100,
+                                                    height:
+                                                        MediaQuery.of(
+                                                                  context,
+                                                                ).size.width <
+                                                                600
+                                                            ? 80
+                                                            : 100,
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                              ],
                             ],
                           ),
                         ),

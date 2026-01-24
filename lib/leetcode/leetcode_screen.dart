@@ -1,9 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:portfolio/home_screen.dart';
 import 'package:portfolio/leetcode/leet_contribution.dart';
-
 
 class LeetcodeScreen extends StatefulWidget {
   const LeetcodeScreen({super.key});
@@ -25,10 +24,7 @@ class _LeetcodeScreenState extends State<LeetcodeScreen> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color(0xFF0B1020),
-                Color(0xFF101828),
-              ],
+              colors: [Color(0xFF0B1020), Color(0xFF101828)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -41,30 +37,32 @@ class _LeetcodeScreenState extends State<LeetcodeScreen> {
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
-                );
+                context.go('/home');
               },
               icon: const Icon(Icons.arrow_back, color: Colors.white),
-              label: MediaQuery.of(context).size.width < 600
-                  ? const Text(
-                      "Back",
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    )
-                  : const Text(
-                      "Back",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
+              label:
+                  MediaQuery.of(context).size.width < 600
+                      ? const Text(
+                        "Back",
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      )
+                      : const Text(
+                        "Back",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.white),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 backgroundColor: Colors.transparent,
-                padding: MediaQuery.of(context).size.width < 600
-                    ? const EdgeInsets.symmetric(horizontal: 8, vertical: 8)
-                    : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    MediaQuery.of(context).size.width < 600
+                        ? const EdgeInsets.symmetric(horizontal: 8, vertical: 8)
+                        : const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
               ),
             ),
           ),
@@ -87,15 +85,16 @@ class _LeetcodeScreenState extends State<LeetcodeScreen> {
               // Main content
               SingleChildScrollView(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
                           child: Text(
                             'Leetcode',
                             style: GoogleFonts.comfortaa(
@@ -125,7 +124,10 @@ class _LeetcodeScreenState extends State<LeetcodeScreen> {
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                 ),
-                                border: Border.all(color: Colors.cyanAccent.withOpacity(0.14), width: 1.2),
+                                border: Border.all(
+                                  color: Colors.cyanAccent.withOpacity(0.14),
+                                  width: 1.2,
+                                ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.35),
@@ -155,7 +157,7 @@ class _LeetcodeScreenState extends State<LeetcodeScreen> {
                                         ),
                                         child: ClipOval(
                                           child: Image.asset(
-                                            'assets/images/LeetcodeScreen.png', 
+                                            'assets/images/LeetcodeScreen.png',
                                             height: 38,
                                             width: 38,
                                             fit: BoxFit.contain,
@@ -200,17 +202,20 @@ class _LeetcodeScreenState extends State<LeetcodeScreen> {
                                       //   },
                                       // ),
                                       child: LeetCodeContributionsWidget(
-  username: 'pratikkumarpradhan', // 🔹 your LeetCode username
-  height: 220,
-  contributionColors: [
-    Colors.green.shade200,
-    Colors.green.shade400,
-    Colors.green.shade600,
-    Colors.green.shade800,
-  ],
-  emptyColor: Colors.grey.shade900,
-  backgroundColor: const Color(0xFF0B1020),
-)
+                                        username:
+                                            'pratikkumarpradhan', // 🔹 your LeetCode username
+                                        height: 220,
+                                        contributionColors: [
+                                          Colors.green.shade200,
+                                          Colors.green.shade400,
+                                          Colors.green.shade600,
+                                          Colors.green.shade800,
+                                        ],
+                                        emptyColor: Colors.grey.shade900,
+                                        backgroundColor: const Color(
+                                          0xFF0B1020,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 12),
@@ -220,24 +225,54 @@ class _LeetcodeScreenState extends State<LeetcodeScreen> {
                                     children: [
                                       Text(
                                         'Less',
-                                        style: GoogleFonts.poppins(color: Colors.white70, fontSize: 10),
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white70,
+                                          fontSize: 10,
+                                        ),
                                       ),
                                       const SizedBox(width: 4),
-                                      Container(width: 10, height: 10, color: const Color(0xff161b22)),
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        color: const Color(0xff161b22),
+                                      ),
                                       const SizedBox(width: 2),
-                                      Container(width: 10, height: 10, color: const Color(0xFF40C463)),
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        color: const Color(0xFF40C463),
+                                      ),
                                       const SizedBox(width: 2),
-                                      Container(width: 10, height: 10, color: const Color(0xFF7BC96F)),
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        color: const Color(0xFF7BC96F),
+                                      ),
                                       const SizedBox(width: 2),
-                                      Container(width: 10, height: 10, color: const Color(0xFF9BE9A8)),
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        color: const Color(0xFF9BE9A8),
+                                      ),
                                       const SizedBox(width: 2),
-                                      Container(width: 10, height: 10, color: const Color(0xFFB8E6B8)),
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        color: const Color(0xFFB8E6B8),
+                                      ),
                                       const SizedBox(width: 2),
-                                      Container(width: 10, height: 10, color: const Color(0xFFD4F4D4)),
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        color: const Color(0xFFD4F4D4),
+                                      ),
                                       const SizedBox(width: 4),
                                       Text(
                                         'More',
-                                        style: GoogleFonts.poppins(color: Colors.white70, fontSize: 10),
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white70,
+                                          fontSize: 10,
+                                        ),
                                       ),
                                     ],
                                   ),
