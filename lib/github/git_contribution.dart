@@ -90,10 +90,14 @@ class _GitHubContributionsWidgetState extends State<GitHubContributionsWidget> {
 
   Future<void> _fetchAllYears() async {
     final List<ContributionDay> totalDays = [];
+    final currentYear = DateTime.now().year;
 
-    final result = await _fetchYearlyContributions(2025);
-    if (result != null) {
-      totalDays.addAll(result);
+    // Fetch from 2025 up to current year
+    for (int year = 2025; year <= currentYear; year++) {
+      final result = await _fetchYearlyContributions(year);
+      if (result != null) {
+        totalDays.addAll(result);
+      }
     }
 
     if (mounted) {
@@ -230,9 +234,15 @@ class _GitHubContributionsWidgetState extends State<GitHubContributionsWidget> {
   Map<String, List<ContributionDay>> _groupByMonth() {
     final Map<String, List<ContributionDay>> monthGroups = {};
     for (var day in _allDays) {
-      if (day.date.year == 2025 &&
-          day.date.month >= 4 &&
-          day.date.month <= 12) {
+      // Show from April 2025 onwards
+      final isAfterStart =
+          (day.date.year == 2025 && day.date.month >= 4) || (day.date.year > 2025);
+
+      // Limit to February 2026
+      final isBeforeEnd =
+          (day.date.year == 2026 && day.date.month <= 2) || (day.date.year < 2026);
+
+      if (isAfterStart && isBeforeEnd) {
         final key = DateFormat('yyyy-MM').format(day.date);
         monthGroups.putIfAbsent(key, () => []).add(day);
       }
