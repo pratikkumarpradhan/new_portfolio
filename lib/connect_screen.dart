@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:portfolio/login/login_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui';
 import 'dart:async';
@@ -203,6 +202,7 @@ class AboutScreen extends StatelessWidget {
           },
         ),
       ),
+      
     ];
   }
 }
@@ -402,7 +402,7 @@ class _GetInTouchCardState extends State<GetInTouchCard> {
                 const SizedBox(height: 16),
                 Text(
                   isLoggedIn
-                      ? 'Logged in as: ${user?.email ?? "Unknown"}'
+                      ? 'Logged in as: ${user.email ?? "Unknown"}'
                       : 'Please sign in to send a message',
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                   textAlign: TextAlign.center,

@@ -824,11 +824,11 @@ class _BlogScreenState extends State<BlogScreen> {
 }
 
 class PostConnector extends StatelessWidget {
-  const PostConnector();
+  const PostConnector({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 16,
       child: Column(
         children: [

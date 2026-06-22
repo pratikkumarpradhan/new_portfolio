@@ -63,7 +63,7 @@ class _AddSkillDialogState extends State<AddSkillDialog> {
                   ),
                   const SizedBox(height: 18),
                   DropdownButtonFormField<String>(
-                    value: category.isNotEmpty ? category : null,
+                    initialValue: category.isNotEmpty ? category : null,
                     items: categories.map((cat) => DropdownMenuItem(
                       value: cat,
                       child: Text(cat, style: const TextStyle(color: Colors.white)),

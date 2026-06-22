@@ -674,7 +674,7 @@ class _PhoneMockupState extends State<PhoneMockup> {
         if (Theme.of(context).platform == TargetPlatform.android ||
             Theme.of(context).platform == TargetPlatform.iOS) {
           ScrollableState? scrollableState = Scrollable.of(context);
-          scrollableState?.position?.activity?.dispose();
+          scrollableState.position.activity?.dispose();
         }
       },
       onPointerMove: (event) {

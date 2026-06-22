@@ -63,10 +63,10 @@ class _LearningScreenState extends State<LearningScreen> {
 
   /// 🟩 Dialog to add new experience card (with checkbox for new section)
   Future<void> _showAddExperienceDialog() async {
-    final _titleController = TextEditingController();
-    final _optionalController = TextEditingController(); // <-- new
-    final _descController = TextEditingController();
-    bool _startNewSection = false;
+    final titleController = TextEditingController();
+    final optionalController = TextEditingController(); // <-- new
+    final descController = TextEditingController();
+    bool startNewSection = false;
 
     await showDialog(
       context: context,
@@ -79,7 +79,7 @@ class _LearningScreenState extends State<LearningScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
-                    controller: _titleController,
+                    controller: titleController,
                     decoration: const InputDecoration(
                       labelText: "Title (optional)",
                     ),
@@ -87,14 +87,14 @@ class _LearningScreenState extends State<LearningScreen> {
 
                   // 🔹 Optional Middle Text Field
                   TextField(
-                    controller: _optionalController,
+                    controller: optionalController,
                     decoration: const InputDecoration(
                       labelText: "Optional Text",
                     ),
                   ),
 
                   TextField(
-                    controller: _descController,
+                    controller: descController,
                     decoration: const InputDecoration(
                       labelText: "Description *",
                       hintText: "Write about your experience...",
@@ -103,9 +103,9 @@ class _LearningScreenState extends State<LearningScreen> {
                   ),
                   const SizedBox(height: 8),
                   CheckboxListTile(
-                    value: _startNewSection,
+                    value: startNewSection,
                     onChanged: (val) {
-                      setStateDialog(() => _startNewSection = val ?? false);
+                      setStateDialog(() => startNewSection = val ?? false);
                     },
                     title: const Text("Start new section (no line above)"),
                     controlAffinity: ListTileControlAffinity.leading,
@@ -123,7 +123,7 @@ class _LearningScreenState extends State<LearningScreen> {
             ElevatedButton(
               child: const Text("Add"),
               onPressed: () async {
-                if (_descController.text.trim().isEmpty) {
+                if (descController.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Description cannot be empty."),
@@ -141,14 +141,14 @@ class _LearningScreenState extends State<LearningScreen> {
                 await FirebaseFirestore.instance.collection('journeySteps').add(
                   {
                     'title':
-                        _titleController.text.trim().isEmpty
+                        titleController.text.trim().isEmpty
                             ? 'Untitled Step'
-                            : _titleController.text.trim(),
+                            : titleController.text.trim(),
                     'optionalText':
-                        _optionalController.text.trim(), // <-- save it
-                    'description': _descController.text.trim(),
+                        optionalController.text.trim(), // <-- save it
+                    'description': descController.text.trim(),
                     'order': order,
-                    'isNewSection': _startNewSection,
+                    'isNewSection': startNewSection,
                   },
                 );
 
@@ -582,7 +582,7 @@ class _LearningScreenState extends State<LearningScreen> {
                   // 🔹 Optional Middle Text
                   if (hasOptionalText) ...[
                     Text(
-                      optionalText!,
+                      optionalText,
                       style: GoogleFonts.tinos(
                         color: Colors.amberAccent.shade200, // new color
                         fontSize:

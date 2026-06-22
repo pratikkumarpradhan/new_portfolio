@@ -2071,8 +2071,9 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                                     .toList();
                                             if (newIndex < 0 ||
                                                 newIndex >=
-                                                    categorySkills.length)
+                                                    categorySkills.length) {
                                               return;
+                                            }
                                             final movedSkill =
                                                 categorySkills[oldIndex];
                                             categorySkills.removeAt(oldIndex);
@@ -2443,8 +2444,9 @@ class _SkillsScreenState extends State<SkillsScreen> {
                                                         .toList();
                                                 if (newIndex < 0 ||
                                                     newIndex >=
-                                                        categorySkills.length)
+                                                        categorySkills.length) {
                                                   return;
+                                                }
                                                 final movedSkill =
                                                     categorySkills[oldIndex];
                                                 categorySkills.removeAt(
@@ -2603,7 +2605,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
   }
 
   void _showEditSkillDialog(BuildContext context, SkillItem skill) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     String category = skill.category;
     String name = skill.name;
     String iconUrl = skill.iconUrl ?? '';
@@ -2625,7 +2627,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
                   vertical: 24,
                 ),
                 child: Form(
-                  key: _formKey,
+                  key: formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -2670,7 +2672,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
                       ),
                       const SizedBox(height: 18),
                       DropdownButtonFormField<String>(
-                        value: category,
+                        initialValue: category,
                         items:
                             categories
                                 .map(
@@ -2814,7 +2816,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
                               ),
                             ),
                             onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
+                              if (formKey.currentState!.validate()) {
                                 try {
                                   await FirebaseFirestore.instance
                                       .collection('skills')
@@ -2933,7 +2935,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
   }
 
   void _showEditCategoryDialog(BuildContext context, String category) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     String newCategoryName = category;
     final categories = ['Languages', 'Framework', 'Databases', 'Tools'];
 
@@ -2954,9 +2956,9 @@ class _SkillsScreenState extends State<SkillsScreen> {
             ),
           ),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: DropdownButtonFormField<String>(
-              value: newCategoryName,
+              initialValue: newCategoryName,
               items:
                   categories
                       .map(
@@ -3002,7 +3004,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
                 ),
               ),
               onPressed: () async {
-                if (_formKey.currentState!.validate()) {
+                if (formKey.currentState!.validate()) {
                   try {
                     final query =
                         await FirebaseFirestore.instance

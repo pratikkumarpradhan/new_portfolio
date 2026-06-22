@@ -13,7 +13,7 @@ import 'package:portfolio/login/register_screen.dart';
 final GoRouter appRouter = GoRouter(
   initialLocation: '/home',
   routes: <RouteBase>[
-    GoRoute(path: '/', redirect: (_, __) => '/home'),
+    GoRoute(path: '/', redirect: (_, _) => '/home'),
 
     // Main website-style pages (render inside HomeScreen's PageView).
     GoRoute(
@@ -72,7 +72,7 @@ final GoRouter appRouter = GoRouter(
             child: const HomeScreen(initialScreenType: 'about'),
           ),
     ),
-    GoRoute(path: '/contact', redirect: (_, __) => '/about'),
+    GoRoute(path: '/contact', redirect: (_, _) => '/about'),
     GoRoute(
       path: '/blog',
       pageBuilder:

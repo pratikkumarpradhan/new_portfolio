@@ -477,10 +477,10 @@ class _PortfolioWebScreenState extends State<PortfolioWebScreen> {
                       builder: (_) => const AddProjectScreen(isWebDev: true),
                     ),
                   );
-                },
-                child: const Icon(Icons.add), // Only + icon
+                }, // Only + icon
                 backgroundColor: Colors.cyanAccent,
                 foregroundColor: Colors.black,
+                child: const Icon(Icons.add),
               )
               : null,
     );
@@ -544,16 +544,18 @@ class _TabletMockupState extends State<TabletMockup> {
     return Listener(
       onPointerMove: (event) {
         final box = context.findRenderObject() as RenderBox?;
-        if (box != null)
+        if (box != null) {
           _updateTilt(box.globalToLocal(event.position), box.size);
+        }
       },
       onPointerUp: (_) => _resetTilt(),
       onPointerCancel: (_) => _resetTilt(),
       child: MouseRegion(
         onHover: (event) {
           final box = context.findRenderObject() as RenderBox?;
-          if (box != null)
+          if (box != null) {
             _updateTilt(box.globalToLocal(event.position), box.size);
+          }
         },
         onExit: (_) => _resetTilt(),
         child: ElevatedButton(

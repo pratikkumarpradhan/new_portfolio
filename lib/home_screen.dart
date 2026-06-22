@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolio/blogs/blog_screen.dart';
@@ -611,7 +610,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showAddButtonDialog() {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     String title = '';
     String screenType = 'home';
     bool showOnHome = true;
@@ -643,7 +642,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -667,7 +666,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: screenType,
+                  initialValue: screenType,
                   items:
                       screenTypes
                           .map(
@@ -733,7 +732,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               onPressed: () async {
-                if (_formKey.currentState!.validate()) {
+                if (formKey.currentState!.validate()) {
                   try {
                     final newOrder =
                         navigationButtons.isEmpty
@@ -782,7 +781,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showEditButtonDialog(NavigationButton button) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     String title = button.title;
     String screenType = button.screenType;
     bool showOnHome = button.showOnHome;
@@ -814,7 +813,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -839,7 +838,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: screenType,
+                  initialValue: screenType,
                   items:
                       screenTypes
                           .map(
@@ -905,7 +904,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               onPressed: () async {
-                if (_formKey.currentState!.validate()) {
+                if (formKey.currentState!.validate()) {
                   try {
                     await FirebaseFirestore.instance
                         .collection('navigationButtons')
@@ -2243,8 +2242,9 @@ class _HoverZoomButton extends StatefulWidget {
     this.onDelete,
     this.onMoveUp,
     this.onMoveDown,
-    this.fontSize,
-    this.padding,
+      this.fontSize,
+
+  this.padding,
   });
 
   @override
