@@ -2,6 +2,8 @@ class PortfolioProject {
   final String title;
   final String overview;
   final String tagline;
+  final String playStoreUrl;
+  final String downloadUrl;
   final String youtubeUrl;
   final String description1Heading;
   final String description1;
@@ -20,6 +22,9 @@ class PortfolioProject {
     required this.title,
     required this.overview,
     required this.tagline,
+    required this.playStoreUrl,
+
+    required this.downloadUrl,
     required this.youtubeUrl,
     required this.description1Heading,
     required this.description1,
@@ -41,6 +46,10 @@ class PortfolioProject {
       overview: map['overview'] ?? '',
       tagline: map['tagline'] ?? '',
       youtubeUrl: map['youtube_url'] ?? '',
+
+      playStoreUrl: map['play_store_url'] ?? '',
+      downloadUrl: map['download_url'] ?? '',
+
       description1Heading: map['description1_heading'] ?? 'Overview',
       description1: map['description1'] ?? '',
       description2Heading: map['description2_heading'] ?? 'Technical Details',
@@ -62,6 +71,10 @@ class PortfolioProject {
       'overview': overview,
       'tagline': tagline,
       'youtube_url': youtubeUrl,
+
+      'play_store_url': playStoreUrl,
+      'download_url': downloadUrl,
+
       'description1_heading': description1Heading,
       'description1': description1,
       'description2_heading': description2Heading,

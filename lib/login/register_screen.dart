@@ -29,6 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(cred.user!.uid)
@@ -38,7 +39,10 @@ class _RegisterPageState extends State<RegisterPage> {
             'createdAt': FieldValue.serverTimestamp(),
             'role': 'normaluser',
           });
-      if (mounted) Navigator.pop(context);
+
+      if (mounted) {
+        context.go('/home');
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         _error = e.message;

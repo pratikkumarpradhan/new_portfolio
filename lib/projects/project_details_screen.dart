@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolio/projects/project_screen.dart';
@@ -20,7 +22,6 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   int _currentIndex = 0;
   Timer? _autoScrollTimer;
   // Removed YoutubePlayerController
-
   bool _isPlayButtonHovered = false;
 
   @override
@@ -442,6 +443,113 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                                       color: Colors.white,
                                     ),
                                     textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                              if (project.playStoreUrl.isNotEmpty ||
+                                  project.downloadUrl.isNotEmpty) ...[
+                                const SizedBox(height: 20),
+
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Color(0xCC0B132B),
+                                          Color(0x99112233),
+                                          Color(0x66121A2E),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.18),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.25),
+                                          blurRadius: 18,
+                                          offset: const Offset(0, 8),
+                                        ),
+                                      ],
+                                    ),
+                                    padding: const EdgeInsets.all(18),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(14),
+                                          decoration: BoxDecoration(
+                                            color: Colors.cyanAccent
+                                                .withOpacity(0.12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.download_rounded,
+                                            color: Colors.cyanAccent,
+                                            size: 30,
+                                          ),
+                                        ),
+
+                                        const SizedBox(width: 16),
+
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Download App",
+                                                style: GoogleFonts.poppins(
+                                                  color: Colors.white,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                project.playStoreUrl.isNotEmpty
+                                                    ? "Available on Google Play Store"
+                                                    : "APK Download Available",
+                                                style: const TextStyle(
+                                                  color: Colors.white70,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        ElevatedButton.icon(
+                                          icon: const Icon(Icons.open_in_new),
+                                          label: const Text("Open"),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.cyanAccent,
+                                            foregroundColor: Colors.black,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 18,
+                                              vertical: 12,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            final url =
+                                                project.playStoreUrl.isNotEmpty
+                                                    ? project.playStoreUrl
+                                                    : project.downloadUrl;
+
+                                            _openUrl(url);
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -953,5 +1061,45 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _openUrl(String url) async {
+    if (url.trim().isEmpty) return;
+
+    String finalUrl = url.trim();
+
+    if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+      finalUrl = 'https://$finalUrl';
+    }
+
+    final Uri webUri = Uri.parse(finalUrl);
+
+    try {
+      // 🌐 WEB
+      if (kIsWeb) {
+        await launchUrl(webUri, webOnlyWindowName: '_blank');
+        return;
+      }
+
+      // 📱 ANDROID - Open Play Store App
+      if (Platform.isAndroid &&
+          finalUrl.contains('play.google.com/store/apps/details')) {
+        final appId = webUri.queryParameters['id'];
+
+        if (appId != null) {
+          final Uri playStoreUri = Uri.parse('market://details?id=$appId');
+
+          if (await canLaunchUrl(playStoreUri)) {
+            await launchUrl(playStoreUri, mode: LaunchMode.externalApplication);
+            return;
+          }
+        }
+      }
+
+      // 📱 Fallback (Android/iOS/Desktop)
+      await launchUrl(webUri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('URL Launch Error: $e');
+    }
   }
 }

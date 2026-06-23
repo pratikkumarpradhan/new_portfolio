@@ -238,7 +238,7 @@ class _GitHubContributionsWidgetState extends State<GitHubContributionsWidget> {
 
       // Limit to February 2026
       final isBeforeEnd =
-          (day.date.year == 2026 && day.date.month <= 2) || (day.date.year < 2026);
+          (day.date.year == 2026 && day.date.month <= 6) || (day.date.year < 2026);
 
       if (isAfterStart && isBeforeEnd) {
         final key = DateFormat('yyyy-MM').format(day.date);

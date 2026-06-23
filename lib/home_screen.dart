@@ -1988,7 +1988,7 @@ class _HomePageState extends State<HomePage>
                     onTap: () async {
                       // const url = 'https://qrr.to/bf04e34f';
                       const url =
-                          'https://drive.google.com/file/d/1veGLSM5Z2nX0DRHuXFI6DQLNfxDNoLYo/view?';
+                          'https://drive.google.com/file/d/1L_sr-mSMQYXEBrOOzX_A-U7kNb4jXtuG/view?usp=drivesdk';
                       final uri = Uri.parse(url);
 
                       if (await canLaunchUrl(uri)) {
